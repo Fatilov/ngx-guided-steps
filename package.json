@@ -7,7 +7,8 @@
     "build:dev": "ng build demo --configuration=development",
     "serve": "ng serve demo",
     "build:lib": "ng build wanejoyhint --configuration=production",
-    "lint": "tsc --noEmit --project demo/tsconfig.app.json"
+    "lint": "tsc --noEmit --project demo/tsconfig.app.json",
+    "test": "jest --config jest.config.ts"
   },
   "repository": {
     "type": "git",
@@ -40,7 +41,13 @@
     "@angular/compiler": "^18.0.0",
     "@angular/compiler-cli": "^18.0.0",
     "@playwright/test": "^1.58.2",
+    "@types/jest": "^30.0.0",
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jest-preset-angular": "^16.1.1",
+    "ng-packagr": "^18.2.1",
     "playwright-core": "^1.52.0",
+    "ts-jest": "^29.4.6",
     "typescript": "~5.4.0"
   }
 }

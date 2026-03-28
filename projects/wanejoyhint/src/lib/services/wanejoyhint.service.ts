@@ -320,7 +320,10 @@ export class WanejoyhintService {
       case 'key': {
         const handler = (e: Event) => {
           const keyEvent = e as KeyboardEvent;
-          if (step.keyCode && keyEvent.keyCode === step.keyCode) {
+          const match = step.key
+            ? keyEvent.key === step.key
+            : step.keyCode ? keyEvent.keyCode === step.keyCode : false;
+          if (match) {
             this.currentStep++;
             this.executeStep();
           }

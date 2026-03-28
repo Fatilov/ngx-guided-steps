@@ -1,0 +1,13 @@
+{
+  "extends": "./projects/wanejoyhint/tsconfig.lib.json",
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "types": ["jest"],
+    "esModuleInterop": true
+  },
+  "include": [
+    "projects/wanejoyhint/src/**/*.ts",
+    "projects/wanejoyhint/src/**/*.spec.ts",
+    "setup-jest.ts"
+  ]
+}

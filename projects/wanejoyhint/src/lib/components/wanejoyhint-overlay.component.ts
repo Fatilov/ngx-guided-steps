@@ -52,10 +52,19 @@ export interface OverlayState {
       [class.wjh-hidden]="!state.visible"
       [class.wjh-transparent]="animating"
       [style.z-index]="config.zIndex"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="'Step ' + (state.stepIndex + 1) + ' of ' + state.totalSteps"
     >
+      <!-- Live region for screen readers -->
+      <div class="wjh-sr-only" aria-live="polite" aria-atomic="true">
+        {{ liveAnnouncement }}
+      </div>
+
       <!-- SVG overlay with cutout -->
       <svg
         class="wjh-svg"
+        aria-hidden="true"
       >
         <defs>
           <mask [attr.id]="maskId">
@@ -135,63 +144,73 @@ export interface OverlayState {
         class="wjh-event-blocker wjh-blocker-top"
         [style.height.px]="blockerTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
+        aria-hidden="true"
       ></div>
       <div
         *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-bottom"
         [style.top.px]="blockerBottomTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
+        aria-hidden="true"
       ></div>
       <div
         *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-left"
         [style.width.px]="blockerLeftWidth"
         [style.z-index]="(config.zIndex || 1010) + 1"
+        aria-hidden="true"
       ></div>
       <div
         *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-right"
         [style.left.px]="blockerRightLeft"
         [style.z-index]="(config.zIndex || 1010) + 1"
+        aria-hidden="true"
       ></div>
 
       <!-- Buttons -->
-      <div
+      <button
         *ngIf="showPrev && buttonPos"
+        type="button"
         class="wjh-btn wjh-prev-btn"
         [class]="prevBtnClass"
         [style.left.px]="buttonPos.prev.x"
         [style.top.px]="buttonPos.prev.y"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onPrevClick()"
-      >{{ prevBtnText }}</div>
+      >{{ prevBtnText }}</button>
 
-      <div
+      <button
         *ngIf="showNext && buttonPos"
+        #firstFocusable
+        type="button"
         class="wjh-btn wjh-next-btn"
         [class]="nextBtnClass"
         [style.left.px]="buttonPos.next.x"
         [style.top.px]="buttonPos.next.y"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onNextClick()"
-      >{{ nextBtnText }}</div>
+      >{{ nextBtnText }}</button>
 
-      <div
+      <button
         *ngIf="showSkip && buttonPos"
+        type="button"
         class="wjh-btn wjh-skip-btn"
         [class]="skipBtnClass"
         [style.left.px]="buttonPos.skip.x"
         [style.top.px]="buttonPos.skip.y"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onSkipClick()"
-      >{{ skipBtnText }}</div>
+      >{{ skipBtnText }}</button>
 
       <!-- Close button -->
-      <div
+      <button
+        type="button"
         class="wjh-close-btn"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onSkipClick()"
-      ></div>
+        aria-label="Close tutorial"
+      ></button>
     </div>
   `,
   styles: [`
@@ -384,6 +403,26 @@ export interface OverlayState {
         top: max(6px, env(safe-area-inset-top, 0px));
       }
     }
+
+    /* Focus indicators */
+    .wjh-btn:focus-visible,
+    .wjh-close-btn:focus-visible {
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
+    /* Screen reader only */
+    .wjh-sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   `],
 })
 export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -439,6 +478,9 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     skip: { x: number; y: number };
   } | null = null;
 
+  // Accessibility
+  liveAnnouncement = '';
+
   // Callbacks set by the service
   _onNext: () => void = () => {};
   _onPrev: () => void = () => {};
@@ -477,6 +519,21 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
       .subscribe(() => {
         if (this.state.visible && this.state.step) {
           this.recalculate();
+        }
+      });
+
+    // ESC key to close
+    fromEvent<KeyboardEvent>(document, 'keydown')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((e) => {
+        if (!this.state.visible) return;
+        if (e.key === 'Escape') {
+          e.preventDefault();
+          this.onSkipClick();
+        }
+        // Focus trap: Tab/Shift+Tab cycle between visible buttons
+        if (e.key === 'Tab') {
+          this.trapFocus(e);
         }
       });
   }
@@ -588,6 +645,10 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     this.nextBtnClass = 'wjh-btn wjh-next-btn ' + (step.nextButton?.className || '');
     this.prevBtnClass = 'wjh-btn wjh-prev-btn ' + (step.prevButton?.className || '');
     this.skipBtnClass = 'wjh-btn wjh-skip-btn ' + (step.skipButton?.className || '');
+
+    // Update live announcement for screen readers
+    const plainText = step.description.replace(/<[^>]*>/g, '');
+    this.liveAnnouncement = `Step ${stepIndex + 1} of ${totalSteps}: ${plainText}`;
 
     // Compute cutout
     this.computeCutout(resolved);
@@ -748,5 +809,27 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
 
   onSkipClick(): void {
     this._onSkip();
+  }
+
+  private trapFocus(e: KeyboardEvent): void {
+    const host = document.getElementById('wanejoyhint-host');
+    if (!host) return;
+    const focusable = Array.from(host.querySelectorAll('button')) as HTMLElement[];
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === first || !host.contains(document.activeElement)) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last || !host.contains(document.activeElement)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
   }
 }

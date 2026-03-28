@@ -30,8 +30,11 @@ export interface WanejoyhintStep {
   /** Alternate CSS selector for the element that receives the event */
   eventSelector?: string;
 
-  /** Key code for 'key' event type */
+  /** Key code for 'key' event type (deprecated, use key instead) */
   keyCode?: number;
+
+  /** Key name for 'key' event type (e.g. 'Enter', 'Escape') */
+  key?: string;
 
   /** Show the Next button (default: depends on eventType) */
   showNext?: boolean;
