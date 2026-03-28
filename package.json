@@ -21,6 +21,9 @@
     "enjoyhint",
     "wanejoyhint"
   ],
+  "engines": {
+    "node": "20.x"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
