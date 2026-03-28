@@ -1,6 +1,6 @@
 import { WanejoyhintService } from './wanejoyhint.service';
 import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
-import { DEFAULT_CONFIG, DEFAULT_LABELS } from '../models/wanejoyhint-config.model';
+import { DEFAULT_CONFIG, DEFAULT_LABELS, WANEJOYHINT_ROUTER } from '../models/wanejoyhint-config.model';
 import { Subject } from 'rxjs';
 
 function createServiceManually(): WanejoyhintService {
@@ -300,6 +300,59 @@ describe('WanejoyhintService', () => {
         makeStep({ selector: '.nonexistent' }),
       ]);
       expect(service.validateSteps()).toEqual(['.nonexistent']);
+    });
+  });
+
+  describe('waitForSelector', () => {
+    it('should accept waitForSelector: true', () => {
+      const step = makeStep({ waitForSelector: true });
+      expect(step.waitForSelector).toBe(true);
+    });
+
+    it('should accept waitForSelector: 5000', () => {
+      const step = makeStep({ waitForSelector: 5000 });
+      expect(step.waitForSelector).toBe(5000);
+    });
+
+    it('should accept waitForSelector: false', () => {
+      const step = makeStep({ waitForSelector: false });
+      expect(step.waitForSelector).toBe(false);
+    });
+  });
+
+  describe('route', () => {
+    it('should accept route property', () => {
+      const step = makeStep({ route: '/dashboard' });
+      expect(step.route).toBe('/dashboard');
+    });
+
+    it('should allow step without route property', () => {
+      const step = makeStep();
+      expect(step.route).toBeUndefined();
+    });
+  });
+
+  describe('async onBeforeStart', () => {
+    it('should accept async onBeforeStart callback', () => {
+      const asyncOnBeforeStart = async () => { /* async implementation */ };
+      const step = makeStep({ onBeforeStart: asyncOnBeforeStart });
+      expect(step.onBeforeStart).toBeDefined();
+      expect(typeof step.onBeforeStart).toBe('function');
+    });
+
+    it('should still support sync onBeforeStart', () => {
+      const syncOnBeforeStart = () => { /* sync implementation */ };
+      const step = makeStep({ onBeforeStart: syncOnBeforeStart });
+      expect(step.onBeforeStart).toBeDefined();
+      expect(typeof step.onBeforeStart).toBe('function');
+    });
+  });
+
+  describe('WanejoyhintRouter token', () => {
+    it('should define WANEJOYHINT_ROUTER as an InjectionToken', () => {
+      expect(WANEJOYHINT_ROUTER).toBeDefined();
+      expect(typeof WANEJOYHINT_ROUTER).toBe('object');
+      expect(WANEJOYHINT_ROUTER.toString()).toContain('InjectionToken');
     });
   });
 });

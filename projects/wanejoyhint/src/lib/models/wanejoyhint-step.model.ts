@@ -72,8 +72,23 @@ export interface WanejoyhintStep {
   /** Auto-advance to the next step after this many milliseconds. Shows a countdown in the progress area. */
   autoAdvance?: number;
 
-  /** Callback fired before this step starts */
-  onBeforeStart?: () => void;
+  /**
+   * Wait for the selector to appear in the DOM before rendering the step.
+   * - `true`: poll every 200ms up to 10s (default timeout)
+   * - `number`: poll every 200ms up to this many ms
+   * - `false` or omitted: fail immediately if element not found
+   */
+  waitForSelector?: boolean | number;
+
+  /**
+   * Angular route to navigate to before executing this step.
+   * Requires a Router instance provided via `WANEJOYHINT_ROUTER` token or config.
+   * Example: '/dashboard', '/settings/profile'
+   */
+  route?: string;
+
+  /** Callback fired before this step starts. Can return a Promise to delay the step until resolved. */
+  onBeforeStart?: () => void | Promise<void>;
 
   /** Callback fired when user clicks Next on this step */
   onNext?: () => void;

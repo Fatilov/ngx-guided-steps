@@ -91,3 +91,28 @@ export const DEFAULT_CONFIG: WanejoyhintConfig = {
 export const WANEJOYHINT_CONFIG = new InjectionToken<WanejoyhintConfig>(
   'WANEJOYHINT_CONFIG'
 );
+
+/**
+ * Optional injection token for Angular Router.
+ * Provide this to enable route-based step navigation.
+ *
+ * @example
+ * ```typescript
+ * import { Router } from '@angular/router';
+ * import { WANEJOYHINT_ROUTER } from 'wanejoyhint';
+ *
+ * providers: [
+ *   { provide: WANEJOYHINT_ROUTER, useExisting: Router }
+ * ]
+ * ```
+ */
+export const WANEJOYHINT_ROUTER = new InjectionToken<WanejoyhintRouter>(
+  'WANEJOYHINT_ROUTER'
+);
+
+/**
+ * Minimal router interface - compatible with Angular Router without requiring @angular/router as a dependency.
+ */
+export interface WanejoyhintRouter {
+  navigate(commands: any[], extras?: any): Promise<boolean>;
+}

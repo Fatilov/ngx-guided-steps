@@ -581,6 +581,15 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     if (userConfig?.skipButtonText && !userConfig?.labels?.skip) this.labels.skip = userConfig.skipButtonText;
   }
 
+  /** Update config at runtime (called by service before each tour) */
+  updateConfig(cfg: Required<WanejoyhintConfig>): void {
+    this.config = cfg;
+    this.labels = { ...DEFAULT_LABELS, ...cfg.labels };
+    if (cfg.nextButtonText && !cfg.labels?.next) this.labels.next = cfg.nextButtonText;
+    if (cfg.prevButtonText && !cfg.labels?.prev) this.labels.prev = cfg.prevButtonText;
+    if (cfg.skipButtonText && !cfg.labels?.skip) this.labels.skip = cfg.skipButtonText;
+  }
+
   ngOnInit(): void {
     fromEvent(window, 'resize')
       .pipe(debounceTime(150), takeUntil(this.destroy$))
