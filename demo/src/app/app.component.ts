@@ -44,6 +44,9 @@ import {
           <button class="btn btn-secondary" id="btn-theme-tour" (click)="startThemeTour()">
             8. Theme sombre
           </button>
+          <button class="btn btn-accent" id="btn-auto-tour" (click)="startAutoAdvanceTour()">
+            9. Auto-avance + clavier + backdrop
+          </button>
         </div>
       </section>
 
@@ -866,6 +869,49 @@ export class AppComponent implements OnDestroy {
           };
         }
       },
+    });
+  }
+
+  // =============================================
+  // 9. AUTO-ADVANCE + Keyboard + Backdrop
+  // =============================================
+  startAutoAdvanceTour(): void {
+    this.clearDemoTimeouts();
+    this.log('--- Tour Auto-avance demarre ---', 'info');
+
+    const steps: WanejoyhintStep[] = [
+      {
+        selector: '#demo-header',
+        description: 'Cette etape avance <b>automatiquement</b> dans 5 secondes. Ou utilisez les fleches &larr; &rarr; du clavier!',
+        eventType: 'next',
+        autoAdvance: 5000,
+      },
+      {
+        selector: '#card-search',
+        description: 'Auto-avance dans 3 secondes. Vous pouvez aussi cliquer sur l\'overlay sombre pour quitter.',
+        eventType: 'next',
+        autoAdvance: 3000,
+        showPrev: true,
+      },
+      {
+        selector: '#card-profile',
+        description: 'Derniere etape. Pas d\'auto-avance ici. Cliquez Suivant ou fleche droite &rarr;',
+        eventType: 'next',
+        showPrev: true,
+      },
+    ];
+
+    this.hint.setSteps(steps);
+    this.hint.run({
+      onStart: () => {
+        this.log('Auto: backdropDismiss + keyboardNav actifs', 'success');
+        const ref = (this.hint as any).overlayRef?.instance;
+        if (ref) {
+          ref.config = { ...ref.config, backdropDismiss: true, showProgress: true };
+        }
+      },
+      onEnd: () => this.log('Auto: Tour termine', 'success'),
+      onSkip: () => this.log('Auto: Tour ferme (backdrop ou ESC)', 'warn'),
     });
   }
 
