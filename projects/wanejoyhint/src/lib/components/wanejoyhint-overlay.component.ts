@@ -16,7 +16,9 @@ let nextInstanceId = 0;
 import {
   WanejoyhintConfig,
   DEFAULT_CONFIG,
+  DEFAULT_LABELS,
   WANEJOYHINT_CONFIG,
+  WanejoyhintLabels,
 } from '../models/wanejoyhint-config.model';
 import {
   WanejoyhintStep,
@@ -48,10 +50,12 @@ export interface OverlayState {
       class="wjh-overlay"
       [class.wjh-hidden]="!state.visible"
       [class.wjh-transparent]="animating"
+      [class.wjh-theme-dark]="config.theme === 'dark'"
+      [class.wjh-transitioning]="transitioning"
       [style.z-index]="config.zIndex"
       role="dialog"
       aria-modal="true"
-      [attr.aria-label]="'Step ' + (state.stepIndex + 1) + ' of ' + state.totalSteps"
+      [attr.aria-label]="dialogLabel"
     >
       <!-- Live region for screen readers -->
       <div class="wjh-sr-only" aria-live="polite" aria-atomic="true">
@@ -138,7 +142,7 @@ export interface OverlayState {
       >
         <span [innerHTML]="state.step.description"></span>
         @if (config.showProgress) {
-        <div class="wjh-progress">{{ state.stepIndex + 1 }} / {{ state.totalSteps }}</div>
+        <div class="wjh-progress">{{ progressText }}</div>
         }
       </div>
       }
@@ -215,7 +219,7 @@ export interface OverlayState {
         class="wjh-close-btn"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onSkipClick()"
-        aria-label="Close tutorial"
+        [attr.aria-label]="labels.close"
       ></button>
     </div>
   `,
@@ -426,11 +430,39 @@ export interface OverlayState {
       letter-spacing: 1px;
     }
 
+    /* Step transition */
+    .wjh-transitioning .wjh-label,
+    .wjh-transitioning .wjh-arrow,
+    .wjh-transitioning .wjh-btn,
+    .wjh-transitioning .wjh-close-btn {
+      opacity: 0;
+      transition: opacity 150ms ease-out;
+    }
+
+    /* Dark theme overrides */
+    .wjh-theme-dark {
+      --wjh-btn-color: #333;
+      --wjh-btn-hover-color: white;
+      --wjh-label-color: #222;
+      --wjh-close-btn-color: #555;
+      --wjh-oversized-bg: #e8e8e8;
+    }
+
+    .wjh-theme-dark .wjh-close-btn::before,
+    .wjh-theme-dark .wjh-close-btn::after {
+      background: #333;
+    }
+
     /* Focus indicators */
     .wjh-btn:focus-visible,
     .wjh-close-btn:focus-visible {
       outline: 2px solid white;
       outline-offset: 2px;
+    }
+
+    .wjh-theme-dark .wjh-btn:focus-visible,
+    .wjh-theme-dark .wjh-close-btn:focus-visible {
+      outline-color: #333;
     }
 
     /* Screen reader only */
@@ -456,6 +488,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   markerId = `wjh-arrow-marker-${this.instanceId}`;
 
   config: Required<WanejoyhintConfig>;
+  labels: Required<WanejoyhintLabels>;
   state: OverlayState = {
     visible: false,
     stepIndex: 0,
@@ -476,6 +509,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   arrowColor = 'rgb(255,255,255)';
   isOversized = false;
   animating = false;
+  transitioning = false;
+
+  // Computed label strings
+  dialogLabel = '';
+  progressText = '';
 
   // Blocker positions
   blockerTop = 0;
@@ -517,6 +555,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   constructor() {
     const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
     this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
+    this.labels = { ...DEFAULT_LABELS, ...userConfig?.labels };
+    // Backwards compat: if old *ButtonText was set but labels.* wasn't, use old value
+    if (userConfig?.nextButtonText && !userConfig?.labels?.next) this.labels.next = userConfig.nextButtonText;
+    if (userConfig?.prevButtonText && !userConfig?.labels?.prev) this.labels.prev = userConfig.prevButtonText;
+    if (userConfig?.skipButtonText && !userConfig?.labels?.skip) this.labels.skip = userConfig.skipButtonText;
   }
 
   ngOnInit(): void {
@@ -568,6 +611,10 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     if (this.pendingRaf !== null) {
       cancelAnimationFrame(this.pendingRaf);
     }
+  }
+
+  private interpolate(template: string, vars: Record<string, string | number>): string {
+    return template.replace(/\{\{(\w+)\}\}/g, (_, key) => String(vars[key] ?? ''));
   }
 
   /**
@@ -658,19 +705,27 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     this.showPrev = step.showPrev !== undefined ? step.showPrev : stepIndex > 0;
     this.showSkip = step.showSkip !== undefined ? step.showSkip : true;
 
-    // Button text
-    this.nextBtnText = step.nextButton?.text || this.config.nextButtonText;
-    this.prevBtnText = step.prevButton?.text || this.config.prevButtonText;
-    this.skipBtnText = step.skipButton?.text || this.config.skipButtonText;
+    // Button text (step-level > labels > deprecated config)
+    this.nextBtnText = step.nextButton?.text || this.labels.next;
+    this.prevBtnText = step.prevButton?.text || this.labels.prev;
+    this.skipBtnText = step.skipButton?.text || this.labels.skip;
 
     // Button classes
     this.nextBtnClass = 'wjh-btn wjh-next-btn ' + (step.nextButton?.className || '');
     this.prevBtnClass = 'wjh-btn wjh-prev-btn ' + (step.prevButton?.className || '');
     this.skipBtnClass = 'wjh-btn wjh-skip-btn ' + (step.skipButton?.className || '');
 
+    // Compute label strings from templates
+    const templateVars = { current: stepIndex + 1, total: totalSteps };
+    this.dialogLabel = this.interpolate(this.labels.stepLabel, templateVars);
+    this.progressText = this.interpolate(this.labels.progress, templateVars);
+
     // Update live announcement for screen readers
     const plainText = step.description.replace(/<[^>]*>/g, '');
-    this.liveAnnouncement = `Step ${stepIndex + 1} of ${totalSteps}: ${plainText}`;
+    this.liveAnnouncement = this.interpolate(this.labels.stepAnnouncement, {
+      ...templateVars,
+      description: plainText,
+    });
 
     // Compute cutout
     this.computeCutout(resolved);
@@ -684,6 +739,8 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     // Compute blockers
     this.computeBlockers(resolved);
 
+    // Brief transition fade for step change
+    this.transitioning = true;
     this.cdr.detectChanges();
 
     // Recompute button positions after label is rendered
@@ -692,6 +749,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     }
     this.pendingRaf = requestAnimationFrame(() => {
       this.pendingRaf = null;
+      this.transitioning = false;
       this.computeButtonPositions();
       this.cdr.detectChanges();
     });
