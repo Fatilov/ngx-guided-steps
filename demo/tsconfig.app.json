@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": ".."
+  },
+  "include": ["src/**/*.ts", "../projects/wanejoyhint/src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts"]
+}
