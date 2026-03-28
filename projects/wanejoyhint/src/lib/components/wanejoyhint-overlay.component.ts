@@ -252,6 +252,7 @@ export interface OverlayState {
       font-family: 'Segoe UI', Arial, sans-serif;
       transition: opacity 400ms ease-in-out;
       pointer-events: none;
+      padding: 8px 12px;
     }
 
     .wjh-label-oversized {
@@ -261,7 +262,11 @@ export interface OverlayState {
     }
 
     @media (max-width: 640px) {
-      .wjh-label { font-size: 16px; }
+      .wjh-label {
+        font-size: 14px;
+        max-width: 90%;
+        padding: 6px 10px;
+      }
     }
 
     /* Event blockers */
@@ -278,7 +283,7 @@ export interface OverlayState {
     .wjh-btn {
       position: absolute;
       pointer-events: all;
-      box-sizing: content-box;
+      box-sizing: border-box;
       min-width: 100px;
       height: 40px;
       cursor: pointer;
@@ -291,6 +296,7 @@ export interface OverlayState {
       background: transparent;
       transition: background-color 0.3s, color 0.3s, border-color 0.3s;
       padding: 0 15px;
+      white-space: nowrap;
     }
 
     .wjh-btn:hover {
@@ -306,13 +312,11 @@ export interface OverlayState {
 
     @media (max-width: 640px) {
       .wjh-btn {
-        font-size: 200%;
-        line-height: 1.2em;
+        font: normal 13px/32px 'Segoe UI', Helvetica, sans-serif;
         min-width: 0;
-        width: 35px;
-        height: 35px;
-        border-radius: 50%;
-        padding: 0;
+        height: 32px;
+        padding: 0 10px;
+        letter-spacing: 0;
       }
 
       .wjh-skip-btn { display: none; }
@@ -589,12 +593,13 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
 
   private computeLabelAndArrow(resolved: ResolvedStepData, text: string): void {
     // Create a temporary off-screen element to measure label
+    const isMobile = window.innerWidth < 640;
     const tempLabel = document.createElement('div');
     tempLabel.className = 'wjh-label';
     tempLabel.style.position = 'absolute';
     tempLabel.style.visibility = 'hidden';
-    tempLabel.style.maxWidth = '80%';
-    tempLabel.style.fontSize = '22px';
+    tempLabel.style.maxWidth = isMobile ? '90%' : '80%';
+    tempLabel.style.fontSize = isMobile ? '14px' : '22px';
     tempLabel.style.display = 'inline-block';
     tempLabel.innerHTML = text;
     document.body.appendChild(tempLabel);
@@ -655,11 +660,14 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private measureTextWidth(text: string): number {
+    const isMobile = window.innerWidth < 640;
     const span = document.createElement('span');
     span.style.position = 'absolute';
     span.style.visibility = 'hidden';
-    span.style.font = 'normal 17px/40px "Segoe UI", Helvetica, sans-serif';
-    span.style.letterSpacing = '1px';
+    span.style.font = isMobile
+      ? 'normal 13px/32px "Segoe UI", Helvetica, sans-serif'
+      : 'normal 17px/40px "Segoe UI", Helvetica, sans-serif';
+    span.style.letterSpacing = isMobile ? '0' : '1px';
     span.textContent = text;
     document.body.appendChild(span);
     const w = span.offsetWidth;

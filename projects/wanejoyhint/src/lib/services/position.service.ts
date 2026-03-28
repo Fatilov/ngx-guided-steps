@@ -73,8 +73,9 @@ export class PositionService {
     const leftOffset = data.centerX - halfW;
     const rightOffset = vw - (data.centerX + halfW);
 
-    const labelShift = vh < 670 ? 130 : 150;
-    const labelMargin = vh < 670 ? 0 : 40;
+    const isMobileView = vw < 640;
+    const labelShift = isMobileView ? 80 : (vh < 670 ? 130 : 150);
+    const labelMargin = isMobileView ? 0 : (vh < 670 ? 0 : 40);
     const labelShiftWithHeight = labelShift + labelHeight + labelMargin;
     const labelVerOffset = halfH + labelShift;
     const labelVerticalSpaceRequired =
@@ -109,8 +110,10 @@ export class PositionService {
     const dataHeightSize =
       data.shape === 'circle' ? data.radius * 2 : data.height || data.radius * 2;
 
-    const rightPos = data.centerX + dataWidthSize / 2 + 80;
-    const leftPos = data.centerX - labelWidth - dataWidthSize / 2 - 80;
+    const isMobile = vw < 640;
+    const horGap = isMobile ? 20 : 80;
+    const rightPos = data.centerX + dataWidthSize / 2 + horGap;
+    const leftPos = data.centerX - labelWidth - dataWidthSize / 2 - horGap;
     const centralPos = vw / 2 - labelWidth / 2;
     const topPos = data.centerY - labelVerOffset - labelHeight;
     const bottomPos = data.centerY + labelVerOffset;
@@ -202,6 +205,24 @@ export class PositionService {
       yFrom = data.centerY;
     }
 
+    // Clamp label to viewport bounds
+    const padding = isMobile ? 8 : 10;
+    if (labelX < padding) labelX = padding;
+    if (labelX + labelWidth > vw - padding) labelX = vw - labelWidth - padding;
+    if (labelY < padding) labelY = padding;
+
+    // Recompute arrow origin after clamping
+    xFrom = labelX + labelWidth / 2;
+    yFrom =
+      data.centerY > labelY + labelHeight / 2
+        ? labelY + labelHeight
+        : labelY;
+
+    if (data.centerY >= labelY && data.centerY <= labelY + labelHeight) {
+      xFrom = data.centerX > labelX ? labelX + labelWidth : labelX;
+      yFrom = data.centerY;
+    }
+
     return {
       label: { x: labelX, y: labelY },
       arrow: bestZone === 'oversized'
@@ -252,6 +273,12 @@ export class PositionService {
       leftNext = distance;
       leftSkip = distance + nextBtnWidth + 10;
     }
+
+    // Clamp all button positions to stay within viewport
+    const maxX = vw - 10;
+    distance = Math.max(10, Math.min(distance, maxX));
+    leftNext = Math.max(10, Math.min(leftNext, maxX));
+    leftSkip = Math.max(10, Math.min(leftSkip, maxX));
 
     return {
       prev: { x: distance, y: verPos },
