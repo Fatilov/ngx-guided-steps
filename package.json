@@ -1,37 +1,39 @@
 {
-  "name": "enjoyhint",
-  "version": "4.0.1",
-  "description": "Web-tool that provides the simplest way to create interactive tutorials and hints.",
-  "main": "enjoyhint.js",
+  "name": "wanejoyhint",
+  "version": "1.0.0",
+  "description": "Angular interactive tutorial and hint library, inspired by EnjoyHint.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "ng build demo --configuration=production",
+    "build:dev": "ng build demo --configuration=development",
+    "serve": "ng serve demo",
+    "build:lib": "ng build wanejoyhint --configuration=production",
+    "lint": "tsc --noEmit --project demo/tsconfig.app.json"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xbsoftware/enjoyhint.git"
+    "url": "https://github.com/fatilov/wanejoyhint"
   },
   "keywords": [
-    "enjoyhint",
+    "angular",
+    "tutorial",
     "hint",
-    "xbs",
-    "tutorials"
+    "onboarding",
+    "enjoyhint",
+    "wanejoyhint"
   ],
-  "author": "XB Software",
+  "author": "",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/xbsoftware/enjoyhint/issues"
-  },
-  "homepage": "https://github.com/xbsoftware/enjoyhint",
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-contrib-concat": "^0.5.1",
-    "grunt-contrib-cssmin": "^0.11.0",
-    "grunt-contrib-jshint": "^0.11.2",
-    "grunt-contrib-uglify": "^0.9.1"
-  },
   "dependencies": {
-    "jquery": "~3.5.1",
-    "jquery.scrollto": "^2.1.2",
-    "kinetic": "^5.2.0"
+    "@angular/cli": "^18.0.0",
+    "@angular/common": "^18.0.0",
+    "@angular/compiler": "^18.0.0",
+    "@angular/compiler-cli": "^18.0.0",
+    "@angular/core": "^18.0.0",
+    "@angular/platform-browser": "^18.0.0",
+    "@angular/platform-browser-dynamic": "^18.0.0",
+    "@angular-devkit/build-angular": "^18.0.0",
+    "rxjs": "^7.0.0",
+    "typescript": "~5.4.0",
+    "zone.js": "~0.14.0"
   }
 }

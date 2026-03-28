@@ -1,5 +1,5 @@
-node_modules/*
-lib/*
-package-lock.json
+node_modules/
+lib/
 dist/
 .angular/
+.vercel/
