@@ -4,8 +4,7 @@ import {
   ComponentRef,
   createComponent,
   EnvironmentInjector,
-  Inject,
-  Optional,
+  inject,
 } from '@angular/core';
 import { Subject, Observable, Subscription } from 'rxjs';
 import {
@@ -64,11 +63,11 @@ export class WanejoyhintService {
     return this.currentStep;
   }
 
-  constructor(
-    private appRef: ApplicationRef,
-    private injector: EnvironmentInjector,
-    @Optional() @Inject(WANEJOYHINT_CONFIG) userConfig?: WanejoyhintConfig
-  ) {
+  private appRef = inject(ApplicationRef);
+  private injector = inject(EnvironmentInjector);
+
+  constructor() {
+    const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
     this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
   }
 
@@ -80,6 +79,16 @@ export class WanejoyhintService {
       throw new Error('Wanejoyhint: Steps array must not be empty.');
     }
     this.steps = steps;
+  }
+
+  /**
+   * Validate that all step selectors exist in the DOM.
+   * Returns an array of missing selectors, or empty array if all valid.
+   */
+  validateSteps(): string[] {
+    return this.steps
+      .map(s => s.selector)
+      .filter(selector => !document.querySelector(selector));
   }
 
   /**
@@ -320,7 +329,10 @@ export class WanejoyhintService {
       case 'key': {
         const handler = (e: Event) => {
           const keyEvent = e as KeyboardEvent;
-          if (step.keyCode && keyEvent.keyCode === step.keyCode) {
+          const match = step.key
+            ? keyEvent.key === step.key
+            : step.keyCode ? keyEvent.keyCode === step.keyCode : false;
+          if (match) {
             this.currentStep++;
             this.executeStep();
           }
@@ -376,18 +388,24 @@ export class WanejoyhintService {
   }
 
   private handleNext(): void {
+    const step = this.steps[this.currentStep];
+    step?.onNext?.();
     this.currentStep++;
     this.executeStep();
   }
 
   private handlePrev(): void {
     if (this.currentStep > 0) {
+      const step = this.steps[this.currentStep];
+      step?.onPrev?.();
       this.currentStep--;
       this.executeStep();
     }
   }
 
   private handleSkip(): void {
+    const step = this.steps[this.currentStep];
+    step?.onSkip?.();
     this.events.onSkip?.();
     this.skip$.next();
     this.stop();

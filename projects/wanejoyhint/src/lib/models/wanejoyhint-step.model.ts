@@ -30,8 +30,11 @@ export interface WanejoyhintStep {
   /** Alternate CSS selector for the element that receives the event */
   eventSelector?: string;
 
-  /** Key code for 'key' event type */
+  /** Key code for 'key' event type (deprecated, use key instead) */
   keyCode?: number;
+
+  /** Key name for 'key' event type (e.g. 'Enter', 'Escape') */
+  key?: string;
 
   /** Show the Next button (default: depends on eventType) */
   showNext?: boolean;
@@ -68,6 +71,15 @@ export interface WanejoyhintStep {
 
   /** Callback fired before this step starts */
   onBeforeStart?: () => void;
+
+  /** Callback fired when user clicks Next on this step */
+  onNext?: () => void;
+
+  /** Callback fired when user clicks Previous on this step */
+  onPrev?: () => void;
+
+  /** Callback fired when user clicks Skip on this step */
+  onSkip?: () => void;
 }
 
 export interface StepButtonConfig {
