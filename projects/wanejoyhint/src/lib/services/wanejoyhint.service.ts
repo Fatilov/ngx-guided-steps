@@ -31,6 +31,7 @@ export class WanejoyhintService {
   private overlayRef: ComponentRef<WanejoyhintOverlayComponent> | null = null;
   private events: WanejoyhintEvents = {};
   private config: Required<WanejoyhintConfig>;
+  private baseConfig: Required<WanejoyhintConfig>;
   private eventListenerCleanup: (() => void) | null = null;
   private customEventSub: Subscription | null = null;
   private running = false;
@@ -71,7 +72,16 @@ export class WanejoyhintService {
 
   constructor() {
     const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
-    this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
+    this.baseConfig = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
+    this.config = { ...this.baseConfig };
+  }
+
+  /**
+   * Override global config for the next tour run.
+   * Merged on top of the global config provided via `provideWanejoyhint()`.
+   */
+  setConfig(overrides: Partial<WanejoyhintConfig>): void {
+    this.config = { ...this.baseConfig, ...overrides } as Required<WanejoyhintConfig>;
   }
 
   /**
@@ -212,6 +222,9 @@ export class WanejoyhintService {
       hostElement: hostEl,
       environmentInjector: this.injector,
     });
+
+    // Pass current config to overlay
+    this.overlayRef.instance.updateConfig(this.config);
 
     // Wire up callbacks
     this.overlayRef.instance._onNext = () => this.handleNext();
