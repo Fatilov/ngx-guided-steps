@@ -3,6 +3,7 @@ import { Subscription } from 'rxjs';
 import {
   WanejoyhintService,
   WanejoyhintStep,
+  WANEJOYHINT_CONFIG,
 } from '../../../projects/wanejoyhint/src/public-api';
 
 @Component({
@@ -36,6 +37,12 @@ import {
           </button>
           <button class="btn btn-dark" id="btn-programmatic" (click)="startProgrammaticTour()">
             6. API programmatique (trigger, reRun, setCurrentStep)
+          </button>
+          <button class="btn btn-primary" id="btn-i18n-tour" (click)="startI18nTour()">
+            7. i18n (labels en francais)
+          </button>
+          <button class="btn btn-secondary" id="btn-theme-tour" (click)="startThemeTour()">
+            8. Theme sombre
           </button>
         </div>
       </section>
@@ -744,6 +751,122 @@ export class AppComponent implements OnDestroy {
       }
     }, 3000);
     this.demoTimeouts.push(t1);
+  }
+
+  // =============================================
+  // 7. TOUR i18n - Labels en francais
+  // =============================================
+  startI18nTour(): void {
+    this.clearDemoTimeouts();
+    this.log('--- Tour i18n demarre ---', 'info');
+
+    // Create a second service instance with French labels via config override
+    // For demo purposes we reconfigure the default labels at runtime
+    const overlay = (this.hint as any).overlayRef?.instance;
+    const savedLabels = overlay?.labels;
+
+    const steps: WanejoyhintStep[] = [
+      {
+        selector: '#demo-header',
+        description: 'Les boutons sont maintenant en <b>francais</b> grace au systeme i18n!',
+        eventType: 'next',
+      },
+      {
+        selector: '#control-panel',
+        description: 'Tous les textes UI sont configurables: boutons, progression, annonces screen reader.',
+        eventType: 'next',
+        showPrev: true,
+      },
+      {
+        selector: '#log-section',
+        description: 'La progression affiche aussi le format personnalise: "Etape X sur Y".',
+        eventType: 'next',
+        showPrev: true,
+      },
+    ];
+
+    this.hint.setSteps(steps);
+    this.hint.run({
+      onStart: () => {
+        this.log('i18n: Labels FR appliques', 'success');
+        // Apply French labels at runtime
+        const ref = (this.hint as any).overlayRef?.instance;
+        if (ref) {
+          ref.labels = {
+            next: 'Suivant',
+            prev: 'Precedent',
+            skip: 'Passer',
+            close: 'Fermer le tutoriel',
+            progress: 'Etape {{current}} sur {{total}}',
+            stepLabel: 'Etape {{current}} sur {{total}}',
+            stepAnnouncement: 'Etape {{current}} sur {{total}}: {{description}}',
+          };
+          ref.config = { ...ref.config, showProgress: true };
+        }
+      },
+      onEnd: () => {
+        this.log('i18n: Tour termine', 'success');
+        // Restore default labels
+        const ref = (this.hint as any).overlayRef?.instance;
+        if (ref && savedLabels) ref.labels = savedLabels;
+      },
+    });
+  }
+
+  // =============================================
+  // 8. TOUR THEME - Theme sombre
+  // =============================================
+  startThemeTour(): void {
+    this.clearDemoTimeouts();
+    this.log('--- Tour Theme Sombre demarre ---', 'info');
+
+    const steps: WanejoyhintStep[] = [
+      {
+        selector: '#demo-header',
+        description: 'Ce tour utilise un overlay <b>clair</b> avec un theme sombre pour les boutons.',
+        eventType: 'next',
+      },
+      {
+        selector: '#card-profile',
+        description: 'Les boutons et textes s\'adaptent au theme pour rester lisibles.',
+        eventType: 'next',
+        showPrev: true,
+      },
+      {
+        selector: '#sidebar',
+        description: 'Le theme "dark" inverse les couleurs des boutons, du texte et du bouton fermer.',
+        eventType: 'next',
+        showPrev: true,
+      },
+    ];
+
+    this.hint.setSteps(steps);
+    this.hint.run({
+      onStart: () => {
+        this.log('Theme: overlay clair + boutons sombres', 'success');
+        const ref = (this.hint as any).overlayRef?.instance;
+        if (ref) {
+          ref.config = {
+            ...ref.config,
+            backgroundColor: 'rgba(255,255,255,0.85)',
+            theme: 'dark',
+            showProgress: true,
+          };
+        }
+      },
+      onEnd: () => {
+        this.log('Theme: Tour termine', 'success');
+        const ref = (this.hint as any).overlayRef?.instance;
+        if (ref) {
+          ref.config = {
+            ...ref.config,
+            backgroundColor: 'rgba(0,0,0,0.6)',
+            theme: 'light',
+            showProgress: false,
+          };
+        }
+      },
+    });
   }
 
   // =============================================

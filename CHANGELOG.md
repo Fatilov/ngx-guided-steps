@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.1.0] - 2026-03-28
+
+### Added
+- **i18n support**: New `WanejoyhintLabels` interface for full UI text customization
+  - Configurable labels: `next`, `prev`, `skip`, `close`, `progress`, `stepLabel`, `stepAnnouncement`
+  - Template interpolation with `{{current}}`, `{{total}}`, `{{description}}` placeholders
+- **Theme support**: `theme` config option (`'light'` or `'dark'`) for visual theme switching
+  - Dark theme inverts button colors, text, and close button for light-background overlays
+- **Smooth step transitions**: CSS fade animation between step changes
+- **CSS custom properties documentation**: Full reference for theming via CSS variables
+
+### Changed
+- Button text now sourced from `labels` (with backwards compat for `nextButtonText`, etc.)
+- Dialog `aria-label` and screen reader announcements use configurable label templates
+- Close button `aria-label` is now configurable via `labels.close`
+
+### Deprecated
+- `nextButtonText`, `prevButtonText`, `skipButtonText` config options (use `labels.next`, `labels.prev`, `labels.skip` instead)
+
 ## [1.0.0] - 2026-03-28
 
 ### Added

@@ -17,9 +17,13 @@ Inspired by [EnjoyHint](https://github.com/xbsoftware/enjoyhint), rebuilt from s
 - WCAG accessibility: `role="dialog"`, `aria-live`, focus trap, ESC to close
 - Programmatic API: `next()`, `prev()`, `trigger()`, `reRun()`, `setCurrentStep()`
 - RxJS observables: `onStepChange`, `onEnd`, `onSkip`
-- Step-level callbacks: `onBeforeStart`
+- Step-level callbacks: `onBeforeStart`, `onNext`, `onPrev`, `onSkip`
 - Custom button text and CSS classes per step
 - Custom arrow colors per step
+- i18n support: fully configurable UI labels via `WanejoyhintLabels`
+- Theme support: `'light'` (default) or `'dark'` theme
+- Smooth step transitions with CSS animations
+- CSS custom properties for easy theming
 - Zero external dependencies (only `@angular/core`, `@angular/common`, `rxjs`)
 
 ## Installation
@@ -118,6 +122,9 @@ export class AppComponent {
 | `prevButton` | `{ text?, className? }` | - | Custom Previous button config |
 | `skipButton` | `{ text?, className? }` | - | Custom Skip button config |
 | `onBeforeStart` | `() => void` | - | Callback before this step starts |
+| `onNext` | `() => void` | - | Callback when Next is clicked on this step |
+| `onPrev` | `() => void` | - | Callback when Previous is clicked on this step |
+| `onSkip` | `() => void` | - | Callback when Skip is clicked on this step |
 | `top/bottom/left/right` | `number` | `0` | Offset adjustments for the highlight |
 
 ### Global Configuration
@@ -133,15 +140,62 @@ bootstrapApplication(AppComponent, {
       provide: WANEJOYHINT_CONFIG,
       useValue: {
         backgroundColor: 'rgba(0, 0, 0, 0.7)',
-        nextButtonText: 'Suivant',
-        prevButtonText: 'Precedent',
-        skipButtonText: 'Passer',
         zIndex: 2000,
+        showProgress: true,
+        theme: 'light',
+        labels: {
+          next: 'Suivant',
+          prev: 'Precedent',
+          skip: 'Passer',
+          close: 'Fermer le tutoriel',
+          progress: 'Etape {{current}} sur {{total}}',
+          stepLabel: 'Etape {{current}} sur {{total}}',
+        }
       }
     }
   ]
 });
 ```
+
+### WanejoyhintLabels (i18n)
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `next` | `'Next'` | Next button text |
+| `prev` | `'Previous'` | Previous button text |
+| `skip` | `'Skip'` | Skip button text |
+| `close` | `'Close tutorial'` | Close button aria-label |
+| `progress` | `'{{current}} / {{total}}'` | Progress indicator format |
+| `stepLabel` | `'Step {{current}} of {{total}}'` | Dialog aria-label format |
+| `stepAnnouncement` | `'Step {{current}} of {{total}}: {{description}}'` | Screen reader announcement format |
+
+### Themes
+
+Set `theme: 'dark'` in the config for light-background overlays:
+
+```typescript
+{
+  provide: WANEJOYHINT_CONFIG,
+  useValue: {
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    theme: 'dark',
+  }
+}
+```
+
+### CSS Custom Properties
+
+Customize the look via CSS custom properties on `wanejoyhint-overlay`:
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| `--wjh-btn-color` | `rgb(30, 205, 151)` | Button border and text color |
+| `--wjh-btn-hover-color` | `white` | Button text color on hover |
+| `--wjh-label-color` | `white` | Label text color |
+| `--wjh-label-font-size` | `22px` | Label font size |
+| `--wjh-label-font-family` | `'Segoe UI', Arial, sans-serif` | Label font family |
+| `--wjh-close-btn-color` | `rgba(33, 224, 163, 1)` | Close button border color |
+| `--wjh-oversized-bg` | `#272A26` | Background for oversized labels |
 
 ## Requirements
 
