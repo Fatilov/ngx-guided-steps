@@ -4,6 +4,7 @@
   "outputDirectory": "dist/demo/browser",
   "installCommand": "npm install",
   "framework": null,
+  "nodeVersion": "20.x",
   "routes": [
     {
       "handle": "filesystem"
