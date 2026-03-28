@@ -1,5 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   WanejoyhintService,
@@ -9,7 +8,6 @@ import {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule],
   template: `
     <div class="demo-container">
       <header class="demo-header" id="demo-header">
@@ -46,12 +44,15 @@ import {
       <section class="log-section" id="log-section">
         <h3>Journal des evenements</h3>
         <div class="log-output" id="log-output">
-          <div *ngFor="let log of logs" class="log-entry" [class.log-info]="log.type === 'info'" [class.log-success]="log.type === 'success'" [class.log-warn]="log.type === 'warn'">
+          @for (log of logs; track $index) {
+          <div class="log-entry" [class.log-info]="log.type === 'info'" [class.log-success]="log.type === 'success'" [class.log-warn]="log.type === 'warn'">
             {{ log.time }} - {{ log.message }}
           </div>
-          <div *ngIf="logs.length === 0" class="log-placeholder">
+          } @empty {
+          <div class="log-placeholder">
             Lancez un tour pour voir les evenements ici...
           </div>
+          }
         </div>
         <button class="btn btn-small" (click)="logs = []">Vider le journal</button>
       </section>
@@ -114,12 +115,14 @@ import {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let item of tableData">
+                  @for (item of tableData; track item.id) {
+                  <tr>
                     <td>{{ item.id }}</td>
                     <td>{{ item.name }}</td>
                     <td><span class="status" [class]="'status-' + item.status">{{ item.status }}</span></td>
                     <td><button class="btn btn-small">Voir</button></td>
                   </tr>
+                  }
                 </tbody>
               </table>
             </div>
@@ -430,7 +433,9 @@ export class AppComponent implements OnDestroy {
     { id: 4, name: 'Projet Delta', status: 'actif' },
   ];
 
-  constructor(private hint: WanejoyhintService) {
+  private hint = inject(WanejoyhintService);
+
+  constructor() {
     this.subs.push(
       this.hint.onStepChange.subscribe(({ index, step }) =>
         this.log(`Step ${index + 1}: ${step.selector}`, 'info')

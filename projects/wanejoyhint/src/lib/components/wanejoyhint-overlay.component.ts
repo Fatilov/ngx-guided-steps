@@ -4,13 +4,11 @@ import {
   ChangeDetectorRef,
   OnDestroy,
   OnInit,
-  Inject,
-  Optional,
   ElementRef,
   ViewChild,
   AfterViewInit,
+  inject,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { Subject, fromEvent } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
@@ -44,7 +42,6 @@ export interface OverlayState {
 @Component({
   selector: 'wanejoyhint-overlay',
   standalone: true,
-  imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -69,8 +66,8 @@ export interface OverlayState {
         <defs>
           <mask [attr.id]="maskId">
             <rect width="100%" height="100%" fill="white" />
+            @if (cutout && state.resolved?.shape === 'rect') {
             <rect
-              *ngIf="cutout && state.resolved?.shape === 'rect'"
               [attr.x]="cutout.x"
               [attr.y]="cutout.y"
               [attr.width]="cutout.w"
@@ -80,14 +77,16 @@ export interface OverlayState {
               fill="black"
               class="wjh-cutout"
             />
+            }
+            @if (cutout && state.resolved?.shape === 'circle') {
             <circle
-              *ngIf="cutout && state.resolved?.shape === 'circle'"
               [attr.cx]="cutout.cx"
               [attr.cy]="cutout.cy"
               [attr.r]="cutout.cr"
               fill="black"
               class="wjh-cutout"
             />
+            }
           </mask>
           <marker
             [attr.id]="markerId"
@@ -116,61 +115,65 @@ export interface OverlayState {
         />
 
         <!-- Arrow path -->
+        @if (arrowPath && !isOversized) {
         <path
-          *ngIf="arrowPath && !isOversized"
           [attr.d]="arrowPath"
           [attr.stroke]="arrowColor"
           style="fill:none; stroke-width:3"
           [attr.marker-end]="'url(#' + markerId + ')'"
           class="wjh-arrow"
         />
+        }
       </svg>
 
       <!-- Label -->
+      @if (labelPos && state.step) {
       <div
-        *ngIf="labelPos && state.step"
         #labelEl
         class="wjh-label"
         [class.wjh-label-oversized]="isOversized"
         [style.left.px]="labelPos.x"
         [style.top.px]="labelPos.y"
         [style.z-index]="(config.zIndex || 1010) + 7"
-        [innerHTML]="state.step.description"
-      ></div>
+      >
+        <span [innerHTML]="state.step.description"></span>
+        @if (config.showProgress) {
+        <div class="wjh-progress">{{ state.stepIndex + 1 }} / {{ state.totalSteps }}</div>
+        }
+      </div>
+      }
 
       <!-- Event blocker regions (4 zones around the cutout) -->
+      @if (cutout) {
       <div
-        *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-top"
         [style.height.px]="blockerTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-bottom"
         [style.top.px]="blockerBottomTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-left"
         [style.width.px]="blockerLeftWidth"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        *ngIf="cutout"
         class="wjh-event-blocker wjh-blocker-right"
         [style.left.px]="blockerRightLeft"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
+      }
 
       <!-- Buttons -->
+      @if (showPrev && buttonPos) {
       <button
-        *ngIf="showPrev && buttonPos"
         type="button"
         class="wjh-btn wjh-prev-btn"
         [class]="prevBtnClass"
@@ -179,9 +182,10 @@ export interface OverlayState {
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onPrevClick()"
       >{{ prevBtnText }}</button>
+      }
 
+      @if (showNext && buttonPos) {
       <button
-        *ngIf="showNext && buttonPos"
         #firstFocusable
         type="button"
         class="wjh-btn wjh-next-btn"
@@ -191,9 +195,10 @@ export interface OverlayState {
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onNextClick()"
       >{{ nextBtnText }}</button>
+      }
 
+      @if (showSkip && buttonPos) {
       <button
-        *ngIf="showSkip && buttonPos"
         type="button"
         class="wjh-btn wjh-skip-btn"
         [class]="skipBtnClass"
@@ -202,6 +207,7 @@ export interface OverlayState {
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onSkipClick()"
       >{{ skipBtnText }}</button>
+      }
 
       <!-- Close button -->
       <button
@@ -215,6 +221,14 @@ export interface OverlayState {
   `,
   styles: [`
     :host {
+      --wjh-btn-color: rgb(30, 205, 151);
+      --wjh-btn-hover-color: white;
+      --wjh-label-color: white;
+      --wjh-label-font-size: 22px;
+      --wjh-label-font-family: 'Segoe UI', Arial, sans-serif;
+      --wjh-close-btn-color: rgba(33, 224, 163, 1);
+      --wjh-oversized-bg: #272A26;
+
       position: fixed;
       top: 0;
       left: 0;
@@ -270,9 +284,9 @@ export interface OverlayState {
       overflow-wrap: break-word;
       word-wrap: break-word;
       text-align: center;
-      color: white;
-      font-size: 22px;
-      font-family: 'Segoe UI', Arial, sans-serif;
+      color: var(--wjh-label-color, white);
+      font-size: var(--wjh-label-font-size, 22px);
+      font-family: var(--wjh-label-font-family, 'Segoe UI', Arial, sans-serif);
       transition: opacity 400ms ease-in-out;
       pointer-events: none;
       padding: 8px 12px;
@@ -280,7 +294,7 @@ export interface OverlayState {
 
     .wjh-label-oversized {
       border-radius: 20px;
-      background-color: #272A26;
+      background-color: var(--wjh-oversized-bg, #272A26);
       transition: background-color ease-out 0.5s, opacity 400ms ease-in-out;
     }
 
@@ -313,10 +327,10 @@ export interface OverlayState {
       min-width: 100px;
       height: 40px;
       cursor: pointer;
-      border: 2px solid rgb(30, 205, 151);
+      border: 2px solid var(--wjh-btn-color, rgb(30, 205, 151));
       border-radius: 40px;
       font: normal 17px/40px 'Segoe UI', Helvetica, sans-serif;
-      color: rgb(30, 205, 151);
+      color: var(--wjh-btn-color, rgb(30, 205, 151));
       text-align: center;
       letter-spacing: 1px;
       background: transparent;
@@ -326,8 +340,8 @@ export interface OverlayState {
     }
 
     .wjh-btn:hover {
-      color: white;
-      background: rgb(30, 205, 151);
+      color: var(--wjh-btn-hover-color, white);
+      background: var(--wjh-btn-color, rgb(30, 205, 151));
     }
 
     .wjh-btn:active {
@@ -361,7 +375,7 @@ export interface OverlayState {
       box-sizing: content-box;
       width: 24px;
       height: 24px;
-      border: 2px solid rgba(33, 224, 163, 1);
+      border: 2px solid var(--wjh-close-btn-color, rgba(33, 224, 163, 1));
       border-radius: 50%;
       background: transparent;
       cursor: pointer;
@@ -402,6 +416,14 @@ export interface OverlayState {
         top: 6px;
         top: max(6px, env(safe-area-inset-top, 0px));
       }
+    }
+
+    /* Progress indicator */
+    .wjh-progress {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: 0.7;
+      letter-spacing: 1px;
     }
 
     /* Focus indicators */
@@ -489,11 +511,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   private destroy$ = new Subject<void>();
   private pendingRaf: number | null = null;
 
-  constructor(
-    private positionService: PositionService,
-    private cdr: ChangeDetectorRef,
-    @Optional() @Inject(WANEJOYHINT_CONFIG) userConfig?: WanejoyhintConfig
-  ) {
+  private positionService = inject(PositionService);
+  private cdr = inject(ChangeDetectorRef);
+
+  constructor() {
+    const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
     this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
   }
 

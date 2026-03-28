@@ -1,14 +1,31 @@
 import { WanejoyhintService } from './wanejoyhint.service';
 import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
+import { Subject } from 'rxjs';
 
-// Mock ApplicationRef and EnvironmentInjector minimally
-function createService(): WanejoyhintService {
-  const mockAppRef = {
-    attachView: jest.fn(),
-    detachView: jest.fn(),
-  } as any;
-  const mockInjector = {} as any;
-  return new WanejoyhintService(mockAppRef, mockInjector);
+function createServiceManually(): WanejoyhintService {
+  const svc = Object.create(WanejoyhintService.prototype);
+  svc['steps'] = [];
+  svc['currentStep'] = 0;
+  svc['overlayRef'] = null;
+  svc['events'] = {};
+  svc['config'] = {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    nextButtonText: 'Next',
+    prevButtonText: 'Previous',
+    skipButtonText: 'Skip',
+    zIndex: 1010,
+    scrollAnimationSpeed: 250,
+  };
+  svc['eventListenerCleanup'] = null;
+  svc['customEventSub'] = null;
+  svc['running'] = false;
+  svc['pendingTimeouts'] = [];
+  svc['stepChange$'] = new Subject();
+  svc['end$'] = new Subject();
+  svc['skip$'] = new Subject();
+  svc['appRef'] = { attachView: jest.fn(), detachView: jest.fn() };
+  svc['injector'] = {};
+  return svc;
 }
 
 describe('WanejoyhintService', () => {
@@ -29,7 +46,7 @@ describe('WanejoyhintService', () => {
     });
     document.body.appendChild(el);
 
-    service = createService();
+    service = createServiceManually();
   });
 
   afterEach(() => {
@@ -63,15 +80,12 @@ describe('WanejoyhintService', () => {
 
     it('should set running to true after run', () => {
       service.setSteps([makeStep()]);
-      // run() calls createOverlay which uses createComponent - this will fail without Angular
-      // but we can test the state before createOverlay
       expect(service.isRunning).toBe(false);
     });
 
     it('should call onStart callback', () => {
       const onStart = jest.fn();
       service.setSteps([makeStep()]);
-      // Mock createOverlay to avoid createComponent failure
       (service as any).createOverlay = jest.fn();
       (service as any).overlayRef = {
         instance: { renderStep: jest.fn() },
@@ -89,7 +103,6 @@ describe('WanejoyhintService', () => {
   describe('stop', () => {
     it('should set running to false', () => {
       service.setSteps([makeStep()]);
-      // Manually set running state since run() requires createComponent
       (service as any).running = true;
       service.stop();
       expect(service.isRunning).toBe(false);
@@ -173,7 +186,6 @@ describe('WanejoyhintService', () => {
     it('should advance custom event step', () => {
       service.setSteps([makeStep({ eventType: 'custom' }), makeStep()]);
       (service as any).running = true;
-      // overlayRef is null so executeStep will fail, but currentStep advances
       try { service.trigger('myEvent'); } catch (_) { /* no overlay */ }
       expect(service.currentStepIndex).toBe(1);
     });
@@ -191,13 +203,11 @@ describe('WanejoyhintService', () => {
       const onBeforeStart = jest.fn();
       service.setSteps([makeStep({ onBeforeStart }), makeStep()]);
       (service as any).running = true;
-      // Mock overlayRef
       (service as any).overlayRef = {
         instance: {
           renderStep: jest.fn(),
         },
       };
-      // Call executeStep directly
       (service as any).executeStep();
       expect(onBeforeStart).toHaveBeenCalled();
     });

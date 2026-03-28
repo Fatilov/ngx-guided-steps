@@ -23,5 +23,10 @@
     "type": "git",
     "url": "https://github.com/fatilov/wanejoyhint"
   },
+  "homepage": "https://wanejoyhint.vercel.app",
+  "bugs": {
+    "url": "https://github.com/fatilov/wanejoyhint/issues"
+  },
+  "author": "fatilov",
   "sideEffects": false
 }

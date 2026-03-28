@@ -21,6 +21,9 @@ export interface WanejoyhintConfig {
 
   /** Default animation time in ms (default: 800) */
   animationTime?: number;
+
+  /** Show step progress indicator e.g. "2 / 5" (default: false) */
+  showProgress?: boolean;
 }
 
 export const DEFAULT_CONFIG: WanejoyhintConfig = {
@@ -30,6 +33,7 @@ export const DEFAULT_CONFIG: WanejoyhintConfig = {
   prevButtonText: 'Previous',
   zIndex: 1010,
   animationTime: 800,
+  showProgress: false,
 };
 
 export const WANEJOYHINT_CONFIG = new InjectionToken<WanejoyhintConfig>(

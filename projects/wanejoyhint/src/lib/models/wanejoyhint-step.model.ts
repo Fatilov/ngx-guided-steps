@@ -71,6 +71,15 @@ export interface WanejoyhintStep {
 
   /** Callback fired before this step starts */
   onBeforeStart?: () => void;
+
+  /** Callback fired when user clicks Next on this step */
+  onNext?: () => void;
+
+  /** Callback fired when user clicks Previous on this step */
+  onPrev?: () => void;
+
+  /** Callback fired when user clicks Skip on this step */
+  onSkip?: () => void;
 }
 
 export interface StepButtonConfig {
