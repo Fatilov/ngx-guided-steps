@@ -2,9 +2,9 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -55,7 +55,7 @@ jobs:
   deploy-production:
     name: Deploy Production
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
 
     steps:
       - uses: actions/checkout@v4
