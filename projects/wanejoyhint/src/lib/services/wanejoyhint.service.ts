@@ -34,7 +34,7 @@ export class WanejoyhintService {
   private customEventSub: Subscription | null = null;
   private running = false;
   private pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
-  private savedScrollY = 0;
+
 
   // Observables for external consumers
   private stepChange$ = new Subject<{ index: number; step: WanejoyhintStep }>();
@@ -93,7 +93,6 @@ export class WanejoyhintService {
     this.currentStep = 0;
     this.running = true;
     this.createOverlay();
-    this.lockScroll();
     this.events.onStart?.();
     this.executeStep();
   }
@@ -115,7 +114,6 @@ export class WanejoyhintService {
     }
     this.currentStep = Math.max(0, Math.min(stepIndex, this.steps.length - 1));
     this.running = true;
-    this.lockScroll();
     if (!this.overlayRef) this.createOverlay();
     this.executeStep();
   }
@@ -166,7 +164,6 @@ export class WanejoyhintService {
     this.clearPendingTimeouts();
     this.cleanupEventListeners();
     this.destroyOverlay();
-    this.unlockScroll();
     this.running = false;
   }
 
@@ -365,43 +362,16 @@ export class WanejoyhintService {
   }
 
   /**
-   * Lock body scroll without causing mobile page-jump.
-   * Saves current scroll position and uses position:fixed trick
-   * so the viewport stays in place on iOS Safari and Android.
-   */
-  private lockScroll(): void {
-    this.savedScrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${this.savedScrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
-  }
-
-  /**
-   * Unlock body scroll and restore the saved scroll position.
-   */
-  private unlockScroll(): void {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.overflow = '';
-    window.scrollTo(0, this.savedScrollY);
-  }
-
-  /**
-   * Temporarily unlock scroll so that scrollIntoView works,
-   * then re-lock after the scroll completes.
+   * Scroll to an element then invoke callback once scroll settles.
+   * We don't lock body scroll — the overlay + event blockers
+   * prevent user interaction (same approach as original EnjoyHint).
    */
   private scrollToElement(el: Element, callback: () => void, scrollSpeed: number): void {
-    this.unlockScroll();
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
     const t = setTimeout(() => {
       if (!this.running) return;
-      this.lockScroll();
       callback();
-    }, scrollSpeed + 20);
+    }, scrollSpeed + 50);
     this.pendingTimeouts.push(t);
   }
 
