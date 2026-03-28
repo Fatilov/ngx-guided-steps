@@ -750,6 +750,120 @@ export const appConfig: ApplicationConfig = {
 
 ---
 
+## Navigation cross-routes
+
+Wanejoyhint peut naviguer entre les routes Angular pendant un tour. Chaque étape peut spécifier une route cible :
+
+### Etape 1 : Fournir le Router
+
+```typescript
+// app.config.ts
+import { Router } from '@angular/router';
+import { provideWanejoyhint, WANEJOYHINT_ROUTER } from 'wanejoyhint';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideWanejoyhint({ showProgress: true }),
+    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+  ],
+};
+```
+
+### Etape 2 : Utiliser `route` dans les étapes
+
+```typescript
+const steps: WanejoyhintStep[] = [
+  {
+    selector: '#dashboard-header',
+    description: 'Bienvenue sur le tableau de bord.',
+    route: '/dashboard',        // Navigue vers /dashboard avant d'afficher
+    waitForSelector: true,      // Attend que l'élément apparaisse
+  },
+  {
+    selector: '#settings-form',
+    description: 'Configurez vos paramètres ici.',
+    route: '/settings',
+    waitForSelector: 3000,      // Attend max 3 secondes
+  },
+  {
+    selector: '#home-hero',
+    description: 'De retour sur l\'accueil !',
+    route: '/',
+    waitForSelector: true,
+  },
+];
+```
+
+---
+
+## Support des modals
+
+Pour cibler des éléments dans des modals (Material Dialog, CDK Overlay, etc.), utilisez `waitForSelector` combiné avec `onBeforeStart` :
+
+```typescript
+const steps: WanejoyhintStep[] = [
+  {
+    selector: '#open-dialog-btn',
+    description: 'Cliquez pour ouvrir le formulaire.',
+    eventType: 'click',
+    showNext: false,
+  },
+  {
+    selector: '.mat-dialog-container #form-field',
+    description: 'Remplissez ce champ dans le modal.',
+    waitForSelector: true,   // Attend que le modal soit rendu
+    eventType: 'next',
+  },
+];
+```
+
+### Avec `onBeforeStart` asynchrone
+
+Pour ouvrir un modal programmatiquement avant l'étape :
+
+```typescript
+{
+  selector: '.cdk-overlay-container .dialog-content',
+  description: 'Voici le contenu du modal.',
+  waitForSelector: 5000,
+  onBeforeStart: async () => {
+    // Ouvre le modal et attend qu'il soit prêt
+    const dialogRef = this.dialog.open(MyDialogComponent);
+    await firstValueFrom(dialogRef.afterOpened());
+  },
+}
+```
+
+---
+
+## Attente d'éléments (waitForSelector)
+
+Par défaut, si un élément n'existe pas dans le DOM, le tour s'arrête. `waitForSelector` active un mécanisme de polling :
+
+| Valeur | Comportement |
+|--------|-------------|
+| `false` ou omis | Échec immédiat si absent (comportement par défaut) |
+| `true` | Poll toutes les 200ms pendant max 10 secondes |
+| `number` (ex: `5000`) | Poll toutes les 200ms pendant max N millisecondes |
+
+```typescript
+{
+  selector: '#element-dynamique',
+  description: 'Cet élément est chargé en lazy.',
+  waitForSelector: true,      // Attend jusqu'à 10s
+}
+
+{
+  selector: '#element-lent',
+  description: 'Cet élément met du temps à charger.',
+  waitForSelector: 15000,     // Attend jusqu'à 15s
+}
+```
+
+Le polling est automatiquement annulé si le tour est stoppé (`stop()`) ou si l'utilisateur appuie sur Échap.
+
+---
+
 ## Publication npm
 
 La bibliotheque est publiee automatiquement sur npm via GitHub Actions lors de la creation d'une release.

@@ -11,6 +11,8 @@ import {
   WanejoyhintConfig,
   DEFAULT_CONFIG,
   WANEJOYHINT_CONFIG,
+  WANEJOYHINT_ROUTER,
+  WanejoyhintRouter,
 } from '../models/wanejoyhint-config.model';
 import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
 import { WanejoyhintOverlayComponent } from '../components/wanejoyhint-overlay.component';
@@ -65,6 +67,7 @@ export class WanejoyhintService {
 
   private appRef = inject(ApplicationRef);
   private injector = inject(EnvironmentInjector);
+  private router = inject(WANEJOYHINT_ROUTER, { optional: true });
 
   constructor() {
     const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
@@ -252,18 +255,35 @@ export class WanejoyhintService {
     }
     this.stepChange$.next({ index: this.currentStep, step });
 
-    // onBeforeStart callback
-    step.onBeforeStart?.();
+    // onBeforeStart callback — supports both sync and async
+    const beforeResult = step.onBeforeStart?.();
+    if (beforeResult instanceof Promise) {
+      beforeResult.then(() => this._scheduleStep(step));
+      return;
+    }
 
+    this._scheduleStep(step);
+  }
+
+  private _scheduleStep(step: WanejoyhintStep): void {
     const timeout = step.timeout || 0;
 
-    const outerTimeout = setTimeout(() => {
+    const outerTimeout = setTimeout(async () => {
       if (!this.running) return;
 
-      // Scroll to element if not in viewport
-      const el = document.querySelector(step.selector);
+      // Navigate to route if specified and router is available
+      if (step.route && this.router) {
+        await this.router.navigate([step.route]);
+        // Small delay to let Angular render the new route
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      if (!this.running) return;
+
+      // Wait for the element (with optional polling)
+      const el = await this.waitForElement(step.selector, step.waitForSelector);
       if (!el) {
-        console.error(`Wanejoyhint: Element "${step.selector}" not found.`);
+        console.error(`Wanejoyhint: Element "${step.selector}" not found after waiting.`);
         this.stop();
         return;
       }
@@ -296,6 +316,35 @@ export class WanejoyhintService {
     }, timeout);
 
     this.pendingTimeouts.push(outerTimeout);
+  }
+
+  private waitForElement(selector: string, wait?: boolean | number): Promise<Element | null> {
+    const el = document.querySelector(selector);
+    if (el) return Promise.resolve(el);
+
+    if (!wait) return Promise.resolve(null);
+
+    const timeout = typeof wait === 'number' ? wait : 10000;
+    const interval = 200;
+
+    return new Promise(resolve => {
+      let elapsed = 0;
+      const timer = setInterval(() => {
+        const found = document.querySelector(selector);
+        if (found) {
+          clearInterval(timer);
+          resolve(found);
+          return;
+        }
+        elapsed += interval;
+        if (elapsed >= timeout) {
+          clearInterval(timer);
+          resolve(null);
+        }
+      }, interval);
+      // Store for cleanup
+      this.pendingTimeouts.push(timer as any);
+    });
   }
 
   private setupEventListeners(step: WanejoyhintStep, el: Element): void {

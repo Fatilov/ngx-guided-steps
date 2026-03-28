@@ -7,7 +7,7 @@
 
 // Models
 export { WanejoyhintStep, StepButtonConfig } from './lib/models/wanejoyhint-step.model';
-export { WanejoyhintConfig, WanejoyhintLabels, WanejoyhintTheme, WANEJOYHINT_CONFIG } from './lib/models/wanejoyhint-config.model';
+export { WanejoyhintConfig, WanejoyhintLabels, WanejoyhintTheme, WanejoyhintRouter, WANEJOYHINT_CONFIG, WANEJOYHINT_ROUTER } from './lib/models/wanejoyhint-config.model';
 
 // Services
 export { WanejoyhintService, WanejoyhintEvents } from './lib/services/wanejoyhint.service';
