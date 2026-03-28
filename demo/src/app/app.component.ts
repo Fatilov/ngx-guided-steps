@@ -61,7 +61,7 @@ import {
         <div class="row">
           <div class="card" id="card-search">
             <h3>Recherche</h3>
-            <input type="text" id="search-input" placeholder="Tapez ici..." class="demo-input" (keydown)="onSearchKey($event)">
+            <input type="text" id="search-input" placeholder="Tapez ici..." class="demo-input">
             <button class="btn btn-small" id="search-btn">Rechercher</button>
           </div>
 
@@ -421,6 +421,7 @@ import {
 export class AppComponent implements OnDestroy {
   logs: { time: string; message: string; type: 'info' | 'success' | 'warn' }[] = [];
   private subs: Subscription[] = [];
+  private demoTimeouts: ReturnType<typeof setTimeout>[] = [];
 
   tableData = [
     { id: 1, name: 'Projet Alpha', status: 'actif' },
@@ -441,17 +442,22 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach((s) => s.unsubscribe());
+    this.clearDemoTimeouts();
     this.hint.stop();
   }
 
-  onSearchKey(event: KeyboardEvent): void {
-    // Used by the key event tour
+  private clearDemoTimeouts(): void {
+    for (const t of this.demoTimeouts) {
+      clearTimeout(t);
+    }
+    this.demoTimeouts = [];
   }
 
   // =============================================
   // 1. TOUR BASIQUE - Next / Prev / Skip
   // =============================================
   startBasicTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Basique demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -497,6 +503,7 @@ export class AppComponent implements OnDestroy {
   // 2. TOUR FORMES - Rect vs Circle
   // =============================================
   startShapesTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Formes demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -548,6 +555,7 @@ export class AppComponent implements OnDestroy {
   // 3. TOUR EVENEMENTS - click, key, custom
   // =============================================
   startEventsTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Evenements demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -580,6 +588,7 @@ export class AppComponent implements OnDestroy {
   // 4. TOUR AVANCE - boutons custom, couleurs, callbacks
   // =============================================
   startAdvancedTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Avance demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -637,6 +646,7 @@ export class AppComponent implements OnDestroy {
   // 5. TOUR SCROLL - elements hors viewport
   // =============================================
   startScrollTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Scroll demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -674,6 +684,7 @@ export class AppComponent implements OnDestroy {
   // 6. TOUR PROGRAMMATIQUE - API avancee
   // =============================================
   startProgrammaticTour(): void {
+    this.clearDemoTimeouts();
     this.log('--- Tour Programmatique demarre ---', 'info');
     const steps: WanejoyhintStep[] = [
       {
@@ -711,21 +722,23 @@ export class AppComponent implements OnDestroy {
     });
 
     // Auto-advance step 1 after 3s
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       if (this.hint.isRunning && this.hint.getCurrentStep() === 0) {
         this.log('API: hint.next() appele programmatiquement', 'warn');
         this.hint.next();
 
         // Auto-advance step 2 after 3s more
-        setTimeout(() => {
+        const t2 = setTimeout(() => {
           if (this.hint.isRunning && this.hint.getCurrentStep() === 1) {
             this.log('API: hint.next() appele a nouveau', 'warn');
             this.log('API: getCurrentStep() = ' + this.hint.getCurrentStep(), 'info');
             this.hint.next();
           }
         }, 3000);
+        this.demoTimeouts.push(t2);
       }
     }, 3000);
+    this.demoTimeouts.push(t1);
   }
 
   // =============================================

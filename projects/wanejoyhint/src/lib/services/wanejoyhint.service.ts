@@ -34,6 +34,7 @@ export class WanejoyhintService {
   private customEventSub: Subscription | null = null;
   private running = false;
   private pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
+  private savedScrollY = 0;
 
   // Observables for external consumers
   private stepChange$ = new Subject<{ index: number; step: WanejoyhintStep }>();
@@ -92,7 +93,7 @@ export class WanejoyhintService {
     this.currentStep = 0;
     this.running = true;
     this.createOverlay();
-    document.body.style.overflow = 'hidden';
+    this.lockScroll();
     this.events.onStart?.();
     this.executeStep();
   }
@@ -114,7 +115,7 @@ export class WanejoyhintService {
     }
     this.currentStep = Math.max(0, Math.min(stepIndex, this.steps.length - 1));
     this.running = true;
-    document.body.style.overflow = 'hidden';
+    this.lockScroll();
     if (!this.overlayRef) this.createOverlay();
     this.executeStep();
   }
@@ -165,7 +166,7 @@ export class WanejoyhintService {
     this.clearPendingTimeouts();
     this.cleanupEventListeners();
     this.destroyOverlay();
-    document.body.style.overflow = '';
+    this.unlockScroll();
     this.running = false;
   }
 
@@ -266,25 +267,26 @@ export class WanejoyhintService {
         rect.top >= 0 &&
         rect.bottom <= (window.innerHeight || document.documentElement.clientHeight);
 
-      const scrollSpeed = inViewport ? 0 : (step.scrollAnimationSpeed || 250);
-
       if (!inViewport) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      const innerTimeout = setTimeout(() => {
+        const scrollSpeed = step.scrollAnimationSpeed || 250;
+        this.scrollToElement(el, () => {
+          if (!this.running || !this.overlayRef) return;
+          this.overlayRef.instance.renderStep(
+            step,
+            this.currentStep,
+            this.steps.length
+          );
+          this.setupEventListeners(step, el);
+        }, scrollSpeed);
+      } else {
         if (!this.running || !this.overlayRef) return;
         this.overlayRef.instance.renderStep(
           step,
           this.currentStep,
           this.steps.length
         );
-
-        // Set up event listeners based on eventType
         this.setupEventListeners(step, el);
-      }, scrollSpeed + 20);
-
-      this.pendingTimeouts.push(innerTimeout);
+      }
     }, timeout);
 
     this.pendingTimeouts.push(outerTimeout);
@@ -360,6 +362,47 @@ export class WanejoyhintService {
       clearTimeout(t);
     }
     this.pendingTimeouts = [];
+  }
+
+  /**
+   * Lock body scroll without causing mobile page-jump.
+   * Saves current scroll position and uses position:fixed trick
+   * so the viewport stays in place on iOS Safari and Android.
+   */
+  private lockScroll(): void {
+    this.savedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${this.savedScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+  }
+
+  /**
+   * Unlock body scroll and restore the saved scroll position.
+   */
+  private unlockScroll(): void {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+    window.scrollTo(0, this.savedScrollY);
+  }
+
+  /**
+   * Temporarily unlock scroll so that scrollIntoView works,
+   * then re-lock after the scroll completes.
+   */
+  private scrollToElement(el: Element, callback: () => void, scrollSpeed: number): void {
+    this.unlockScroll();
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const t = setTimeout(() => {
+      if (!this.running) return;
+      this.lockScroll();
+      callback();
+    }, scrollSpeed + 20);
+    this.pendingTimeouts.push(t);
   }
 
   private handleNext(): void {

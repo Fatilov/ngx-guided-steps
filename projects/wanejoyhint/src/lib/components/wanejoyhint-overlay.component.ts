@@ -56,8 +56,6 @@ export interface OverlayState {
       <!-- SVG overlay with cutout -->
       <svg
         class="wjh-svg"
-        [attr.width]="svgWidth"
-        [attr.height]="svgHeight"
       >
         <defs>
           <mask [attr.id]="maskId">
@@ -208,12 +206,14 @@ export interface OverlayState {
 
     .wjh-overlay {
       position: fixed;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      /* stylelint-disable-next-line */
+      height: 100dvh;
       top: 0;
       left: 0;
       pointer-events: none;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .wjh-hidden { display: none; }
@@ -225,8 +225,10 @@ export interface OverlayState {
 
     .wjh-svg {
       position: absolute;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
+      /* stylelint-disable-next-line */
+      height: 100dvh;
       top: 0;
       left: 0;
       z-index: 100;
@@ -245,7 +247,9 @@ export interface OverlayState {
       display: inline-block;
       max-width: 80%;
       position: absolute;
-      overflow: hidden;
+      overflow: visible;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
       text-align: center;
       color: white;
       font-size: 22px;
@@ -273,6 +277,8 @@ export interface OverlayState {
     .wjh-event-blocker {
       position: absolute;
       pointer-events: all;
+      touch-action: none;
+      -webkit-touch-callout: none;
     }
     .wjh-blocker-top { top: 0; left: 0; width: 100%; }
     .wjh-blocker-bottom { left: 0; width: 100%; height: 2000px; }
@@ -283,6 +289,7 @@ export interface OverlayState {
     .wjh-btn {
       position: absolute;
       pointer-events: all;
+      touch-action: manipulation;
       box-sizing: border-box;
       min-width: 100px;
       height: 40px;
@@ -327,8 +334,11 @@ export interface OverlayState {
       display: inline-block;
       position: absolute;
       right: 10px;
+      right: max(10px, env(safe-area-inset-right, 0px));
       top: 10px;
+      top: max(10px, env(safe-area-inset-top, 0px));
       pointer-events: all;
+      touch-action: manipulation;
       box-sizing: content-box;
       width: 24px;
       height: 24px;
@@ -360,6 +370,19 @@ export interface OverlayState {
     .wjh-close-btn:active {
       border-color: rgba(33, 224, 163, 1);
       background: rgba(33, 224, 163, 1);
+    }
+
+    @media (max-width: 640px) {
+      .wjh-close-btn {
+        width: 32px;
+        height: 32px;
+        min-width: 44px;
+        min-height: 44px;
+        right: 6px;
+        right: max(6px, env(safe-area-inset-right, 0px));
+        top: 6px;
+        top: max(6px, env(safe-area-inset-top, 0px));
+      }
     }
   `],
 })
@@ -435,6 +458,22 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   ngOnInit(): void {
     fromEvent(window, 'resize')
       .pipe(debounceTime(150), takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.state.visible && this.state.step) {
+          this.recalculate();
+        }
+      });
+
+    fromEvent(window, 'scroll', { capture: true })
+      .pipe(debounceTime(50), takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.state.visible && this.state.step) {
+          this.recalculate();
+        }
+      });
+
+    fromEvent(window, 'orientationchange')
+      .pipe(debounceTime(200), takeUntil(this.destroy$))
       .subscribe(() => {
         if (this.state.visible && this.state.step) {
           this.recalculate();

@@ -74,7 +74,11 @@ export class PositionService {
     const rightOffset = vw - (data.centerX + halfW);
 
     const isMobileView = vw < 640;
-    const labelShift = isMobileView ? 80 : (vh < 670 ? 130 : 150);
+    const isSmallMobile = vw <= 360;
+    const isMidMobile = vw <= 414;
+    const labelShift = isMobileView
+      ? (isSmallMobile ? 50 : (isMidMobile ? 65 : 80))
+      : (vh < 670 ? 130 : 150);
     const labelMargin = isMobileView ? 0 : (vh < 670 ? 0 : 40);
     const labelShiftWithHeight = labelShift + labelHeight + labelMargin;
     const labelVerOffset = halfH + labelShift;
@@ -106,9 +110,9 @@ export class PositionService {
     }
 
     const dataWidthSize =
-      data.shape === 'circle' ? data.radius * 2 : data.width || data.radius * 2;
+      data.shape === 'circle' ? data.radius * 2 : (data.width || data.radius * 2 || 0);
     const dataHeightSize =
-      data.shape === 'circle' ? data.radius * 2 : data.height || data.radius * 2;
+      data.shape === 'circle' ? data.radius * 2 : (data.height || data.radius * 2 || 0);
 
     const isMobile = vw < 640;
     const horGap = isMobile ? 20 : 80;
@@ -210,6 +214,7 @@ export class PositionService {
     if (labelX < padding) labelX = padding;
     if (labelX + labelWidth > vw - padding) labelX = vw - labelWidth - padding;
     if (labelY < padding) labelY = padding;
+    if (labelY + labelHeight > vh - padding) labelY = vh - labelHeight - padding;
 
     // Recompute arrow origin after clamping
     xFrom = labelX + labelWidth / 2;
@@ -250,8 +255,10 @@ export class PositionService {
     showNext: boolean
   ): { prev: ButtonPosition; next: ButtonPosition; skip: ButtonPosition } {
     const vw = window.innerWidth;
-    let summaryWidth = nextBtnWidth + skipBtnWidth + prevBtnWidth + 30;
+    const vh = window.innerHeight;
+    const summaryWidth = nextBtnWidth + skipBtnWidth + prevBtnWidth + 30;
     let distance = labelX - 100;
+    const btnHeight = 36;
     let verPos = labelY + labelHeight + 40;
 
     if (summaryWidth + labelX > xTo) {
@@ -261,6 +268,14 @@ export class PositionService {
     if (summaryWidth + distance > vw || distance < 0) {
       distance = 10;
       verPos = yFrom < yTo ? labelY - 80 : labelY + labelHeight + 40;
+    }
+
+    // Clamp verPos so buttons stay within viewport vertically
+    const minY = 10;
+    if (verPos < minY) {
+      verPos = minY;
+    } else if (verPos + btnHeight > vh - minY) {
+      verPos = vh - btnHeight - minY;
     }
 
     let leftNext = distance + prevBtnWidth + 10;
@@ -274,16 +289,52 @@ export class PositionService {
       leftSkip = distance + nextBtnWidth + 10;
     }
 
-    // Clamp all button positions to stay within viewport
-    const maxX = vw - 10;
-    distance = Math.max(10, Math.min(distance, maxX));
-    leftNext = Math.max(10, Math.min(leftNext, maxX));
-    leftSkip = Math.max(10, Math.min(leftSkip, maxX));
+    // Clamp all button positions to stay within viewport, accounting for button widths
+    const minX = 10;
+    distance = Math.max(minX, Math.min(distance, vw - prevBtnWidth - minX));
+    leftNext = Math.max(minX, Math.min(leftNext, vw - nextBtnWidth - minX));
+    leftSkip = Math.max(minX, Math.min(leftSkip, vw - skipBtnWidth - minX));
+
+    // If total button width exceeds viewport, stack buttons vertically
+    const btnRowHeight = 40;
+    let prevY = verPos;
+    let nextY = verPos;
+    let skipY = verPos;
+
+    if (summaryWidth > vw - 2 * minX) {
+      // Buttons don't fit in a single row; stack them
+      distance = minX;
+      leftNext = minX;
+      leftSkip = minX;
+      if (showPrev) {
+        nextY = prevY + btnRowHeight;
+        skipY = prevY + btnRowHeight * 2;
+      } else {
+        skipY = nextY + btnRowHeight;
+      }
+
+      // Clamp stacked buttons so the bottommost row stays in viewport
+      const maxBottomY = Math.max(prevY, nextY, skipY);
+      if (maxBottomY + btnHeight > vh - minY) {
+        const overflow = maxBottomY + btnHeight - (vh - minY);
+        prevY -= overflow;
+        nextY -= overflow;
+        skipY -= overflow;
+        // Ensure none go above the viewport
+        const minStackY = Math.min(prevY, nextY, skipY);
+        if (minStackY < minY) {
+          const shift = minY - minStackY;
+          prevY += shift;
+          nextY += shift;
+          skipY += shift;
+        }
+      }
+    }
 
     return {
-      prev: { x: distance, y: verPos },
-      next: { x: leftNext, y: verPos },
-      skip: { x: leftSkip, y: verPos },
+      prev: { x: distance, y: prevY },
+      next: { x: leftNext, y: nextY },
+      skip: { x: leftSkip, y: skipY },
     };
   }
 
