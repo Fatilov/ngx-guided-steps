@@ -1,9 +1,10 @@
-import { Component, inject, OnDestroy } from '@angular/core';
-import { WanejoyhintService, WanejoyhintStep } from '../../../../projects/wanejoyhint/src/public-api';
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
+  imports: [RouterLink],
   template: `
     <!-- Hero Section -->
     <section id="hero" class="hero">
@@ -15,10 +16,10 @@ import { WanejoyhintService, WanejoyhintStep } from '../../../../projects/wanejo
           et une accessibilite complete.
         </p>
         <div class="hero-actions">
-          <button id="hero-cta" class="btn btn-primary" (click)="startQuickTour()">
+          <a id="hero-cta" class="btn btn-primary" routerLink="/features">
             <span class="btn-icon">&#9654;</span>
-            Lancer la demo
-          </button>
+            Lancer le parcours complet
+          </a>
           <a
             class="btn btn-secondary"
             href="https://github.com/wanejoyhint/wanejoyhint"
@@ -831,51 +832,4 @@ import { WanejoyhintService, WanejoyhintStep } from '../../../../projects/wanejo
     }
   `],
 })
-export class HomeComponent implements OnDestroy {
-  private readonly hint = inject(WanejoyhintService);
-
-  private readonly steps: WanejoyhintStep[] = [
-    {
-      selector: '#hero',
-      description: 'Bienvenue ! Decouvrez Wanejoyhint, votre bibliotheque de tutoriels interactifs pour Angular.',
-      eventType: 'next',
-    },
-    {
-      selector: '#feature-grid',
-      description: "Toutes les fonctionnalites cles en un coup d'oeil.",
-      eventType: 'next',
-      showPrev: true,
-    },
-    {
-      selector: '#feat-svg',
-      description: "L'overlay utilise un masque SVG pour decouper l'element cible — <b>rect</b> ou <b>circle</b>.",
-      shape: 'rect',
-      eventType: 'next',
-      showPrev: true,
-    },
-    {
-      selector: '#install-section',
-      description: 'Installation en une seule commande npm.',
-      eventType: 'next',
-      showPrev: true,
-    },
-    {
-      selector: '#stats-bar',
-      description: 'Zero jQuery, Angular 18+, accessible et teste. <b>Pret pour la production !</b>',
-      eventType: 'next',
-      showPrev: true,
-    },
-  ];
-
-  startQuickTour(): void {
-    this.hint.setSteps(this.steps);
-    this.hint.run({
-      onStart: () => console.log('Tour demarre'),
-      onEnd: () => console.log('Tour termine'),
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.hint.stop();
-  }
-}
+export class HomeComponent {}
