@@ -67,6 +67,12 @@ export interface WanejoyhintConfig {
 
   /** Visual theme: 'light' (default) or 'dark' */
   theme?: WanejoyhintTheme;
+
+  /** Enable arrow key navigation between steps (default: true) */
+  keyboardNav?: boolean;
+
+  /** Allow clicking the backdrop (dark overlay) to dismiss the tour (default: false) */
+  backdropDismiss?: boolean;
 }
 
 export const DEFAULT_CONFIG: WanejoyhintConfig = {
@@ -78,6 +84,8 @@ export const DEFAULT_CONFIG: WanejoyhintConfig = {
   animationTime: 800,
   showProgress: false,
   theme: 'light',
+  keyboardNav: true,
+  backdropDismiss: false,
 };
 
 export const WANEJOYHINT_CONFIG = new InjectionToken<WanejoyhintConfig>(

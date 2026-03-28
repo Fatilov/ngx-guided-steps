@@ -8,8 +8,13 @@
   - Template interpolation with `{{current}}`, `{{total}}`, `{{description}}` placeholders
 - **Theme support**: `theme` config option (`'light'` or `'dark'`) for visual theme switching
   - Dark theme inverts button colors, text, and close button for light-background overlays
+- **Keyboard navigation**: Arrow keys left/right to navigate between steps (`keyboardNav` config, default: true)
+- **Auto-advance**: `autoAdvance` step property with visible countdown timer, cancelled on manual interaction
+- **Backdrop dismiss**: `backdropDismiss` config option to close the tour by clicking the overlay
 - **Smooth step transitions**: CSS fade animation between step changes
 - **CSS custom properties documentation**: Full reference for theming via CSS variables
+- **Complete developer guide**: README rewritten as a step-by-step guide in French (installation to integration)
+- Unit tests: 48 total (up from 39)
 
 ### Changed
 - Button text now sourced from `labels` (with backwards compat for `nextButtonText`, etc.)

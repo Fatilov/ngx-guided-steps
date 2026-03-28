@@ -1,5 +1,6 @@
 import { WanejoyhintService } from './wanejoyhint.service';
 import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
+import { DEFAULT_CONFIG, DEFAULT_LABELS } from '../models/wanejoyhint-config.model';
 import { Subject } from 'rxjs';
 
 function createServiceManually(): WanejoyhintService {
@@ -210,6 +211,95 @@ describe('WanejoyhintService', () => {
       };
       (service as any).executeStep();
       expect(onBeforeStart).toHaveBeenCalled();
+    });
+
+    it('should call onNext callback on handleNext', () => {
+      const onNext = jest.fn();
+      service.setSteps([makeStep({ onNext }), makeStep()]);
+      (service as any).running = true;
+      (service as any).overlayRef = {
+        instance: { renderStep: jest.fn() },
+      };
+      (service as any).handleNext();
+      expect(onNext).toHaveBeenCalled();
+    });
+
+    it('should call onPrev callback on handlePrev', () => {
+      const onPrev = jest.fn();
+      service.setSteps([makeStep(), makeStep({ onPrev })]);
+      (service as any).running = true;
+      (service as any).currentStep = 1;
+      (service as any).overlayRef = {
+        instance: { renderStep: jest.fn() },
+      };
+      (service as any).handlePrev();
+      expect(onPrev).toHaveBeenCalled();
+    });
+
+    it('should call onSkip callback on handleSkip', () => {
+      const onSkip = jest.fn();
+      service.setSteps([makeStep({ onSkip })]);
+      (service as any).running = true;
+      (service as any).handleSkip();
+      expect(onSkip).toHaveBeenCalled();
+    });
+  });
+
+  describe('config defaults', () => {
+    it('should have correct DEFAULT_CONFIG values', () => {
+      expect(DEFAULT_CONFIG.backgroundColor).toBe('rgba(0,0,0,0.6)');
+      expect(DEFAULT_CONFIG.zIndex).toBe(1010);
+      expect(DEFAULT_CONFIG.animationTime).toBe(800);
+      expect(DEFAULT_CONFIG.showProgress).toBe(false);
+      expect(DEFAULT_CONFIG.theme).toBe('light');
+      expect(DEFAULT_CONFIG.keyboardNav).toBe(true);
+      expect(DEFAULT_CONFIG.backdropDismiss).toBe(false);
+    });
+
+    it('should have correct DEFAULT_LABELS values', () => {
+      expect(DEFAULT_LABELS.next).toBe('Next');
+      expect(DEFAULT_LABELS.prev).toBe('Previous');
+      expect(DEFAULT_LABELS.skip).toBe('Skip');
+      expect(DEFAULT_LABELS.close).toBe('Close tutorial');
+      expect(DEFAULT_LABELS.progress).toContain('{{current}}');
+      expect(DEFAULT_LABELS.progress).toContain('{{total}}');
+      expect(DEFAULT_LABELS.stepLabel).toContain('{{current}}');
+      expect(DEFAULT_LABELS.stepAnnouncement).toContain('{{description}}');
+    });
+  });
+
+  describe('step model', () => {
+    it('should support autoAdvance property', () => {
+      const step = makeStep({ autoAdvance: 3000 });
+      expect(step.autoAdvance).toBe(3000);
+    });
+
+    it('should support step-level callbacks', () => {
+      const step = makeStep({
+        onNext: jest.fn(),
+        onPrev: jest.fn(),
+        onSkip: jest.fn(),
+        onBeforeStart: jest.fn(),
+      });
+      expect(step.onNext).toBeDefined();
+      expect(step.onPrev).toBeDefined();
+      expect(step.onSkip).toBeDefined();
+      expect(step.onBeforeStart).toBeDefined();
+    });
+  });
+
+  describe('validateSteps', () => {
+    it('should return empty array when all selectors exist', () => {
+      service.setSteps([makeStep({ selector: '.test-el' })]);
+      expect(service.validateSteps()).toEqual([]);
+    });
+
+    it('should return missing selectors', () => {
+      service.setSteps([
+        makeStep({ selector: '.test-el' }),
+        makeStep({ selector: '.nonexistent' }),
+      ]);
+      expect(service.validateSteps()).toEqual(['.nonexistent']);
     });
   });
 });

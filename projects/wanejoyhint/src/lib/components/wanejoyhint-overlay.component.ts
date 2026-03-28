@@ -116,6 +116,9 @@ export interface OverlayState {
           height="100%"
           [attr.fill]="config.backgroundColor"
           [attr.mask]="'url(#' + maskId + ')'"
+          [style.pointer-events]="config.backdropDismiss ? 'all' : 'none'"
+          [style.cursor]="config.backdropDismiss ? 'pointer' : 'default'"
+          (click)="onBackdropClick()"
         />
 
         <!-- Arrow path -->
@@ -143,6 +146,9 @@ export interface OverlayState {
         <span [innerHTML]="state.step.description"></span>
         @if (config.showProgress) {
         <div class="wjh-progress">{{ progressText }}</div>
+        }
+        @if (countdownSeconds > 0) {
+        <div class="wjh-countdown">{{ countdownSeconds }}s</div>
         }
       </div>
       }
@@ -430,6 +436,14 @@ export interface OverlayState {
       letter-spacing: 1px;
     }
 
+    /* Auto-advance countdown */
+    .wjh-countdown {
+      margin-top: 4px;
+      font-size: 11px;
+      opacity: 0.6;
+      font-variant-numeric: tabular-nums;
+    }
+
     /* Step transition */
     .wjh-transitioning .wjh-label,
     .wjh-transitioning .wjh-arrow,
@@ -546,6 +560,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   _onPrev: () => void = () => {};
   _onSkip: () => void = () => {};
 
+  // Auto-advance countdown
+  countdownSeconds = 0;
+  private autoAdvanceTimer: ReturnType<typeof setTimeout> | null = null;
+  private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
   private destroy$ = new Subject<void>();
   private pendingRaf: number | null = null;
 
@@ -587,7 +606,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
         }
       });
 
-    // ESC key to close
+    // Keyboard handling: ESC, arrow keys, Tab focus trap
     fromEvent<KeyboardEvent>(document, 'keydown')
       .pipe(takeUntil(this.destroy$))
       .subscribe((e) => {
@@ -595,6 +614,16 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
         if (e.key === 'Escape') {
           e.preventDefault();
           this.onSkipClick();
+        }
+        // Arrow key navigation
+        if (this.config.keyboardNav) {
+          if (e.key === 'ArrowRight') {
+            e.preventDefault();
+            this.onNextClick();
+          } else if (e.key === 'ArrowLeft') {
+            e.preventDefault();
+            this.onPrevClick();
+          }
         }
         // Focus trap: Tab/Shift+Tab cycle between visible buttons
         if (e.key === 'Tab') {
@@ -608,6 +637,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.clearAutoAdvance();
     if (this.pendingRaf !== null) {
       cancelAnimationFrame(this.pendingRaf);
     }
@@ -753,6 +783,12 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
       this.computeButtonPositions();
       this.cdr.detectChanges();
     });
+
+    // Auto-advance countdown
+    this.clearAutoAdvance();
+    if (step.autoAdvance && step.autoAdvance > 0) {
+      this.startAutoAdvance(step.autoAdvance);
+    }
   }
 
   private computeCutout(resolved: ResolvedStepData): void {
@@ -871,6 +907,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   }
 
   hide(): void {
+    this.clearAutoAdvance();
     this.state = { ...this.state, visible: false };
     this.cutout = null;
     this.labelPos = null;
@@ -880,15 +917,54 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   }
 
   onNextClick(): void {
+    this.clearAutoAdvance();
     this._onNext();
   }
 
   onPrevClick(): void {
+    this.clearAutoAdvance();
     this._onPrev();
   }
 
   onSkipClick(): void {
+    this.clearAutoAdvance();
     this._onSkip();
+  }
+
+  onBackdropClick(): void {
+    if (this.config.backdropDismiss) {
+      this.onSkipClick();
+    }
+  }
+
+  private startAutoAdvance(ms: number): void {
+    this.countdownSeconds = Math.ceil(ms / 1000);
+    this.cdr.detectChanges();
+
+    this.countdownInterval = setInterval(() => {
+      this.countdownSeconds--;
+      if (this.countdownSeconds <= 0) {
+        this.clearAutoAdvance();
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+
+    this.autoAdvanceTimer = setTimeout(() => {
+      this.clearAutoAdvance();
+      this._onNext();
+    }, ms);
+  }
+
+  private clearAutoAdvance(): void {
+    if (this.autoAdvanceTimer !== null) {
+      clearTimeout(this.autoAdvanceTimer);
+      this.autoAdvanceTimer = null;
+    }
+    if (this.countdownInterval !== null) {
+      clearInterval(this.countdownInterval);
+      this.countdownInterval = null;
+    }
+    this.countdownSeconds = 0;
   }
 
   private trapFocus(e: KeyboardEvent): void {

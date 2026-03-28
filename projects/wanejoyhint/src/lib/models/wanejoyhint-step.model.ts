@@ -69,6 +69,9 @@ export interface WanejoyhintStep {
   left?: number;
   right?: number;
 
+  /** Auto-advance to the next step after this many milliseconds. Shows a countdown in the progress area. */
+  autoAdvance?: number;
+
   /** Callback fired before this step starts */
   onBeforeStart?: () => void;
 
