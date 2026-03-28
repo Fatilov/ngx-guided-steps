@@ -103,24 +103,26 @@ import {
               <button class="tool-btn" id="tool-delete">Supprimer</button>
               <button class="tool-btn" id="tool-export">Exporter</button>
             </div>
-            <table class="demo-table" id="demo-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nom</th>
-                  <th>Statut</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let item of tableData">
-                  <td>{{ item.id }}</td>
-                  <td>{{ item.name }}</td>
-                  <td><span class="status" [class]="'status-' + item.status">{{ item.status }}</span></td>
-                  <td><button class="btn btn-small">Voir</button></td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="table-wrapper">
+              <table class="demo-table" id="demo-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of tableData">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td><span class="status" [class]="'status-' + item.status">{{ item.status }}</span></td>
+                    <td><button class="btn btn-small">Voir</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
@@ -151,36 +153,42 @@ import {
       color: #333;
       background: #f5f7fa;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .demo-header {
       background: linear-gradient(135deg, #1ecd97, #18a87a);
       color: white;
-      padding: 30px 40px;
+      padding: 24px 20px;
       text-align: center;
     }
-    .demo-header h1 { font-size: 2em; margin-bottom: 8px; }
-    .demo-header p { opacity: 0.9; font-size: 1.1em; }
+    .demo-header h1 { font-size: 1.6em; margin-bottom: 6px; }
+    .demo-header p { opacity: 0.9; font-size: 0.95em; }
 
     .control-panel {
-      padding: 30px 40px;
+      padding: 20px 16px;
       background: white;
       border-bottom: 1px solid #e0e0e0;
     }
-    .control-panel h2 { margin-bottom: 15px; }
+    .control-panel h2 { margin-bottom: 12px; font-size: 1.2em; }
 
-    .btn-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
 
     .btn {
-      padding: 10px 20px;
+      padding: 8px 14px;
       border: 2px solid #1ecd97;
       border-radius: 25px;
       background: transparent;
       color: #1ecd97;
-      font-size: 14px;
+      font-size: 13px;
       cursor: pointer;
       transition: all 0.3s;
       font-weight: 500;
+      text-align: center;
     }
     .btn:hover { background: #1ecd97; color: white; }
     .btn-primary { border-color: #1ecd97; color: #1ecd97; }
@@ -195,26 +203,27 @@ import {
     .btn-info:hover { background: #29b6f6; }
     .btn-dark { border-color: #455a64; color: #455a64; }
     .btn-dark:hover { background: #455a64; }
-    .btn-small { padding: 5px 15px; font-size: 12px; }
+    .btn-small { padding: 5px 12px; font-size: 12px; }
 
     .log-section {
-      padding: 20px 40px;
+      padding: 16px;
       background: #fff;
-      margin: 20px 40px;
+      margin: 12px 16px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    .log-section h3 { margin-bottom: 10px; }
+    .log-section h3 { margin-bottom: 8px; font-size: 1em; }
     .log-output {
       background: #1e1e2e;
       color: #cdd6f4;
-      padding: 15px;
+      padding: 12px;
       border-radius: 8px;
-      max-height: 200px;
+      max-height: 150px;
       overflow-y: auto;
-      font-family: 'Fira Code', monospace;
-      font-size: 13px;
-      margin-bottom: 10px;
+      font-family: 'Fira Code', 'Courier New', monospace;
+      font-size: 12px;
+      margin-bottom: 8px;
+      word-break: break-word;
     }
     .log-entry { padding: 2px 0; }
     .log-info { color: #89b4fa; }
@@ -222,27 +231,32 @@ import {
     .log-warn { color: #fab387; }
     .log-placeholder { color: #585b70; font-style: italic; }
 
-    .demo-elements { padding: 20px 40px; }
-    .row { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
+    .demo-elements { padding: 12px 16px; }
+    .row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
 
     .card {
       background: white;
       border-radius: 10px;
-      padding: 20px;
+      padding: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      flex: 1;
-      min-width: 200px;
+      flex: 1 1 100%;
+      min-width: 0;
     }
-    .card h3 { margin-bottom: 10px; color: #333; }
+    .card h3 { margin-bottom: 8px; color: #333; font-size: 1em; }
 
     .avatar {
-      width: 50px; height: 50px;
+      width: 44px; height: 44px;
       border-radius: 50%;
       background: #6c63ff;
       color: white;
       display: flex; align-items: center; justify-content: center;
-      font-weight: bold; font-size: 18px;
-      margin-bottom: 10px;
+      font-weight: bold; font-size: 16px;
+      margin-bottom: 8px;
     }
 
     .badge {
@@ -250,7 +264,7 @@ import {
       color: white;
       padding: 3px 10px;
       border-radius: 12px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
     }
 
@@ -269,74 +283,138 @@ import {
     .sidebar {
       background: white;
       border-radius: 10px;
-      padding: 20px;
+      padding: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      min-width: 180px;
-      width: 200px;
+      flex: 1 1 100%;
+      min-width: 0;
     }
-    .sidebar h3 { margin-bottom: 15px; }
+    .sidebar h3 { margin-bottom: 12px; font-size: 1em; }
     .sidebar ul { list-style: none; }
     .menu-item {
-      padding: 10px 15px;
+      padding: 10px 12px;
       border-radius: 8px;
       cursor: pointer;
       transition: background 0.2s;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     .menu-item:hover { background: #f0f0f0; }
 
     .main-content {
-      flex: 1;
+      flex: 1 1 100%;
+      min-width: 0;
       background: white;
       border-radius: 10px;
-      padding: 20px;
+      padding: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
-    .main-content h3 { margin-bottom: 10px; }
+    .main-content h3 { margin-bottom: 8px; font-size: 1em; }
 
     .toolbar {
-      display: flex; gap: 8px;
-      margin: 15px 0;
+      display: flex;
+      gap: 6px;
+      margin: 12px 0;
+      flex-wrap: wrap;
     }
     .tool-btn {
-      padding: 6px 14px;
+      padding: 6px 10px;
       border: 1px solid #ddd;
       border-radius: 6px;
       background: #fafafa;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       transition: all 0.2s;
     }
     .tool-btn:hover { background: #e8e8e8; }
 
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
     .demo-table {
       width: 100%;
       border-collapse: collapse;
+      min-width: 360px;
     }
     .demo-table th, .demo-table td {
-      padding: 10px 15px;
+      padding: 8px 10px;
       text-align: left;
       border-bottom: 1px solid #eee;
+      font-size: 13px;
+      white-space: nowrap;
     }
     .demo-table th { font-weight: 600; color: #666; }
 
     .status {
-      padding: 3px 10px;
+      padding: 3px 8px;
       border-radius: 12px;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
     }
     .status-actif { background: #e8f5e9; color: #2e7d32; }
     .status-inactif { background: #fce4ec; color: #c62828; }
     .status-attente { background: #fff3e0; color: #ef6c00; }
 
-    .scroll-target-section { padding: 0 40px; }
+    .scroll-target-section { padding: 0 16px; }
 
     .demo-footer {
       text-align: center;
-      padding: 20px;
+      padding: 16px;
       color: #999;
-      margin-top: 40px;
+      margin-top: 30px;
+      font-size: 0.85em;
+    }
+
+    /* ==================== TABLET ==================== */
+    @media (min-width: 640px) {
+      .demo-header { padding: 28px 30px; }
+      .demo-header h1 { font-size: 1.8em; }
+
+      .control-panel { padding: 24px 30px; }
+
+      .btn { font-size: 14px; padding: 9px 18px; }
+
+      .log-section { margin: 16px 30px; padding: 20px; }
+
+      .demo-elements { padding: 16px 30px; }
+
+      .card { flex: 1 1 calc(50% - 8px); }
+      .sidebar { flex: 0 0 200px; }
+      .main-content { flex: 1 1 0; }
+
+      .scroll-target-section { padding: 0 30px; }
+    }
+
+    /* ==================== DESKTOP ==================== */
+    @media (min-width: 960px) {
+      .demo-header { padding: 30px 40px; }
+      .demo-header h1 { font-size: 2em; }
+      .demo-header p { font-size: 1.1em; }
+
+      .control-panel { padding: 30px 40px; }
+      .control-panel h2 { font-size: 1.4em; }
+
+      .btn-group { gap: 10px; }
+
+      .log-section { margin: 20px 40px; padding: 20px 40px; }
+      .log-output { font-size: 13px; max-height: 200px; }
+
+      .demo-elements { padding: 20px 40px; }
+      .row { gap: 20px; margin-bottom: 20px; }
+
+      .card {
+        flex: 1 1 0;
+        min-width: 200px;
+        padding: 20px;
+      }
+
+      .demo-table th, .demo-table td {
+        padding: 10px 15px;
+        font-size: 14px;
+      }
+
+      .scroll-target-section { padding: 0 40px; }
     }
   `],
 })
