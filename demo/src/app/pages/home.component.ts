@@ -22,7 +22,7 @@ import { RouterLink } from '@angular/router';
           </a>
           <a
             class="btn btn-secondary"
-            href="https://github.com/wanejoyhint/wanejoyhint"
+            href="https://github.com/fatilov/wanejoyhint"
             target="_blank"
             rel="noopener noreferrer"
           >
