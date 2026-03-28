@@ -11,8 +11,10 @@ import {
   AfterViewInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, fromEvent, merge } from 'rxjs';
+import { Subject, fromEvent } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
+
+let nextInstanceId = 0;
 import {
   WanejoyhintConfig,
   DEFAULT_CONFIG,
@@ -58,7 +60,7 @@ export interface OverlayState {
         [attr.height]="svgHeight"
       >
         <defs>
-          <mask id="wjh-mask">
+          <mask [attr.id]="maskId">
             <rect width="100%" height="100%" fill="white" />
             <rect
               *ngIf="cutout && state.resolved?.shape === 'rect'"
@@ -81,7 +83,7 @@ export interface OverlayState {
             />
           </mask>
           <marker
-            id="wjh-arrow-marker"
+            [attr.id]="markerId"
             viewBox="0 0 36 21"
             refX="21"
             refY="10"
@@ -103,7 +105,7 @@ export interface OverlayState {
           width="100%"
           height="100%"
           [attr.fill]="config.backgroundColor"
-          mask="url(#wjh-mask)"
+          [attr.mask]="'url(#' + maskId + ')'"
         />
 
         <!-- Arrow path -->
@@ -112,7 +114,7 @@ export interface OverlayState {
           [attr.d]="arrowPath"
           [attr.stroke]="arrowColor"
           style="fill:none; stroke-width:3"
-          marker-end="url(#wjh-arrow-marker)"
+          [attr.marker-end]="'url(#' + markerId + ')'"
           class="wjh-arrow"
         />
       </svg>
@@ -360,6 +362,11 @@ export interface OverlayState {
 export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('labelEl') labelEl?: ElementRef<HTMLElement>;
 
+  // Unique SVG IDs per instance to avoid collisions
+  private instanceId = nextInstanceId++;
+  maskId = `wjh-mask-${this.instanceId}`;
+  markerId = `wjh-arrow-marker-${this.instanceId}`;
+
   config: Required<WanejoyhintConfig>;
   state: OverlayState = {
     visible: false,
@@ -411,6 +418,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   _onSkip: () => void = () => {};
 
   private destroy$ = new Subject<void>();
+  private pendingRaf: number | null = null;
 
   constructor(
     private positionService: PositionService,
@@ -435,6 +443,9 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.pendingRaf !== null) {
+      cancelAnimationFrame(this.pendingRaf);
+    }
   }
 
   /**
@@ -550,7 +561,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     this.cdr.detectChanges();
 
     // Recompute button positions after label is rendered
-    requestAnimationFrame(() => {
+    if (this.pendingRaf !== null) {
+      cancelAnimationFrame(this.pendingRaf);
+    }
+    this.pendingRaf = requestAnimationFrame(() => {
+      this.pendingRaf = null;
       this.computeButtonPositions();
       this.cdr.detectChanges();
     });

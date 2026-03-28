@@ -7,8 +7,7 @@ import {
   Inject,
   Optional,
 } from '@angular/core';
-import { Subject, Observable, Subscription, fromEvent } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
+import { Subject, Observable, Subscription } from 'rxjs';
 import {
   WanejoyhintConfig,
   DEFAULT_CONFIG,
@@ -31,10 +30,10 @@ export class WanejoyhintService {
   private overlayRef: ComponentRef<WanejoyhintOverlayComponent> | null = null;
   private events: WanejoyhintEvents = {};
   private config: Required<WanejoyhintConfig>;
-  private destroy$ = new Subject<void>();
   private eventListenerCleanup: (() => void) | null = null;
   private customEventSub: Subscription | null = null;
   private running = false;
+  private pendingTimeouts: ReturnType<typeof setTimeout>[] = [];
 
   // Observables for external consumers
   private stepChange$ = new Subject<{ index: number; step: WanejoyhintStep }>();
@@ -86,6 +85,9 @@ export class WanejoyhintService {
    * Start the tutorial from the beginning.
    */
   run(events?: WanejoyhintEvents): void {
+    if (this.steps.length === 0) {
+      throw new Error('Wanejoyhint: No steps configured. Call setSteps() first.');
+    }
     this.events = events || {};
     this.currentStep = 0;
     this.running = true;
@@ -107,8 +109,12 @@ export class WanejoyhintService {
    * Re-run from a specific step index.
    */
   reRun(stepIndex: number): void {
-    this.currentStep = stepIndex;
+    if (this.steps.length === 0) {
+      throw new Error('Wanejoyhint: No steps configured. Call setSteps() first.');
+    }
+    this.currentStep = Math.max(0, Math.min(stepIndex, this.steps.length - 1));
     this.running = true;
+    document.body.style.overflow = 'hidden';
     if (!this.overlayRef) this.createOverlay();
     this.executeStep();
   }
@@ -117,6 +123,7 @@ export class WanejoyhintService {
    * Move to the next step programmatically.
    */
   next(): void {
+    if (!this.running) return;
     this.currentStep++;
     this.executeStep();
   }
@@ -125,6 +132,7 @@ export class WanejoyhintService {
    * Move to the previous step programmatically.
    */
   prev(): void {
+    if (!this.running) return;
     if (this.currentStep > 0) {
       this.currentStep--;
       this.executeStep();
@@ -132,13 +140,21 @@ export class WanejoyhintService {
   }
 
   /**
-   * Trigger a custom event to advance from a 'custom' event step.
+   * Trigger a named event to advance from a 'custom' event step.
    */
   trigger(eventName: string): void {
+    if (!this.running) return;
     if (eventName === 'next') {
       this.next();
     } else if (eventName === 'skip') {
-      this.stop();
+      this.handleSkip();
+    } else {
+      // For custom event types: advance if current step is a 'custom' step
+      const step = this.steps[this.currentStep];
+      if (step && step.eventType === 'custom') {
+        this.currentStep++;
+        this.executeStep();
+      }
     }
   }
 
@@ -146,6 +162,7 @@ export class WanejoyhintService {
    * Stop and destroy the tutorial.
    */
   stop(): void {
+    this.clearPendingTimeouts();
     this.cleanupEventListeners();
     this.destroyOverlay();
     document.body.style.overflow = '';
@@ -174,7 +191,7 @@ export class WanejoyhintService {
     }
 
     // Remove any existing overlay
-    const existing = document.querySelector('wanejoyhint-overlay');
+    const existing = document.getElementById('wanejoyhint-host');
     if (existing) existing.remove();
 
     const hostEl = document.createElement('div');
@@ -205,6 +222,7 @@ export class WanejoyhintService {
   }
 
   private executeStep(): void {
+    this.clearPendingTimeouts();
     this.cleanupEventListeners();
 
     // Check if we've passed the last step
@@ -220,7 +238,11 @@ export class WanejoyhintService {
     }
 
     const step = this.steps[this.currentStep];
-    this.events.onNext?.();
+
+    // Only fire onNext for steps after the first
+    if (this.currentStep > 0) {
+      this.events.onNext?.();
+    }
     this.stepChange$.next({ index: this.currentStep, step });
 
     // onBeforeStart callback
@@ -228,7 +250,9 @@ export class WanejoyhintService {
 
     const timeout = step.timeout || 0;
 
-    setTimeout(() => {
+    const outerTimeout = setTimeout(() => {
+      if (!this.running) return;
+
       // Scroll to element if not in viewport
       const el = document.querySelector(step.selector);
       if (!el) {
@@ -248,8 +272,8 @@ export class WanejoyhintService {
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
-      setTimeout(() => {
-        if (!this.overlayRef) return;
+      const innerTimeout = setTimeout(() => {
+        if (!this.running || !this.overlayRef) return;
         this.overlayRef.instance.renderStep(
           step,
           this.currentStep,
@@ -259,7 +283,11 @@ export class WanejoyhintService {
         // Set up event listeners based on eventType
         this.setupEventListeners(step, el);
       }, scrollSpeed + 20);
+
+      this.pendingTimeouts.push(innerTimeout);
     }, timeout);
+
+    this.pendingTimeouts.push(outerTimeout);
   }
 
   private setupEventListeners(step: WanejoyhintStep, el: Element): void {
@@ -268,9 +296,7 @@ export class WanejoyhintService {
     switch (eventType) {
       case 'auto':
         // Simulate the event and immediately advance
-        if (step.eventType === 'auto') {
-          (el as HTMLElement).click?.();
-        }
+        (el as HTMLElement).click?.();
         this.currentStep++;
         this.executeStep();
         return;
@@ -295,7 +321,7 @@ export class WanejoyhintService {
       case 'key': {
         const handler = (e: Event) => {
           const keyEvent = e as KeyboardEvent;
-          if (step.keyCode && keyEvent.which === step.keyCode) {
+          if (step.keyCode && keyEvent.keyCode === step.keyCode) {
             this.currentStep++;
             this.executeStep();
           }
@@ -308,7 +334,7 @@ export class WanejoyhintService {
       }
 
       case 'custom':
-        // Will be advanced by calling trigger() or next()
+        // Will be advanced by calling trigger(eventName) or next()
         break;
 
       case 'next':
@@ -327,6 +353,13 @@ export class WanejoyhintService {
       this.customEventSub.unsubscribe();
       this.customEventSub = null;
     }
+  }
+
+  private clearPendingTimeouts(): void {
+    for (const t of this.pendingTimeouts) {
+      clearTimeout(t);
+    }
+    this.pendingTimeouts = [];
   }
 
   private handleNext(): void {
