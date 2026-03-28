@@ -953,7 +953,12 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     this.countdownInterval = setInterval(() => {
       this.countdownSeconds--;
       if (this.countdownSeconds <= 0) {
-        this.clearAutoAdvance();
+        // Only clear the interval, NOT the auto-advance timer
+        if (this.countdownInterval !== null) {
+          clearInterval(this.countdownInterval);
+          this.countdownInterval = null;
+        }
+        this.countdownSeconds = 0;
       }
       this.cdr.detectChanges();
     }, 1000);

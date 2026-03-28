@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-api';
 
@@ -339,6 +339,7 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
 })
 export class FeaturesComponent implements OnDestroy {
   hint = inject(WanejoyhintService);
+  private cdr = inject(ChangeDetectorRef);
   logs: { time: string; message: string; type: 'info' | 'success' | 'warn' }[] = [];
   modalOpen = false;
 
@@ -513,7 +514,7 @@ export class FeaturesComponent implements OnDestroy {
         description: 'Le modal a ete ouvert via <b>onBeforeStart</b>.',
         eventType: 'next',
         waitForSelector: 3000,
-        onBeforeStart: () => { this.modalOpen = true; },
+        onBeforeStart: () => { this.modalOpen = true; this.cdr.detectChanges(); },
       },
       // Step 16: Inside modal
       {
@@ -528,7 +529,7 @@ export class FeaturesComponent implements OnDestroy {
         description: '<b>isRunning</b>: true, <b>currentStep</b>: visible en temps reel.',
         eventType: 'next',
         showPrev: true,
-        onBeforeStart: () => { this.modalOpen = false; },
+        onBeforeStart: () => { this.modalOpen = false; this.cdr.detectChanges(); },
       },
       // Step 18: Event log
       {

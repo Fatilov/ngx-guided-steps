@@ -13,62 +13,38 @@ import { Component } from '@angular/core';
       <section class="card">
         <h2>Internationalisation (i18n)</h2>
         <p>Personnalisez tous les textes via <code>setConfig()</code> :</p>
-        <pre class="code-block"><code>hint.setConfig(&#123;
-  labels: &#123;
-    next: 'Suivant',
-    prev: 'Precedent',
-    skip: 'Passer',
-    progress: '&#123;&#123;current&#125;&#125; sur &#123;&#123;total&#125;&#125;'
-  &#125;
-&#125;);</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeI18n"></code></pre>
       </section>
 
       <section class="card">
         <h2>Themes</h2>
         <p>Deux themes integres : <code>light</code> (defaut) et <code>dark</code>.</p>
-        <pre class="code-block"><code>hint.setConfig(&#123;
-  theme: 'dark',
-  backgroundColor: 'rgba(255,255,255,0.85)'
-&#125;);</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeTheme"></code></pre>
       </section>
 
       <section class="card">
         <h2>Navigation cross-routes</h2>
         <p>Naviguez entre les pages pendant un tour grace a la propriete <code>route</code> et au token <code>WANEJOYHINT_ROUTER</code>.</p>
-        <pre class="code-block"><code>&#123;
-  selector: '#dashboard-stats',
-  route: '/dashboard',
-  waitForSelector: true,
-  description: 'Cet element est sur une autre page.'
-&#125;</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeCrossRoute"></code></pre>
       </section>
 
       <section class="card">
         <h2>Backdrop dismiss et navigation clavier</h2>
         <p>Activez la fermeture par clic sur l'overlay et la navigation par fleches :</p>
-        <pre class="code-block"><code>hint.setConfig(&#123;
-  backdropDismiss: true,
-  keyboardNav: true
-&#125;);</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeBackdrop"></code></pre>
         <p>Touches supportees : <kbd>&#8592;</kbd> precedent, <kbd>&#8594;</kbd> suivant, <kbd>Echap</kbd> fermer.</p>
       </section>
 
       <section class="card">
         <h2>Observables RxJS</h2>
         <p>Abonnez-vous aux evenements du tour :</p>
-        <pre class="code-block"><code>hint.onStepChange.subscribe(&#123; index, step &#125; =&gt; ...);
-hint.onEnd.subscribe(() =&gt; ...);
-hint.onSkip.subscribe(() =&gt; ...);</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeObservables"></code></pre>
       </section>
 
       <section class="card">
         <h2>API programmatique</h2>
         <p>Controlez le tour par code :</p>
-        <pre class="code-block"><code>hint.next();        // etape suivante
-hint.prev();        // etape precedente
-hint.stop();        // arreter le tour
-hint.isRunning;     // boolean
-hint.getCurrentStep(); // index courant</code></pre>
+        <pre class="code-block"><code [innerHTML]="codeApi"></code></pre>
       </section>
     </div>
   `,
@@ -160,4 +136,40 @@ hint.getCurrentStep(); // index courant</code></pre>
     }
   `],
 })
-export class AdvancedComponent {}
+export class AdvancedComponent {
+  codeI18n = `hint.setConfig({
+  labels: {
+    next: 'Suivant',
+    prev: 'Precedent',
+    skip: 'Passer',
+    progress: '{{current}} sur {{total}}'
+  }
+});`;
+
+  codeTheme = `hint.setConfig({
+  theme: 'dark',
+  backgroundColor: 'rgba(255,255,255,0.85)'
+});`;
+
+  codeCrossRoute = `{
+  selector: '#dashboard-stats',
+  route: '/dashboard',
+  waitForSelector: true,
+  description: 'Cet element est sur une autre page.'
+}`;
+
+  codeBackdrop = `hint.setConfig({
+  backdropDismiss: true,
+  keyboardNav: true
+});`;
+
+  codeObservables = `hint.onStepChange.subscribe(({ index, step }) =&gt; ...);
+hint.onEnd.subscribe(() =&gt; ...);
+hint.onSkip.subscribe(() =&gt; ...);`;
+
+  codeApi = `hint.next();        // etape suivante
+hint.prev();        // etape precedente
+hint.stop();        // arreter le tour
+hint.isRunning;     // boolean
+hint.getCurrentStep(); // index courant`;
+}

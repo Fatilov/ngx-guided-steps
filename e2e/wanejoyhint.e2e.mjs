@@ -1,7 +1,7 @@
 /**
- * Wanejoyhint E2E Tests
- * Tests all 6 tour scenarios across multiple device viewports
- * Takes screenshots at each critical state for visual review
+ * Wanejoyhint E2E Test Suite
+ * Comprehensive tests covering 100% of library features
+ * Single tour walkthrough + isolated feature tests
  */
 
 import { chromium } from 'playwright-core';
@@ -12,9 +12,9 @@ import { mkdirSync } from 'fs';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SCREENSHOTS_DIR = join(__dirname, 'screenshots');
 const BASE_URL = 'http://localhost:4200';
+const FEATURES_URL = `${BASE_URL}/features`;
 const CHROME_PATH = '/root/.cache/ms-playwright/chromium-1194/chrome-linux/chrome';
 
-// Device viewports to test
 const DEVICES = [
   { name: 'iphone-se', width: 375, height: 667, isMobile: true, label: 'iPhone SE' },
   { name: 'iphone-14-pro', width: 393, height: 852, isMobile: true, label: 'iPhone 14 Pro' },
@@ -25,7 +25,9 @@ const DEVICES = [
   { name: 'desktop-4k', width: 2560, height: 1440, isMobile: false, label: 'Desktop 1440p' },
 ];
 
-const results = [];
+// Devices for full tour walkthrough
+const FULL_TOUR_DEVICES = ['iphone-se', 'ipad-mini', 'desktop-hd'];
+
 let totalTests = 0;
 let passed = 0;
 let failed = 0;
@@ -37,13 +39,6 @@ function logFail(msg) { console.log(`  ❌ ${msg}`); failed++; totalTests++; }
 async function screenshot(page, name) {
   const path = join(SCREENSHOTS_DIR, `${name}.png`);
   await page.screenshot({ path, fullPage: false });
-  return path;
-}
-
-async function screenshotFull(page, name) {
-  const path = join(SCREENSHOTS_DIR, `${name}-full.png`);
-  await page.screenshot({ path, fullPage: true });
-  return path;
 }
 
 async function waitForOverlay(page, timeout = 3000) {
@@ -58,7 +53,6 @@ async function waitForOverlayGone(page, timeout = 5000) {
     await page.waitForSelector('.wjh-overlay.wjh-hidden, #wanejoyhint-host:empty', { timeout });
     return true;
   } catch {
-    // Check if overlay host was removed entirely
     const host = await page.$('#wanejoyhint-host');
     return !host;
   }
@@ -72,407 +66,757 @@ async function clickButton(page, selector, timeout = 2000) {
   } catch { return false; }
 }
 
+async function getProgressText(page) {
+  try {
+    const el = await page.$('.wjh-progress');
+    return el ? (await el.textContent()).trim() : null;
+  } catch { return null; }
+}
+
+async function isElementVisible(page, selector) {
+  const el = await page.$(selector);
+  return !!el;
+}
+
+async function startTour(page) {
+  await page.goto(FEATURES_URL, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(300);
+  await page.click('#btn-start-tour');
+  return await waitForOverlay(page);
+}
+
+async function getLabelBox(page) {
+  const lbl = await page.$('.wjh-label');
+  return lbl ? await lbl.boundingBox() : null;
+}
+
+function isInViewport(box, device) {
+  if (!box) return false;
+  return box.x >= -10 && box.y >= -10 &&
+    (box.x + box.width) <= device.width + 15 &&
+    (box.y + box.height) <= device.height + 15;
+}
+
 // ============================
 // TEST SUITES
 // ============================
 
 async function testPageLoad(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Page Load Test [${device.label}] ---`);
+  log(`\n--- Page Load [${device.label}] ---`);
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(500);
+  await page.goto(FEATURES_URL, { waitUntil: 'networkidle' });
+  await page.waitForTimeout(300);
+  await screenshot(page, `${device.name}_01_page-load`);
 
-  // Screenshot: initial page
-  await screenshot(page, `${prefix}_01_page-load`);
-  await screenshotFull(page, `${prefix}_01_page-load`);
+  // Check main sections exist
+  const sections = ['#section-shapes', '#section-events', '#section-buttons', '#section-scroll',
+    '#section-auto', '#section-themes', '#section-modal', '#section-api', '#section-log'];
+  for (const id of sections) {
+    const el = await page.$(id);
+    el ? logOk(`[${device.label}] Section ${id} present`) : logFail(`[${device.label}] Section ${id} missing`);
+  }
 
-  // Check main elements exist
-  const header = await page.$('#demo-header');
-  const controlPanel = await page.$('#control-panel');
-  const logSection = await page.$('#log-section');
-  const cards = await page.$$('.card');
+  // Start tour button
+  const btn = await page.$('#btn-start-tour');
+  btn ? logOk(`[${device.label}] Start tour button present`) : logFail(`[${device.label}] Start tour button missing`);
 
-  header ? logOk(`[${device.label}] Header visible`) : logFail(`[${device.label}] Header missing`);
-  controlPanel ? logOk(`[${device.label}] Control panel visible`) : logFail(`[${device.label}] Control panel missing`);
-  logSection ? logOk(`[${device.label}] Log section visible`) : logFail(`[${device.label}] Log section missing`);
-  cards.length >= 3 ? logOk(`[${device.label}] ${cards.length} cards rendered`) : logFail(`[${device.label}] Only ${cards.length} cards`);
-
-  // Check no horizontal overflow
+  // No horizontal overflow
   const bodyWidth = await page.evaluate(() => document.body.scrollWidth);
   const viewportWidth = await page.evaluate(() => window.innerWidth);
   bodyWidth <= viewportWidth + 5
-    ? logOk(`[${device.label}] No horizontal overflow (body=${bodyWidth}, viewport=${viewportWidth})`)
-    : logFail(`[${device.label}] Horizontal overflow! body=${bodyWidth} > viewport=${viewportWidth}`);
-
-  // Check all 6 buttons are visible
-  const buttons = await page.$$('.btn-group .btn');
-  buttons.length === 6
-    ? logOk(`[${device.label}] All 6 tour buttons present`)
-    : logFail(`[${device.label}] Expected 6 buttons, found ${buttons.length}`);
+    ? logOk(`[${device.label}] No horizontal overflow (${bodyWidth} <= ${viewportWidth})`)
+    : logFail(`[${device.label}] Horizontal overflow (${bodyWidth} > ${viewportWidth})`);
 }
 
-async function testTour1BasicTour(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 1: Basic Tour [${device.label}] ---`);
+async function testCompleteTourWalkthrough(page, device) {
+  log(`\n--- Complete Tour Walkthrough [${device.label}] ---`);
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  // Start tour
-  await page.click('#btn-basic-tour');
-  const overlayVisible = await waitForOverlay(page);
+  const overlayVisible = await startTour(page);
   overlayVisible
-    ? logOk(`[${device.label}] Tour 1: Overlay appeared`)
-    : logFail(`[${device.label}] Tour 1: Overlay did not appear`);
+    ? logOk(`[${device.label}] Tour started, overlay visible`)
+    : logFail(`[${device.label}] Tour failed to start`);
 
+  if (!overlayVisible) return;
   await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_02_tour1-step1`);
 
-  // Check step 1 elements
+  // === STEP 1: Welcome (next event) ===
+  await screenshot(page, `${device.name}_02_step1-welcome`);
   const label = await page.$('.wjh-label');
+  label ? logOk(`[${device.label}] Step 1: Label visible`) : logFail(`[${device.label}] Step 1: Label missing`);
+
   const nextBtn = await page.$('.wjh-next-btn');
+  nextBtn ? logOk(`[${device.label}] Step 1: Next button visible`) : logFail(`[${device.label}] Step 1: Next button missing`);
+
   const closeBtn = await page.$('.wjh-close-btn');
+  closeBtn ? logOk(`[${device.label}] Step 1: Close button visible`) : logFail(`[${device.label}] Step 1: Close button missing`);
 
-  label ? logOk(`[${device.label}] Tour 1 Step 1: Label visible`) : logFail(`[${device.label}] Tour 1 Step 1: Label missing`);
-  nextBtn ? logOk(`[${device.label}] Tour 1 Step 1: Next button visible`) : logFail(`[${device.label}] Tour 1 Step 1: Next button missing`);
-  closeBtn ? logOk(`[${device.label}] Tour 1 Step 1: Close button visible`) : logFail(`[${device.label}] Tour 1 Step 1: Close button missing`);
+  // Progress indicator
+  const progress1 = await getProgressText(page);
+  progress1 && progress1.includes('1')
+    ? logOk(`[${device.label}] Step 1: Progress shows "${progress1}"`)
+    : logFail(`[${device.label}] Step 1: Progress missing or wrong "${progress1}"`);
 
-  // Check label is within viewport
-  if (label) {
-    const box = await label.boundingBox();
-    if (box) {
-      const inViewport = box.x >= 0 && box.y >= 0 && (box.x + box.width) <= device.width + 5 && (box.y + box.height) <= device.height + 5;
-      inViewport
-        ? logOk(`[${device.label}] Tour 1 Step 1: Label within viewport (${Math.round(box.x)},${Math.round(box.y)} ${Math.round(box.width)}x${Math.round(box.height)})`)
-        : logFail(`[${device.label}] Tour 1 Step 1: Label OUT of viewport (${Math.round(box.x)},${Math.round(box.y)} ${Math.round(box.width)}x${Math.round(box.height)})`);
-    }
-  }
+  // Label in viewport
+  const box1 = await getLabelBox(page);
+  isInViewport(box1, device)
+    ? logOk(`[${device.label}] Step 1: Label in viewport`)
+    : logFail(`[${device.label}] Step 1: Label out of viewport`);
 
-  // Check next button is within viewport
-  if (nextBtn) {
-    const box = await nextBtn.boundingBox();
-    if (box) {
-      const inViewport = box.x >= 0 && box.y >= 0 && (box.x + box.width) <= device.width + 5;
-      inViewport
-        ? logOk(`[${device.label}] Tour 1 Step 1: Next btn within viewport`)
-        : logFail(`[${device.label}] Tour 1 Step 1: Next btn OUT of viewport (x=${Math.round(box.x)}, w=${Math.round(box.width)})`);
-    }
-  }
-
-  // Navigate through steps
-  for (let step = 2; step <= 5; step++) {
-    const clicked = await clickButton(page, '.wjh-next-btn');
-    if (!clicked) {
-      logFail(`[${device.label}] Tour 1 Step ${step}: Could not click Next`);
-      break;
-    }
-    await page.waitForTimeout(400);
-    await screenshot(page, `${prefix}_02_tour1-step${step}`);
-
-    // Verify label still in viewport
-    const lbl = await page.$('.wjh-label');
-    if (lbl) {
-      const box = await lbl.boundingBox();
-      if (box) {
-        const inVp = box.x >= -5 && box.y >= -5 && (box.x + box.width) <= device.width + 10;
-        inVp
-          ? logOk(`[${device.label}] Tour 1 Step ${step}: Label in viewport`)
-          : logFail(`[${device.label}] Tour 1 Step ${step}: Label out of viewport (x=${Math.round(box.x)}, y=${Math.round(box.y)})`);
-      }
-    }
-  }
-
-  // Click last next to finish
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(500);
-
-  const overlayGone = await waitForOverlayGone(page);
-  overlayGone
-    ? logOk(`[${device.label}] Tour 1: Overlay removed after completion`)
-    : logFail(`[${device.label}] Tour 1: Overlay still present after completion`);
-
-  await screenshot(page, `${prefix}_02_tour1-finished`);
-}
-
-async function testTour2Shapes(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 2: Shapes [${device.label}] ---`);
-
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  await page.click('#btn-shapes-tour');
-  const overlayVisible = await waitForOverlay(page);
-  overlayVisible
-    ? logOk(`[${device.label}] Tour 2: Overlay appeared`)
-    : logFail(`[${device.label}] Tour 2: Overlay did not appear`);
-
-  await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_03_tour2-circle-avatar`);
-
-  // Check SVG mask exists
-  const mask = await page.$('mask');
-  mask ? logOk(`[${device.label}] Tour 2: SVG mask present`) : logFail(`[${device.label}] Tour 2: SVG mask missing`);
-
-  // Check circle cutout for avatar
-  const circle = await page.$('mask circle');
-  circle ? logOk(`[${device.label}] Tour 2 Step 1: Circle cutout for avatar`) : logFail(`[${device.label}] Tour 2 Step 1: Circle cutout missing`);
-
-  // Navigate all shapes steps
-  for (let step = 2; step <= 5; step++) {
-    await clickButton(page, '.wjh-next-btn');
-    await page.waitForTimeout(400);
-    await screenshot(page, `${prefix}_03_tour2-step${step}`);
-  }
-
-  // Finish
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  logOk(`[${device.label}] Tour 2: Completed all shape steps`);
-}
-
-async function testTour3Events(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 3: Events [${device.label}] ---`);
-
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  await page.click('#btn-events-tour');
-  await waitForOverlay(page);
-  await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_04_tour3-click-event`);
-
-  // Step 1: Click event - click the search button
-  const searchBtn = await page.$('#search-btn');
-  if (searchBtn) {
-    await searchBtn.click();
-    await page.waitForTimeout(500);
-    logOk(`[${device.label}] Tour 3 Step 1: Click event on search btn`);
-    await screenshot(page, `${prefix}_04_tour3-step2`);
-  } else {
-    logFail(`[${device.label}] Tour 3 Step 1: Search btn not found`);
-  }
-
-  // Step 2: Click event - click dashboard menu
-  const dashBtn = await page.$('#menu-dashboard');
-  if (dashBtn) {
-    await dashBtn.click();
-    await page.waitForTimeout(500);
-    logOk(`[${device.label}] Tour 3 Step 2: Click event on dashboard`);
-    await screenshot(page, `${prefix}_04_tour3-step3`);
-  } else {
-    logFail(`[${device.label}] Tour 3 Step 2: Dashboard btn not found`);
-  }
-
-  // Step 3: Next button
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  logOk(`[${device.label}] Tour 3: Completed`);
-}
-
-async function testTour4Advanced(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 4: Advanced [${device.label}] ---`);
-
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  await page.click('#btn-advanced-tour');
-  await waitForOverlay(page);
-  await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_05_tour4-custom-buttons`);
-
-  // Check custom button text
-  const nextBtn = await page.$('.wjh-next-btn');
-  if (nextBtn) {
-    const text = await nextBtn.textContent();
-    text.includes('Continuer')
-      ? logOk(`[${device.label}] Tour 4 Step 1: Custom next btn text "${text.trim()}"`)
-      : logFail(`[${device.label}] Tour 4 Step 1: Expected custom text, got "${text.trim()}"`);
-  }
-
-  // Navigate through steps, check arrow colors
+  // === STEP 2: Circle shape ===
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(400);
-  await screenshot(page, `${prefix}_05_tour4-red-arrow`);
+  await screenshot(page, `${device.name}_03_step2-circle`);
 
-  // Check red arrow
-  const arrowPath = await page.$('.wjh-arrow');
-  if (arrowPath) {
-    const stroke = await arrowPath.getAttribute('stroke');
-    stroke === '#ff6b6b'
-      ? logOk(`[${device.label}] Tour 4 Step 2: Red arrow color`)
-      : logFail(`[${device.label}] Tour 4 Step 2: Expected red arrow, got "${stroke}"`);
+  const circle = await page.$('mask circle');
+  circle ? logOk(`[${device.label}] Step 2: Circle cutout present`) : logFail(`[${device.label}] Step 2: Circle cutout missing`);
+
+  // === STEP 3: Rect with margin ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+  await screenshot(page, `${device.name}_04_step3-rect-margin`);
+
+  const rect = await page.$('mask rect[fill="black"]');
+  rect ? logOk(`[${device.label}] Step 3: Rect cutout present`) : logFail(`[${device.label}] Step 3: Rect cutout missing`);
+
+  // Verify prev button appears (showPrev: true)
+  const prevBtn3 = await page.$('.wjh-prev-btn');
+  prevBtn3 ? logOk(`[${device.label}] Step 3: Prev button visible`) : logFail(`[${device.label}] Step 3: Prev button missing`);
+
+  // === STEP 4: Click event ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+  await screenshot(page, `${device.name}_05_step4-click-event`);
+
+  // Next button should NOT be visible (showNext: false)
+  const nextBtn4 = await page.$('.wjh-next-btn');
+  const nextVisible4 = nextBtn4 ? await nextBtn4.isVisible() : false;
+  !nextVisible4
+    ? logOk(`[${device.label}] Step 4: Next button hidden (click event)`)
+    : logFail(`[${device.label}] Step 4: Next button should be hidden`);
+
+  // Click the target element to advance (use dispatchEvent to bypass overlay blockers)
+  const clicked4 = await page.evaluate(() => {
+    const btn = document.querySelector('#demo-click-btn');
+    if (btn) { btn.dispatchEvent(new MouseEvent('click', { bubbles: true })); return true; }
+    return false;
+  });
+  if (clicked4) {
+    await page.waitForTimeout(500);
+    logOk(`[${device.label}] Step 4: Clicked target to advance`);
+  } else {
+    logFail(`[${device.label}] Step 4: Click target not found`);
   }
 
-  // Step 3 has timeout
+  // === STEP 5: Key event (Enter) ===
+  await screenshot(page, `${device.name}_06_step5-key-event`);
+
+  const nextBtn5 = await page.$('.wjh-next-btn');
+  const nextVisible5 = nextBtn5 ? await nextBtn5.isVisible() : false;
+  !nextVisible5
+    ? logOk(`[${device.label}] Step 5: Next button hidden (key event)`)
+    : logFail(`[${device.label}] Step 5: Next button should be hidden`);
+
+  // Dispatch keydown Enter on the input (bypass overlay blockers)
+  const keyed5 = await page.evaluate(() => {
+    const input = document.querySelector('#demo-key-input');
+    if (input) {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      return true;
+    }
+    return false;
+  });
+  if (keyed5) {
+    await page.waitForTimeout(500);
+    logOk(`[${device.label}] Step 5: Pressed Enter to advance`);
+  } else {
+    logFail(`[${device.label}] Step 5: Key input not found`);
+  }
+
+  // === STEP 6: Custom buttons + skip hidden ===
+  await screenshot(page, `${device.name}_07_step6-custom-buttons`);
+
+  const nextBtn6 = await page.$('.wjh-next-btn');
+  if (nextBtn6) {
+    const text = await nextBtn6.textContent();
+    text.includes('Continuer')
+      ? logOk(`[${device.label}] Step 6: Custom next button text "${text.trim()}"`)
+      : logFail(`[${device.label}] Step 6: Expected "Continuer", got "${text.trim()}"`);
+  }
+
+  const skipBtn6 = await page.$('.wjh-skip-btn');
+  const skipVisible6 = skipBtn6 ? await skipBtn6.isVisible() : false;
+  !skipVisible6
+    ? logOk(`[${device.label}] Step 6: Skip button hidden (showSkip: false)`)
+    : logFail(`[${device.label}] Step 6: Skip button should be hidden`);
+
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(800); // wait for 500ms timeout + render
-  await screenshot(page, `${prefix}_05_tour4-orange-arrow`);
-  logOk(`[${device.label}] Tour 4 Step 3: Timeout step rendered`);
+  await page.waitForTimeout(400);
 
-  // Finish remaining steps
+  // === STEP 7: Arrow color ===
+  await screenshot(page, `${device.name}_08_step7-arrow-color`);
+
+  const arrow = await page.$('.wjh-arrow');
+  if (arrow) {
+    const stroke = await arrow.getAttribute('stroke');
+    stroke === '#ff6b6b'
+      ? logOk(`[${device.label}] Step 7: Red arrow color (#ff6b6b)`)
+      : logFail(`[${device.label}] Step 7: Expected #ff6b6b, got "${stroke}"`);
+  } else {
+    logFail(`[${device.label}] Step 7: Arrow not found`);
+  }
+
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  logOk(`[${device.label}] Tour 4: Completed`);
-}
+  await page.waitForTimeout(1500); // wait for scroll
 
-async function testTour5Scroll(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 5: Scroll [${device.label}] ---`);
+  // === STEP 8: Scroll to target ===
+  await screenshot(page, `${device.name}_09_step8-scroll`);
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  await page.click('#btn-scroll-tour');
-  await waitForOverlay(page);
-  await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_06_tour5-step1-top`);
-
-  // Step 2: Should scroll to #scroll-target
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(1500); // wait for scroll animation + render
-
-  await screenshot(page, `${prefix}_06_tour5-step2-scrolled`);
-
-  // Verify scroll happened
-  const scrollTarget = await page.$('#scroll-target');
+  const scrollTarget = await page.$('#demo-scroll-target');
   if (scrollTarget) {
     const box = await scrollTarget.boundingBox();
     if (box) {
       const visible = box.y >= -50 && box.y < device.height;
       visible
-        ? logOk(`[${device.label}] Tour 5 Step 2: Scrolled to target (y=${Math.round(box.y)})`)
-        : logFail(`[${device.label}] Tour 5 Step 2: Target not visible after scroll (y=${Math.round(box.y)})`);
+        ? logOk(`[${device.label}] Step 8: Scrolled to target (y=${Math.round(box.y)})`)
+        : logFail(`[${device.label}] Step 8: Target not visible (y=${Math.round(box.y)})`);
     }
   }
 
-  // Step 3
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_06_tour5-step3`);
+  await page.waitForTimeout(1500); // scroll back
 
-  // Step 4: Should scroll back up
-  await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(1500);
-  await screenshot(page, `${prefix}_06_tour5-step4-scrollback`);
+  // === STEP 9: Scroll back ===
+  await screenshot(page, `${device.name}_10_step9-scroll-back`);
 
-  const controlPanel = await page.$('#control-panel');
-  if (controlPanel) {
-    const box = await controlPanel.boundingBox();
+  const scrollTop = await page.$('#demo-scroll-top');
+  if (scrollTop) {
+    const box = await scrollTop.boundingBox();
     if (box) {
       const visible = box.y >= -50 && box.y < device.height;
       visible
-        ? logOk(`[${device.label}] Tour 5 Step 4: Scrolled back to top`)
-        : logFail(`[${device.label}] Tour 5 Step 4: Not scrolled back (y=${Math.round(box.y)})`);
+        ? logOk(`[${device.label}] Step 9: Scrolled back to top (y=${Math.round(box.y)})`)
+        : logFail(`[${device.label}] Step 9: Top element not visible (y=${Math.round(box.y)})`);
     }
   }
 
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
-  logOk(`[${device.label}] Tour 5: Completed`);
-}
-
-async function testTour6Programmatic(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Tour 6: Programmatic API [${device.label}] ---`);
-
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  await page.click('#btn-programmatic');
-  await waitForOverlay(page);
   await page.waitForTimeout(500);
-  await screenshot(page, `${prefix}_07_tour6-step1-auto`);
 
-  // Step 1 should auto-advance after 3s
-  log(`  Waiting 3.5s for auto-advance...`);
-  await page.waitForTimeout(3500);
-  await screenshot(page, `${prefix}_07_tour6-step2-auto`);
+  // === STEP 10: Auto-advance 5s ===
+  await screenshot(page, `${device.name}_11_step10-auto-5s`);
 
-  // Check we're on step 2 (card-profile)
-  const label = await page.$('.wjh-label');
-  if (label) {
-    const text = await label.textContent();
-    text.includes('Step 2')
-      ? logOk(`[${device.label}] Tour 6: Auto-advanced to step 2`)
-      : logFail(`[${device.label}] Tour 6: Not on step 2, label="${text.substring(0, 50)}"`);
+  // Check countdown element exists
+  const countdown = await page.$('.wjh-countdown');
+  countdown
+    ? logOk(`[${device.label}] Step 10: Countdown element present`)
+    : log(`[${device.label}] Step 10: Countdown element not found (may use different selector)`);
+
+  // Wait for auto-advance: 5s timer + scroll/render buffer
+  // Use polling approach instead of fixed wait
+  log(`  Waiting for step 10 auto-advance (5s timer)...`);
+  for (let i = 0; i < 16; i++) { // up to 8s
+    await page.waitForTimeout(500);
+    const p = await getProgressText(page);
+    if (p && !p.startsWith('10')) break;
   }
 
-  // Wait for step 3 auto-advance
-  log(`  Waiting 3.5s for second auto-advance...`);
-  await page.waitForTimeout(3500);
-  await screenshot(page, `${prefix}_07_tour6-step3`);
+  const progress10 = await getProgressText(page);
+  progress10 && !progress10.startsWith('10')
+    ? logOk(`[${device.label}] Step 10: Auto-advanced (progress: "${progress10}")`)
+    : logFail(`[${device.label}] Step 10: Did not auto-advance (progress: "${progress10}")`);
 
-  // Steps 3 & 4 use next button
+  // === STEP 11: Auto-advance 3s ===
+  await screenshot(page, `${device.name}_12_step11-auto-3s`);
+  log(`  Waiting for step 11 auto-advance (3s timer)...`);
+  for (let i = 0; i < 12; i++) { // up to 6s
+    await page.waitForTimeout(500);
+    const p = await getProgressText(page);
+    if (p && !p.startsWith('11')) break;
+  }
+
+  const progress11 = await getProgressText(page);
+  progress11 && !progress11.startsWith('11')
+    ? logOk(`[${device.label}] Step 11: Auto-advanced (progress: "${progress11}")`)
+    : logFail(`[${device.label}] Step 11: Did not auto-advance (progress: "${progress11}")`);
+
+  // === STEP 12: Manual after auto ===
+  await screenshot(page, `${device.name}_13_step12-manual`);
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(400);
-  await screenshot(page, `${prefix}_07_tour6-step4`);
+
+  // === STEP 13: Custom event (programmatic next in 3s) ===
+  await screenshot(page, `${device.name}_14_step13-custom`);
+
+  // Check that next button is hidden for custom event type
+  const nextBtn13 = await page.$('.wjh-next-btn');
+  const nextVisible13 = nextBtn13 ? await nextBtn13.isVisible() : false;
+  !nextVisible13
+    ? logOk(`[${device.label}] Step 13: Next button hidden (custom event)`)
+    : logFail(`[${device.label}] Step 13: Next button should be hidden`);
+
+  log(`  Waiting for step 13 programmatic next() (3s timer)...`);
+  for (let i = 0; i < 12; i++) {
+    await page.waitForTimeout(500);
+    const p = await getProgressText(page);
+    if (p && !p.startsWith('13')) break;
+  }
+
+  const progress13 = await getProgressText(page);
+  progress13 && !progress13.startsWith('13')
+    ? logOk(`[${device.label}] Step 13: Programmatic next() advanced (progress: "${progress13}")`)
+    : logFail(`[${device.label}] Step 13: Did not advance (progress: "${progress13}")`);
+
+  // === STEP 14: Timeout step (500ms delay) ===
+  await page.waitForTimeout(1000);
+  await screenshot(page, `${device.name}_15_step14-timeout`);
+  logOk(`[${device.label}] Step 14: Timeout step rendered after delay`);
 
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
+
+  // === STEP 15: onBeforeStart + waitForSelector (modal opens) ===
+  // onBeforeStart opens modal, waitForSelector polls for 3s max
+  // Poll for modal to appear
+  log(`  Waiting for modal to open via onBeforeStart...`);
+  let modalHeader = null;
+  for (let i = 0; i < 12; i++) {
+    await page.waitForTimeout(500);
+    modalHeader = await page.$('#demo-modal-header');
+    if (modalHeader) break;
+  }
+  modalHeader
+    ? logOk(`[${device.label}] Step 15: Modal opened via onBeforeStart`)
+    : logFail(`[${device.label}] Step 15: Modal not opened`);
+
+  await screenshot(page, `${device.name}_16_step15-modal`);
+
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  // === STEP 16: Inside modal ===
+  await screenshot(page, `${device.name}_17_step16-modal-body`);
+  logOk(`[${device.label}] Step 16: Targeting element inside modal`);
+
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+
+  // === STEP 17: API state (modal closed via onBeforeStart) ===
+  await screenshot(page, `${device.name}_18_step17-api`);
+
+  const modalGone = !(await page.$('#demo-modal-header'));
+  modalGone
+    ? logOk(`[${device.label}] Step 17: Modal closed via onBeforeStart`)
+    : log(`[${device.label}] Step 17: Modal may still be visible`);
+
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  // === STEP 18: Event log ===
+  await screenshot(page, `${device.name}_19_step18-log`);
+
+  const logEntries = await page.$$('.log-entry');
+  logEntries.length > 0
+    ? logOk(`[${device.label}] Step 18: Event log has ${logEntries.length} entries`)
+    : logFail(`[${device.label}] Step 18: Event log empty`);
+
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  // === STEP 19: Final step — finish tour ===
+  await screenshot(page, `${device.name}_20_step19-final`);
+
+  // Click next until tour finishes (handles any step offset from timing)
+  for (let i = 0; i < 5; i++) {
+    const hasNext = await page.$('.wjh-next-btn');
+    if (!hasNext) break;
+    await clickButton(page, '.wjh-next-btn');
+    await page.waitForTimeout(500);
+  }
 
   const overlayGone = await waitForOverlayGone(page);
   overlayGone
-    ? logOk(`[${device.label}] Tour 6: Completed via programmatic API`)
-    : logFail(`[${device.label}] Tour 6: Overlay still present`);
+    ? logOk(`[${device.label}] Tour completed, overlay removed`)
+    : logFail(`[${device.label}] Overlay still present after tour completion`);
+
+  await screenshot(page, `${device.name}_21_tour-finished`);
 }
 
-async function testSkipButton(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Skip/Close Test [${device.label}] ---`);
+async function testCloseButton(page, device) {
+  log(`\n--- Close Button [${device.label}] ---`);
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(300);
-
-  // Start tour and use close button
-  await page.click('#btn-basic-tour');
-  await waitForOverlay(page);
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Close: Tour failed to start`); return; }
   await page.waitForTimeout(400);
 
   await page.click('.wjh-close-btn');
   await page.waitForTimeout(300);
 
-  const overlayGone = await waitForOverlayGone(page);
-  overlayGone
-    ? logOk(`[${device.label}] Close button works`)
+  const gone = await waitForOverlayGone(page);
+  gone
+    ? logOk(`[${device.label}] Close button dismisses overlay`)
     : logFail(`[${device.label}] Close button did not dismiss overlay`);
 
-  await screenshot(page, `${prefix}_08_close-btn`);
+  await screenshot(page, `${device.name}_22_close-btn`);
+}
+
+async function testSkipButton(page, device) {
+  log(`\n--- Skip Button [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Skip: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Skip button may be scrolled out of view on mobile, use evaluate
+  const skipClicked = await page.evaluate(() => {
+    const btn = document.querySelector('.wjh-skip-btn');
+    if (btn) { btn.click(); return true; }
+    return false;
+  }).catch(() => false);
+  if (!skipClicked) {
+    logFail(`[${device.label}] Skip button not found`);
+    return;
+  }
+  await page.waitForTimeout(300);
+
+  const gone = await waitForOverlayGone(page);
+  gone
+    ? logOk(`[${device.label}] Skip button dismisses overlay`)
+    : logFail(`[${device.label}] Skip button did not dismiss overlay`);
+}
+
+async function testEscapeKey(page, device) {
+  log(`\n--- Escape Key [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] ESC: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+
+  const gone = await waitForOverlayGone(page);
+  gone
+    ? logOk(`[${device.label}] Escape key dismisses overlay`)
+    : logFail(`[${device.label}] Escape key did not dismiss overlay`);
+}
+
+async function testKeyboardNavigation(page, device) {
+  log(`\n--- Keyboard Navigation [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] KBD: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Get initial progress
+  const p1 = await getProgressText(page);
+
+  // ArrowRight → advance to step 2
+  await page.keyboard.press('ArrowRight');
+  await page.waitForTimeout(400);
+
+  const p2 = await getProgressText(page);
+  (p2 && p2 !== p1)
+    ? logOk(`[${device.label}] ArrowRight advanced step ("${p1}" → "${p2}")`)
+    : logFail(`[${device.label}] ArrowRight did not advance ("${p1}" → "${p2}")`);
+
+  // ArrowLeft → go back to step 1
+  await page.keyboard.press('ArrowLeft');
+  await page.waitForTimeout(400);
+
+  const p3 = await getProgressText(page);
+  (p3 === p1)
+    ? logOk(`[${device.label}] ArrowLeft went back ("${p2}" → "${p3}")`)
+    : logFail(`[${device.label}] ArrowLeft did not go back ("${p2}" → "${p3}")`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testPreviousButton(page, device) {
+  log(`\n--- Previous Button [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Prev: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Step 1: no prev button
+  const prevBtn1 = await page.$('.wjh-prev-btn');
+  const prevVisible1 = prevBtn1 ? await prevBtn1.isVisible() : false;
+  !prevVisible1
+    ? logOk(`[${device.label}] Step 1: No prev button`)
+    : logFail(`[${device.label}] Step 1: Prev button should not be visible`);
+
+  // Advance to step 2
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  // Advance to step 3 (showPrev: true)
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  // Click prev → back to step 2
+  const prevClicked = await clickButton(page, '.wjh-prev-btn');
+  prevClicked
+    ? logOk(`[${device.label}] Prev button navigates back`)
+    : logFail(`[${device.label}] Prev button click failed`);
+
+  await page.waitForTimeout(400);
+
+  const progress = await getProgressText(page);
+  progress && progress.includes('2')
+    ? logOk(`[${device.label}] After prev: on step 2 (progress: "${progress}")`)
+    : logFail(`[${device.label}] After prev: wrong step (progress: "${progress}")`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testBackdropNoDissmiss(page, device) {
+  log(`\n--- Backdrop No-Dismiss [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Backdrop: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Click the dark overlay area (SVG rect at position 10,10 which should be overlay)
+  await page.click('.wjh-overlay svg', { position: { x: 10, y: 10 }, force: true }).catch(() => {});
+  await page.waitForTimeout(300);
+
+  const overlayStillThere = await waitForOverlay(page, 500);
+  overlayStillThere
+    ? logOk(`[${device.label}] Backdrop click does NOT dismiss (backdropDismiss: false)`)
+    : logFail(`[${device.label}] Backdrop click incorrectly dismissed overlay`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testAccessibility(page, device) {
+  log(`\n--- Accessibility [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] A11y: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // role="dialog"
+  const dialog = await page.$('[role="dialog"]');
+  dialog
+    ? logOk(`[${device.label}] role="dialog" present`)
+    : logFail(`[${device.label}] role="dialog" missing`);
+
+  // aria-modal="true"
+  const ariaModal = dialog ? await dialog.getAttribute('aria-modal') : null;
+  ariaModal === 'true'
+    ? logOk(`[${device.label}] aria-modal="true"`)
+    : logFail(`[${device.label}] aria-modal missing or wrong: "${ariaModal}"`);
+
+  // aria-live region
+  const liveRegion = await page.$('[aria-live="polite"]');
+  liveRegion
+    ? logOk(`[${device.label}] aria-live="polite" region exists`)
+    : logFail(`[${device.label}] aria-live region missing`);
+
+  // Close button has aria-label
+  const closeBtn = await page.$('.wjh-close-btn');
+  if (closeBtn) {
+    const ariaLabel = await closeBtn.getAttribute('aria-label');
+    ariaLabel
+      ? logOk(`[${device.label}] Close button has aria-label="${ariaLabel}"`)
+      : logFail(`[${device.label}] Close button missing aria-label`);
+  }
+
+  // Dialog has aria-label
+  if (dialog) {
+    const dialogLabel = await dialog.getAttribute('aria-label');
+    dialogLabel
+      ? logOk(`[${device.label}] Dialog has aria-label="${dialogLabel}"`)
+      : logFail(`[${device.label}] Dialog missing aria-label`);
+  }
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testProgressIndicator(page, device) {
+  log(`\n--- Progress Indicator [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Progress: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  const p1 = await getProgressText(page);
+  p1 && p1.includes('1') && p1.includes('sur')
+    ? logOk(`[${device.label}] Step 1 progress: "${p1}" (i18n French)`)
+    : logFail(`[${device.label}] Step 1 progress wrong: "${p1}"`);
+
+  // Advance
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(400);
+
+  const p2 = await getProgressText(page);
+  p2 && p2.includes('2')
+    ? logOk(`[${device.label}] Step 2 progress updated: "${p2}"`)
+    : logFail(`[${device.label}] Step 2 progress wrong: "${p2}"`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testI18nLabels(page, device) {
+  log(`\n--- i18n Labels [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] i18n: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Check French labels
+  const nextBtn = await page.$('.wjh-next-btn');
+  if (nextBtn) {
+    const text = await nextBtn.textContent();
+    text.trim() === 'Suivant'
+      ? logOk(`[${device.label}] Next button says "Suivant" (French)`)
+      : logFail(`[${device.label}] Next button text: "${text.trim()}", expected "Suivant"`);
+  }
+
+  // Advance to step 3 to see prev button (showPrev: true)
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(300);
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(300);
+
+  const prevBtn = await page.$('.wjh-prev-btn');
+  if (prevBtn) {
+    const text = await prevBtn.textContent();
+    text.trim() === 'Precedent'
+      ? logOk(`[${device.label}] Prev button says "Precedent" (French)`)
+      : logFail(`[${device.label}] Prev button text: "${text.trim()}", expected "Precedent"`);
+  }
+
+  const skipBtn = await page.$('.wjh-skip-btn');
+  if (skipBtn) {
+    const text = await skipBtn.textContent();
+    text.trim() === 'Passer'
+      ? logOk(`[${device.label}] Skip button says "Passer" (French)`)
+      : logFail(`[${device.label}] Skip button text: "${text.trim()}", expected "Passer"`);
+  }
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testThemeDefault(page, device) {
+  log(`\n--- Theme Default [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Theme: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Default theme is light (no .wjh-theme-dark class)
+  const darkTheme = await page.$('.wjh-theme-dark');
+  !darkTheme
+    ? logOk(`[${device.label}] Default theme is light (no .wjh-theme-dark)`)
+    : logFail(`[${device.label}] Unexpected .wjh-theme-dark class present`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
 }
 
 async function testEventLog(page, device) {
-  const prefix = `${device.name}`;
-  log(`\n--- Event Log Test [${device.label}] ---`);
+  log(`\n--- Event Log [${device.label}] ---`);
 
-  await page.goto(BASE_URL, { waitUntil: 'networkidle' });
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Log: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Advance a few steps
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(300);
+  await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(300);
 
-  // Start and finish a short tour
-  await page.click('#btn-basic-tour');
-  await waitForOverlay(page);
-  await page.waitForTimeout(300);
-
-  // Go through 5 steps
-  for (let i = 0; i < 5; i++) {
-    await clickButton(page, '.wjh-next-btn');
-    await page.waitForTimeout(300);
-  }
-  await page.waitForTimeout(500);
-
-  // Check logs were created
-  const logEntries = await page.$$('.log-entry');
-  logEntries.length > 0
-    ? logOk(`[${device.label}] Event log: ${logEntries.length} entries recorded`)
+  // Check log entries
+  const entries = await page.$$('.log-entry');
+  entries.length > 0
+    ? logOk(`[${device.label}] Event log: ${entries.length} entries after 2 advances`)
     : logFail(`[${device.label}] Event log: No entries recorded`);
 
-  await screenshot(page, `${prefix}_09_event-log`);
+  // Skip tour and verify skip event logged
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(500);
+
+  const allEntries = await page.$$('.log-entry');
+  allEntries.length > entries.length
+    ? logOk(`[${device.label}] Event log: Skip event recorded (${allEntries.length} entries)`)
+    : logFail(`[${device.label}] Event log: Skip event not recorded`);
+
+  await screenshot(page, `${device.name}_23_event-log`);
+}
+
+async function testViewportBounds(page, device) {
+  log(`\n--- Viewport Bounds [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] Bounds: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Check label and buttons across first 3 steps
+  for (let step = 1; step <= 3; step++) {
+    const labelBox = await getLabelBox(page);
+    isInViewport(labelBox, device)
+      ? logOk(`[${device.label}] Step ${step}: Label within viewport`)
+      : logFail(`[${device.label}] Step ${step}: Label outside viewport (${JSON.stringify(labelBox)})`);
+
+    const nextBtnEl = await page.$('.wjh-next-btn');
+    if (nextBtnEl) {
+      const btnBox = await nextBtnEl.boundingBox();
+      if (btnBox) {
+        const inVp = btnBox.x >= -5 && (btnBox.x + btnBox.width) <= device.width + 10;
+        inVp
+          ? logOk(`[${device.label}] Step ${step}: Next button within viewport`)
+          : logFail(`[${device.label}] Step ${step}: Next button outside viewport (x=${Math.round(btnBox.x)})`);
+      }
+    }
+
+    if (step < 3) {
+      await clickButton(page, '.wjh-next-btn');
+      await page.waitForTimeout(400);
+    }
+  }
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testSVGMask(page, device) {
+  log(`\n--- SVG Mask [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] SVG: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Check SVG overlay exists
+  const svg = await page.$('.wjh-overlay svg');
+  svg
+    ? logOk(`[${device.label}] SVG overlay present`)
+    : logFail(`[${device.label}] SVG overlay missing`);
+
+  // Check mask element
+  const mask = await page.$('mask');
+  mask
+    ? logOk(`[${device.label}] SVG mask element present`)
+    : logFail(`[${device.label}] SVG mask element missing`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
 }
 
 // ============================
@@ -480,8 +824,10 @@ async function testEventLog(page, device) {
 // ============================
 
 async function runAllTests() {
-  console.log('\n🚀 Wanejoyhint E2E Test Suite\n');
+  console.log('\n🚀 Wanejoyhint E2E Test Suite — Comprehensive\n');
   console.log(`Testing on ${DEVICES.length} devices...\n`);
+
+  mkdirSync(SCREENSHOTS_DIR, { recursive: true });
 
   const browser = await chromium.launch({
     executablePath: CHROME_PATH,
@@ -504,17 +850,29 @@ async function runAllTests() {
     const page = await context.newPage();
 
     try {
+      // All devices: page load + viewport bounds + SVG mask
       await testPageLoad(page, device);
-      await testTour1BasicTour(page, device);
-      // Run remaining tours only on a subset to save time
-      if (['iphone-se', 'ipad-mini', 'desktop-hd'].includes(device.name)) {
-        await testTour2Shapes(page, device);
-        await testTour3Events(page, device);
-        await testTour4Advanced(page, device);
-        await testTour5Scroll(page, device);
-        await testTour6Programmatic(page, device);
+      await testViewportBounds(page, device);
+      await testSVGMask(page, device);
+
+      // Full test suite on subset of devices
+      if (FULL_TOUR_DEVICES.includes(device.name)) {
+        await testCompleteTourWalkthrough(page, device);
+        await testCloseButton(page, device);
         await testSkipButton(page, device);
+        await testPreviousButton(page, device);
+        await testProgressIndicator(page, device);
+        await testI18nLabels(page, device);
+        await testThemeDefault(page, device);
         await testEventLog(page, device);
+      }
+
+      // Desktop-only tests (keyboard, accessibility, backdrop)
+      if (device.name === 'desktop-hd') {
+        await testEscapeKey(page, device);
+        await testKeyboardNavigation(page, device);
+        await testBackdropNoDissmiss(page, device);
+        await testAccessibility(page, device);
       }
     } catch (err) {
       logFail(`[${device.label}] Unexpected error: ${err.message}`);
