@@ -33,7 +33,8 @@
             "index": "demo/src/index.html",
             "browser": "demo/src/main.ts",
             "polyfills": ["zone.js"],
-            "tsConfig": "demo/tsconfig.app.json"
+            "tsConfig": "demo/tsconfig.app.json",
+            "styles": ["demo/src/styles.css"]
           },
           "configurations": {
             "production": {

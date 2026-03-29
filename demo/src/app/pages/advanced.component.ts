@@ -257,12 +257,12 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Hero header */
     .hero-bar {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       padding: 48px 0 40px;
     }
     .hero-bar h1 {
       font-size: 2em;
-      color: white;
+      color: var(--site-surface);
       margin: 0 0 8px;
       font-weight: 800;
     }
@@ -307,15 +307,15 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       display: block;
       padding: 8px 14px;
       font-size: 13px;
-      color: #555;
+      color: var(--site-text-secondary);
       text-decoration: none;
       border-radius: 6px;
       transition: all 0.15s;
       line-height: 1.4;
     }
     .nav-link:hover {
-      background: #f0f2f5;
-      color: #1a1a2e;
+      background: var(--site-code-inline-bg);
+      color: var(--site-text);
     }
 
     /* Main content */
@@ -327,20 +327,21 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Cards */
     .card {
-      background: white;
-      border: 1px solid #e8ecf0;
+      background: var(--site-surface);
+      border: 1px solid var(--site-surface-border);
       border-radius: 14px;
       padding: 28px 32px;
       margin-bottom: 24px;
       position: relative;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px var(--site-shadow);
       scroll-margin-top: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     .card:nth-child(even) {
-      border-left: 3px solid #1ecd97;
+      border-left: 3px solid var(--site-accent);
     }
     .card:nth-child(odd) {
-      border-left: 3px solid #6c63ff;
+      border-left: 3px solid var(--site-accent-secondary);
     }
 
     .card-number {
@@ -350,8 +351,8 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: #1a1a2e;
-      color: white;
+      background: var(--site-text);
+      color: var(--site-surface);
       font-size: 13px;
       font-weight: 700;
       display: flex;
@@ -361,12 +362,12 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     .card h2 {
       font-size: 1.25em;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin: 0 0 10px;
       font-weight: 700;
     }
     .card p {
-      color: #555;
+      color: var(--site-text-secondary);
       font-size: 14px;
       line-height: 1.7;
       margin: 0 0 16px;
@@ -374,7 +375,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Inline code */
     code {
-      background: #f0f2f5;
+      background: var(--site-code-inline-bg);
       padding: 2px 7px;
       border-radius: 4px;
       font-size: 13px;
@@ -383,8 +384,8 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Code blocks */
     .code-block {
-      background: #0d1117;
-      color: #c9d1d9;
+      background: var(--site-code-bg);
+      color: var(--site-code-text);
       padding: 18px 20px;
       border-radius: 10px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
@@ -411,11 +412,11 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     .a11y-list dt {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 13px;
-      color: #1a1a2e;
+      color: var(--site-text);
       font-weight: 600;
       margin-top: 14px;
       padding: 4px 8px;
-      background: #f0f2f5;
+      background: var(--site-code-inline-bg);
       border-radius: 4px;
       display: inline-block;
     }
@@ -424,7 +425,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     }
     .a11y-list dd {
       margin: 6px 0 0 0;
-      color: #666;
+      color: var(--site-text-secondary);
       font-size: 14px;
       line-height: 1.6;
     }
@@ -446,25 +447,25 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     .key-table th {
       text-align: left;
       padding: 10px 14px;
-      background: #f5f7fa;
-      color: #1a1a2e;
+      background: var(--site-bg);
+      color: var(--site-text);
       font-weight: 600;
       font-size: 13px;
-      border-bottom: 2px solid #e8ecf0;
+      border-bottom: 2px solid var(--site-surface-border);
     }
     .key-table td {
       padding: 10px 14px;
-      border-bottom: 1px solid #eee;
-      color: #555;
+      border-bottom: 1px solid var(--site-surface-border);
+      color: var(--site-text-secondary);
     }
     kbd {
-      background: #f0f2f5;
-      border: 1px solid #d0d4da;
+      background: var(--site-code-inline-bg);
+      border: 1px solid var(--site-surface-border);
       border-radius: 5px;
       padding: 3px 8px;
       font-size: 12px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 2px var(--site-shadow);
     }
 
     /* Tablet */
@@ -493,7 +494,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         white-space: nowrap;
         padding: 6px 12px;
         font-size: 12px;
-        background: #f5f7fa;
+        background: var(--site-bg);
         border-radius: 20px;
       }
       .content { padding: 20px 0 60px; }

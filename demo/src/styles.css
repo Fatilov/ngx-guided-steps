@@ -1,0 +1,86 @@
+/* ========================================
+   Wanejoyhint Demo — Global Theme Variables
+   ======================================== */
+
+:root,
+[data-theme="light"] {
+  --site-bg: #f5f7fa;
+  --site-bg-alt: #eef1f5;
+  --site-surface: #ffffff;
+  --site-surface-border: #e8ecf0;
+  --site-text: #1a1a2e;
+  --site-text-secondary: #555555;
+  --site-text-tertiary: #999999;
+  --site-chrome-bg: #1a1a2e;
+  --site-chrome-text: #ffffff;
+  --site-chrome-text-muted: rgba(255, 255, 255, 0.7);
+  --site-accent: #1ecd97;
+  --site-accent-hover: #17b882;
+  --site-accent-bg: rgba(30, 205, 151, 0.12);
+  --site-accent-text: #0f1e17;
+  --site-accent-secondary: #6c63ff;
+  --site-code-bg: #0d1117;
+  --site-code-text: #c9d1d9;
+  --site-code-inline-bg: #f0f0f0;
+  --site-input-border: #e0e0e0;
+  --site-input-bg: #ffffff;
+  --site-hover-bg: rgba(0, 0, 0, 0.04);
+  --site-shadow: rgba(0, 0, 0, 0.08);
+  --site-hero-from: #1a1a2e;
+  --site-hero-to: #16213e;
+}
+
+[data-theme="dark"] {
+  --site-bg: #0f1117;
+  --site-bg-alt: #161922;
+  --site-surface: #1c1f2e;
+  --site-surface-border: #2a2d3e;
+  --site-text: #e2e4e9;
+  --site-text-secondary: #a0a4b0;
+  --site-text-tertiary: #6b7080;
+  --site-chrome-bg: #0a0c14;
+  --site-chrome-text: #e2e4e9;
+  --site-chrome-text-muted: rgba(255, 255, 255, 0.55);
+  --site-accent: #1ecd97;
+  --site-accent-hover: #24e0a6;
+  --site-accent-bg: rgba(30, 205, 151, 0.15);
+  --site-accent-text: #0f1e17;
+  --site-accent-secondary: #8b83ff;
+  --site-code-bg: #0d1117;
+  --site-code-text: #c9d1d9;
+  --site-code-inline-bg: #262a36;
+  --site-input-border: #3a3d4e;
+  --site-input-bg: #1c1f2e;
+  --site-hover-bg: rgba(255, 255, 255, 0.06);
+  --site-shadow: rgba(0, 0, 0, 0.3);
+  --site-hero-from: #0a0c14;
+  --site-hero-to: #111528;
+}
+
+/* ========================================
+   Base Resets
+   ======================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: var(--site-text);
+  background: var(--site-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+code, pre, .mono {
+  font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

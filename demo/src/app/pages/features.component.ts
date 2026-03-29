@@ -243,8 +243,8 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
     <!-- 9. Log -->
     <section class="section section-dark" id="section-log">
       <div class="container">
-        <h2 style="color:white">9. Journal des evenements</h2>
-        <p class="section-desc" style="color:rgba(255,255,255,0.6)">Tous les evenements du tour en temps reel.</p>
+        <h2 style="color:var(--site-chrome-text)">9. Journal des evenements</h2>
+        <p class="section-desc" style="color:var(--site-text-tertiary)">Tous les evenements du tour en temps reel.</p>
         <div class="log-output" id="log-output">
           @for (entry of logs; track $index) {
             <div class="log-entry" [class.log-info]="entry.type==='info'" [class.log-success]="entry.type==='success'" [class.log-warn]="entry.type==='warn'">
@@ -254,7 +254,7 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
             <div class="log-placeholder">Lancez le tour pour voir les evenements...</div>
           }
         </div>
-        <button class="btn btn-small" style="margin-top:8px;border-color:rgba(255,255,255,0.3);color:rgba(255,255,255,0.6)" (click)="logs=[]">Vider</button>
+        <button class="btn btn-small" style="margin-top:8px;border-color:var(--site-surface-border);color:var(--site-text-tertiary)" (click)="logs=[]">Vider</button>
       </div>
     </section>
   `,
@@ -262,91 +262,92 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
     :host { display: block; }
 
     .hero-bar {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       padding: 40px 0;
     }
     .hero-bar-inner {
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 20px;
     }
-    .hero-bar h1 { font-size: 1.8em; color: white; margin-bottom: 4px; }
-    .hero-bar p { color: rgba(255,255,255,0.65); font-size: 15px; }
-    .hero-bar p b { color: #1ecd97; }
+    .hero-bar h1 { font-size: 1.8em; color: var(--site-chrome-text); margin-bottom: 4px; }
+    .hero-bar p { color: var(--site-text-tertiary); font-size: 15px; }
+    .hero-bar p b { color: var(--site-accent); }
 
     .btn-start {
       padding: 14px 32px; border: none; border-radius: 10px;
-      background: #1ecd97; color: #0f1e17; font-size: 1rem;
+      background: var(--site-accent); color: var(--site-accent-text); font-size: 1rem;
       font-weight: 700; cursor: pointer; transition: all 0.2s;
       white-space: nowrap;
     }
     .btn-start:hover {
-      background: #17b882; transform: translateY(-2px);
+      background: var(--site-accent-hover); transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(30,205,151,0.35);
     }
 
     .section { padding: 48px 0; }
-    .section-white { background: white; }
-    .section-gray { background: #f5f7fa; }
-    .section-dark { background: #1a1a2e; color: white; }
+    .section-white { background: var(--site-surface); }
+    .section-gray { background: var(--site-bg-alt); }
+    .section-dark { background: var(--site-hero-from); color: var(--site-chrome-text); }
     .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
 
-    h2 { font-size: 1.4em; margin-bottom: 6px; color: #1a1a2e; }
-    h4 { margin-bottom: 6px; color: #333; font-size: 0.95em; }
-    .section-desc { color: #666; margin-bottom: 24px; font-size: 14px; }
-    .section-desc code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    h2 { font-size: 1.4em; margin-bottom: 6px; color: var(--site-text); }
+    h4 { margin-bottom: 6px; color: var(--site-text); font-size: 0.95em; }
+    .section-desc { color: var(--site-text-secondary); margin-bottom: 24px; font-size: 14px; }
+    .section-desc code { background: var(--site-code-inline-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
 
     .demo-row {
       display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; align-items: center;
     }
 
     .demo-card {
-      background: white; border-radius: 12px; padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06); flex: 1 1 180px; min-width: 160px;
+      background: var(--site-surface); border-radius: 12px; padding: 20px;
+      box-shadow: 0 2px 10px var(--site-shadow); flex: 1 1 180px; min-width: 160px;
+      transition: background-color 0.2s, box-shadow 0.2s;
     }
-    .section-gray .demo-card { background: white; }
-    .demo-card p { font-size: 13px; color: #888; margin: 4px 0; }
+    .section-gray .demo-card { background: var(--site-surface); }
+    .demo-card p { font-size: 13px; color: var(--site-text-tertiary); margin: 4px 0; }
     .card-center { text-align: center; }
 
     .avatar {
-      width: 52px; height: 52px; border-radius: 50%; background: #6c63ff; color: white;
+      width: 52px; height: 52px; border-radius: 50%; background: var(--site-accent-secondary); color: var(--site-chrome-text);
       display: inline-flex; align-items: center; justify-content: center;
       font-weight: 700; font-size: 18px; margin-bottom: 8px;
     }
 
     .demo-input {
-      width: 100%; padding: 10px 14px; border: 2px solid #e0e0e0; border-radius: 8px;
+      width: 100%; padding: 10px 14px; border: 2px solid var(--site-input-border); border-radius: 8px;
       font-size: 14px; outline: none; transition: border-color 0.2s;
     }
-    .demo-input:focus { border-color: #1ecd97; }
+    .demo-input:focus { border-color: var(--site-accent); }
 
     .demo-zone {
-      padding: 16px 24px; border: 2px dashed #ccc; border-radius: 10px;
-      color: #999; font-size: 13px; text-align: center; min-width: 160px;
+      padding: 16px 24px; border: 2px dashed var(--site-surface-border); border-radius: 10px;
+      color: var(--site-text-tertiary); font-size: 13px; text-align: center; min-width: 160px;
     }
 
     .spacer {
       height: 600px; display: flex; align-items: center; justify-content: center;
-      color: #bbb; font-size: 14px;
+      color: var(--site-text-tertiary); font-size: 14px;
     }
 
-    .theme-light { border: 2px solid #e0e0e0; }
-    .theme-dark { background: #2d2d44; border: 2px solid #444; }
-    .theme-dark h4, .theme-dark p { color: #ddd !important; }
+    .theme-light { border: 2px solid var(--site-surface-border); }
+    .theme-dark { background: var(--site-hero-to); border: 2px solid var(--site-surface-border); }
+    .theme-dark h4, .theme-dark p { color: var(--site-code-text) !important; }
 
     .api-card { flex: 1 1 200px; }
 
     .btn {
-      padding: 10px 20px; border: 2px solid #1ecd97; border-radius: 25px;
-      background: transparent; color: #1ecd97; font-size: 14px; cursor: pointer;
+      padding: 10px 20px; border: 2px solid var(--site-accent); border-radius: 25px;
+      background: transparent; color: var(--site-accent); font-size: 14px; cursor: pointer;
       font-weight: 500; transition: all 0.2s; text-align: center;
     }
-    .btn:hover { background: #1ecd97; color: white; }
-    .btn-primary { border-color: #1ecd97; color: #1ecd97; }
-    .btn-primary:hover { background: #1ecd97; }
-    .btn-secondary { border-color: #6c63ff; color: #6c63ff; }
-    .btn-secondary:hover { background: #6c63ff; color: white; }
+    .btn:hover { background: var(--site-accent); color: var(--site-chrome-text); }
+    .btn-primary { border-color: var(--site-accent); color: var(--site-accent); }
+    .btn-primary:hover { background: var(--site-accent); }
+    .btn-secondary { border-color: var(--site-accent-secondary); color: var(--site-accent-secondary); }
+    .btn-secondary:hover { background: var(--site-accent-secondary); color: var(--site-chrome-text); }
     .btn-accent { border-color: #ff6b6b; color: #ff6b6b; }
-    .btn-accent:hover { background: #ff6b6b; color: white; }
+    .btn-accent:hover { background: #ff6b6b; color: var(--site-chrome-text); }
     .btn-small { padding: 6px 14px; font-size: 12px; }
     .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -357,27 +358,29 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
       justify-content: center; z-index: 900;
     }
     .modal-dialog {
-      background: white; border-radius: 14px; width: 90%; max-width: 440px;
+      background: var(--site-surface); border-radius: 14px; width: 90%; max-width: 440px;
       box-shadow: 0 8px 40px rgba(0,0,0,0.25); overflow: hidden;
+      transition: background-color 0.2s;
     }
     .modal-header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid #eee;
+      padding: 16px 20px; border-bottom: 1px solid var(--site-surface-border);
     }
-    .modal-header h4 { margin: 0; color: #1a1a2e; }
+    .modal-header h4 { margin: 0; color: var(--site-text); }
     .modal-close {
       background: none; border: none; font-size: 22px; cursor: pointer;
-      color: #999; padding: 0 4px; line-height: 1;
+      color: var(--site-text-tertiary); padding: 0 4px; line-height: 1;
     }
     .modal-body { padding: 20px; }
-    .modal-body p { color: #555; font-size: 14px; margin-bottom: 8px; }
-    .modal-body code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-size: 13px; }
-    .modal-footer { padding: 12px 20px; border-top: 1px solid #eee; text-align: right; }
+    .modal-body p { color: var(--site-text-secondary); font-size: 14px; margin-bottom: 8px; }
+    .modal-body code { background: var(--site-code-inline-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+    .modal-footer { padding: 12px 20px; border-top: 1px solid var(--site-surface-border); text-align: right; }
 
     .log-output {
-      background: #0d1117; padding: 14px; border-radius: 8px;
+      background: var(--site-code-bg); padding: 14px; border-radius: 8px;
       max-height: 180px; overflow-y: auto; font-family: 'Fira Code', monospace;
-      font-size: 12px; color: #cdd6f4;
+      font-size: 12px; color: var(--site-code-text);
+      transition: background-color 0.2s;
     }
     .log-entry { padding: 2px 0; }
     .log-info { color: #89b4fa; }
@@ -387,20 +390,21 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
 
     .code-block {
       margin-top: 12px;
-      background: #0d1117;
+      background: var(--site-code-bg);
       border-radius: 8px;
       padding: 14px 18px;
       overflow-x: auto;
+      transition: background-color 0.2s;
     }
     .code-block pre {
       margin: 0;
       font-family: 'Fira Code', 'Consolas', monospace;
       font-size: 12px;
       line-height: 1.5;
-      color: #e6edf3;
+      color: var(--site-code-text);
     }
     .code-block code {
-      color: #e6edf3;
+      color: var(--site-code-text);
     }
     .code-block .comment {
       color: #8b949e;

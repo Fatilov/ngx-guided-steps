@@ -207,7 +207,7 @@ import { RouterLink } from '@angular/router';
     :host {
       display: block;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-      color: #1a1a2e;
+      color: var(--site-text);
       line-height: 1.6;
       overflow-x: hidden;
       max-width: 100%;
@@ -224,8 +224,8 @@ import { RouterLink } from '@angular/router';
     code {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 0.85em;
-      background: rgba(30, 205, 151, 0.12);
-      color: #0e9a6e;
+      background: var(--site-code-inline-bg);
+      color: var(--site-accent);
       padding: 0.1em 0.35em;
       border-radius: 4px;
       overflow-wrap: break-word;
@@ -236,7 +236,7 @@ import { RouterLink } from '@angular/router';
     /* Hero                                                                */
     /* ------------------------------------------------------------------ */
     .hero {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       min-height: 92vh;
       display: flex;
       align-items: center;
@@ -267,7 +267,7 @@ import { RouterLink } from '@angular/router';
     .hero-badge {
       display: inline-block;
       background: rgba(30, 205, 151, 0.15);
-      color: #1ecd97;
+      color: var(--site-accent);
       border: 1px solid rgba(30, 205, 151, 0.3);
       border-radius: 20px;
       padding: 4px 14px;
@@ -282,14 +282,14 @@ import { RouterLink } from '@angular/router';
       font-size: clamp(2.6rem, 6vw, 4rem);
       font-weight: 800;
       line-height: 1.1;
-      color: #ffffff;
+      color: var(--site-chrome-text);
       margin-bottom: 12px;
       letter-spacing: -0.03em;
     }
 
     .hero-accent-subtitle {
       font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: #1ecd97;
+      color: var(--site-accent);
       font-weight: 600;
       margin-bottom: 20px;
     }
@@ -327,17 +327,17 @@ import { RouterLink } from '@angular/router';
     }
 
     .btn:focus-visible {
-      outline: 3px solid #1ecd97;
+      outline: 3px solid var(--site-accent);
       outline-offset: 3px;
     }
 
     .btn-primary {
-      background: #1ecd97;
-      color: #0f1e17;
+      background: var(--site-accent);
+      color: var(--site-accent-text);
     }
 
     .btn-primary:hover {
-      background: #17b882;
+      background: var(--site-accent-hover);
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(30, 205, 151, 0.35);
     }
@@ -348,7 +348,7 @@ import { RouterLink } from '@angular/router';
 
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
+      color: var(--site-chrome-text);
       border: 1px solid rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(8px);
     }
@@ -399,7 +399,7 @@ import { RouterLink } from '@angular/router';
       position: absolute;
       bottom: -28px;
       right: 20px;
-      background: #1ecd97;
+      background: var(--site-accent);
       border-radius: 10px;
       padding: 10px 14px;
       display: flex;
@@ -426,7 +426,7 @@ import { RouterLink } from '@angular/router';
     /* Quick Start                                                         */
     /* ------------------------------------------------------------------ */
     .quickstart {
-      background: #f5f7fa;
+      background: var(--site-bg);
       padding: 96px 24px;
     }
 
@@ -439,14 +439,14 @@ import { RouterLink } from '@angular/router';
       font-size: clamp(1.75rem, 3vw, 2.4rem);
       font-weight: 800;
       text-align: center;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
 
     .section-subtitle {
       text-align: center;
-      color: #5a6472;
+      color: var(--site-text-secondary);
       font-size: 1.05rem;
       margin-bottom: 56px;
     }
@@ -475,8 +475,8 @@ import { RouterLink } from '@angular/router';
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1ecd97, #0e9a6e);
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--site-accent), var(--site-accent-hover));
+      color: var(--site-chrome-text);
       font-weight: 800;
       font-size: 1rem;
       display: flex;
@@ -488,18 +488,18 @@ import { RouterLink } from '@angular/router';
     .step-label {
       font-size: 1.15rem;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--site-text);
     }
 
     .code-block {
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px var(--site-shadow);
       max-width: 100%;
     }
 
     .code-block-header {
-      background: #2d3748;
+      background: var(--site-code-bg);
       padding: 10px 16px;
       display: flex;
       align-items: center;
@@ -529,11 +529,11 @@ import { RouterLink } from '@angular/router';
     .dot--green  { background: #28c840; }
 
     .code-block-body {
-      background: #1a202c;
+      background: var(--site-code-bg);
       padding: 20px 24px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 0.85rem;
-      color: #cbd5e0;
+      color: var(--site-code-text);
       line-height: 1.65;
       overflow-x: auto;
       overflow-wrap: break-word;
@@ -557,7 +557,7 @@ import { RouterLink } from '@angular/router';
     /* Features                                                            */
     /* ------------------------------------------------------------------ */
     .features {
-      background: #ffffff;
+      background: var(--site-surface);
       padding: 96px 24px;
     }
 
@@ -569,18 +569,18 @@ import { RouterLink } from '@angular/router';
 
     .feature-card {
       display: block;
-      background: #ffffff;
-      border: 1px solid #e8ecf0;
+      background: var(--site-surface);
+      border: 1px solid var(--site-surface-border);
       border-radius: 16px;
       padding: 28px 24px;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
     }
 
     .feature-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 16px 40px var(--site-shadow);
       border-color: rgba(30, 205, 151, 0.35);
     }
 
@@ -608,7 +608,7 @@ import { RouterLink } from '@angular/router';
     .icon-shape--svg {
       width: 22px;
       height: 22px;
-      border: 2.5px solid #1ecd97;
+      border: 2.5px solid var(--site-accent);
       border-radius: 4px;
       position: relative;
     }
@@ -636,7 +636,7 @@ import { RouterLink } from '@angular/router';
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1a1a2e 50%, #f97316 50%);
+      background: linear-gradient(135deg, var(--site-hero-from) 50%, #f97316 50%);
       border: 2px solid #f97316;
     }
 
@@ -710,13 +710,13 @@ import { RouterLink } from '@angular/router';
     .feature-title {
       font-size: 1.05rem;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin-bottom: 8px;
     }
 
     .feature-desc {
       font-size: 0.9rem;
-      color: #5a6472;
+      color: var(--site-text-secondary);
       line-height: 1.65;
     }
 
@@ -724,7 +724,7 @@ import { RouterLink } from '@angular/router';
     /* Stats Bar                                                           */
     /* ------------------------------------------------------------------ */
     .stats {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       padding: 56px 24px;
     }
 
@@ -749,7 +749,7 @@ import { RouterLink } from '@angular/router';
     .stat-value {
       font-size: clamp(1.3rem, 2.5vw, 1.7rem);
       font-weight: 800;
-      color: #1ecd97;
+      color: var(--site-accent);
       letter-spacing: -0.02em;
       line-height: 1.1;
       white-space: nowrap;
