@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-advanced',
   standalone: true,
-  imports: [RouterLink],
   template: `
     <!-- Header -->
     <div class="hero-bar">
