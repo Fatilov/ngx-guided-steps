@@ -58,7 +58,7 @@ export class PositionService {
 
   /**
    * Calculate the best label position using the 8-zone algorithm
-   * mirrored from the original EnjoyHint.
+   * Uses an 8-zone algorithm to find optimal placement.
    */
   calculateLabelPosition(
     data: ResolvedStepData,

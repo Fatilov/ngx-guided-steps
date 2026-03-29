@@ -442,7 +442,7 @@ export class GuidedStepsService {
   /**
    * Scroll to an element then invoke callback once scroll settles.
    * We don't lock body scroll — the overlay + event blockers
-   * prevent user interaction (same approach as original EnjoyHint).
+   * prevent user interaction.
    */
   private scrollToElement(el: Element, callback: () => void, scrollSpeed: number): void {
     el.scrollIntoView({ behavior: 'smooth', block: 'center' });
