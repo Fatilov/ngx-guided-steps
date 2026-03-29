@@ -28,6 +28,15 @@ interface AreaCandidate {
 
 @Injectable({ providedIn: 'root' })
 export class PositionService {
+  /** Returns the effective viewport size, preferring visualViewport when the keyboard is open. */
+  private getViewportSize(): { vw: number; vh: number } {
+    const vv = window.visualViewport;
+    if (vv && vv.height < window.innerHeight - 50) {
+      return { vw: vv.width, vh: vv.height };
+    }
+    return { vw: window.innerWidth, vh: window.innerHeight };
+  }
+
   /**
    * Resolve element position from DOM selector.
    */
@@ -56,8 +65,7 @@ export class PositionService {
     labelWidth: number,
     labelHeight: number
   ): { label: LabelPosition; arrow: ArrowData } {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const { vw, vh } = this.getViewportSize();
 
     const halfW =
       data.shape === 'circle'
@@ -254,8 +262,7 @@ export class PositionService {
     showPrev: boolean,
     showNext: boolean
   ): { prev: ButtonPosition; next: ButtonPosition; skip: ButtonPosition } {
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
+    const { vw, vh } = this.getViewportSize();
     const summaryWidth = nextBtnWidth + skipBtnWidth + prevBtnWidth + 30;
     let distance = labelX - 100;
     const btnHeight = 36;
@@ -347,7 +354,7 @@ export class PositionService {
     const rect = el.getBoundingClientRect();
     return (
       rect.top >= 0 &&
-      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+      rect.bottom <= (this.getViewportSize().vh || document.documentElement.clientHeight)
     );
   }
 
