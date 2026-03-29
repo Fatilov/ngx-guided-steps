@@ -1,6 +1,6 @@
 /*
- * ngx-guided-steps - Angular Interactive Tutorial Library
- * Inspired by EnjoyHint, built for Angular 18+
+ * ngx-guided-steps - Angular Guided Tour Library
+ * Interactive step-by-step tutorials for Angular 18+
  *
  * Public API Surface
  */
