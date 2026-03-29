@@ -34,6 +34,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
     .navbar {
@@ -63,6 +64,7 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
     .navbar-links {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
     }
 
@@ -91,10 +93,45 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
     .footer-links a { color: #1ecd97; text-decoration: none; }
     .footer-links span { margin: 0 8px; }
 
-    @media (max-width: 640px) {
-      .navbar { padding: 0 12px; height: 48px; }
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 8px 12px;
+        height: auto;
+        min-height: 48px;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
       .navbar-brand { font-size: 15px; }
-      .navbar-links a { font-size: 11px; padding: 4px 8px; }
+      .navbar-links {
+        gap: 2px;
+        justify-content: flex-end;
+      }
+      .navbar-links a { font-size: 11px; padding: 4px 6px; }
+      .footer {
+        flex-direction: column;
+        padding: 16px 12px;
+        font-size: 12px;
+      }
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 4px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        justify-content: center;
+        gap: 6px;
+      }
+      .navbar-brand { font-size: 14px; }
+      .navbar-links {
+        width: 100%;
+        justify-content: center;
+        gap: 2px;
+      }
+      .navbar-links a { font-size: 10px; padding: 4px 5px; }
     }
   `],
 })

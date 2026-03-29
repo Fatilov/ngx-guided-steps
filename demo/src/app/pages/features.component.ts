@@ -406,14 +406,52 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
       color: #8b949e;
     }
 
+    .demo-input { box-sizing: border-box; }
+
     @media (max-width: 640px) {
+      .container { max-width: 100%; padding: 0 16px; box-sizing: border-box; }
       .hero-bar { padding: 24px 0; }
       .hero-bar h1 { font-size: 1.3em; }
+      .hero-bar-inner { flex-direction: column; align-items: flex-start; text-align: left; }
+      .btn-start { width: 100%; text-align: center; padding: 14px 24px; }
       .section { padding: 32px 0; }
       h2 { font-size: 1.2em; }
-      .demo-row { gap: 10px; }
-      .demo-card { flex: 1 1 100%; }
-      .btn { font-size: 13px; padding: 8px 16px; }
+      .section-desc { font-size: 13px; }
+      .demo-row { flex-direction: column; gap: 10px; }
+      .demo-card { flex: 1 1 100%; min-width: 0; }
+      .demo-zone { min-width: 0; width: 100%; box-sizing: border-box; }
+      .btn { font-size: 13px; padding: 10px 16px; min-height: 44px; }
+      .btn-small { min-height: 44px; padding: 8px 14px; font-size: 12px; }
+      .btn-group { flex-direction: column; }
+      .btn-group .btn { width: 100%; }
+      .code-block { max-width: 100%; box-sizing: border-box; padding: 12px 14px; overflow-x: auto; }
+      .code-block pre { overflow-x: auto; font-size: 11px; white-space: pre; }
+      .code-block code { max-width: 100%; }
+      .log-output { overflow-x: auto; font-size: 11px; max-height: 150px; }
+      .modal-dialog { width: 95%; max-width: none; }
+      .modal-header { padding: 14px 16px; }
+      .modal-body { padding: 16px; }
+      .modal-footer { padding: 10px 16px; }
+      .spacer { height: 300px; font-size: 12px; }
+      .api-card { flex: 1 1 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .container { padding: 0 12px; }
+      .hero-bar { padding: 16px 0; }
+      .hero-bar h1 { font-size: 1.15em; }
+      .hero-bar p { font-size: 13px; }
+      .btn-start { padding: 12px 20px; font-size: 0.9rem; }
+      .section { padding: 24px 0; }
+      h2 { font-size: 1.1em; }
+      .section-desc { font-size: 12px; margin-bottom: 16px; }
+      .demo-card { padding: 14px; }
+      .code-block { padding: 10px 12px; border-radius: 6px; }
+      .code-block pre { font-size: 10px; }
+      .log-output { padding: 10px; font-size: 10px; max-height: 130px; }
+      .spacer { height: 200px; }
+      .avatar { width: 44px; height: 44px; font-size: 15px; }
+      .modal-dialog { width: 96%; margin: 0 2%; }
     }
   `],
 })

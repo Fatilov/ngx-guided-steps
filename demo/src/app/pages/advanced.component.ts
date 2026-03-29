@@ -217,32 +217,34 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
           <div class="card-number">15</div>
           <h2>Navigation clavier</h2>
           <p>Activez la navigation clavier pour permettre aux utilisateurs de controler le tour sans la souris.</p>
-          <table class="key-table">
-            <thead>
-              <tr>
-                <th>Touche</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><kbd>Arrow Right</kbd></td>
-                <td>Etape suivante</td>
-              </tr>
-              <tr>
-                <td><kbd>Arrow Left</kbd></td>
-                <td>Etape precedente</td>
-              </tr>
-              <tr>
-                <td><kbd>Escape</kbd></td>
-                <td>Fermer le tour</td>
-              </tr>
-              <tr>
-                <td><kbd>Tab</kbd></td>
-                <td>Focus trap (navigation entre boutons)</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-scroll">
+            <table class="key-table">
+              <thead>
+                <tr>
+                  <th>Touche</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><kbd>Arrow Right</kbd></td>
+                  <td>Etape suivante</td>
+                </tr>
+                <tr>
+                  <td><kbd>Arrow Left</kbd></td>
+                  <td>Etape precedente</td>
+                </tr>
+                <tr>
+                  <td><kbd>Escape</kbd></td>
+                  <td>Fermer le tour</td>
+                </tr>
+                <tr>
+                  <td><kbd>Tab</kbd></td>
+                  <td>Focus trap (navigation entre boutons)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <pre class="code-block"><code>provideWanejoyhint({{ '{' }} keyboardNav: true {{ '}' }}) // defaut</code></pre>
         </section>
 
@@ -250,7 +252,8 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     </div>
   `,
   styles: [`
-    :host { display: block; }
+    :host { display: block; overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: border-box; }
 
     /* Hero header */
     .hero-bar {
@@ -387,6 +390,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 13px;
       overflow-x: auto;
+      max-width: 100%;
       line-height: 1.65;
       margin: 0;
       white-space: pre;
@@ -425,11 +429,18 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       line-height: 1.6;
     }
 
+    /* Table scroll wrapper */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+    }
+
     /* Keyboard table */
     .key-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       font-size: 14px;
     }
     .key-table th {
@@ -456,17 +467,19 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     }
 
-    /* Mobile */
+    /* Tablet */
     @media (max-width: 768px) {
       .hero-bar { padding: 32px 0 28px; }
       .hero-bar h1 { font-size: 1.5em; }
-      .layout { flex-direction: column; gap: 0; }
+      .container { padding: 0 16px; }
+      .layout { flex-direction: column; gap: 0; padding: 0 16px; }
       .sidebar {
         width: 100%;
         position: static;
         padding: 20px 0 0;
         max-height: none;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .sidebar-nav {
         flex-direction: row;
@@ -474,6 +487,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         gap: 4px;
         padding-bottom: 12px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .nav-link {
         white-space: nowrap;
@@ -483,9 +497,30 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         border-radius: 20px;
       }
       .content { padding: 20px 0 60px; }
-      .card { padding: 22px 20px; }
+      .card { padding: 22px 20px; max-width: 100%; }
       .card h2 { font-size: 1.1em; }
       .code-block { font-size: 12px; padding: 14px 16px; }
+      .a11y-list dt { display: block; }
+    }
+
+    /* Small phones */
+    @media (max-width: 480px) {
+      .hero-bar { padding: 24px 0 20px; }
+      .hero-bar h1 { font-size: 1.25em; }
+      .hero-bar p { font-size: 14px; }
+      .container { padding: 0 12px; }
+      .layout { padding: 0 12px; }
+      .card { padding: 18px 14px; border-radius: 10px; }
+      .card h2 { font-size: 1em; }
+      .card p { font-size: 13px; }
+      .card-number { width: 24px; height: 24px; font-size: 11px; top: -10px; left: 14px; }
+      .code-block { font-size: 11px; padding: 12px 10px; border-radius: 8px; }
+      .nav-link { font-size: 11px; padding: 5px 10px; }
+      .key-table { font-size: 13px; }
+      .key-table th, .key-table td { padding: 8px 10px; }
+      kbd { font-size: 11px; padding: 2px 6px; }
+      .a11y-list dt { font-size: 12px; }
+      .a11y-list dd { font-size: 13px; }
     }
   `],
 })

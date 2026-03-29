@@ -169,6 +169,35 @@ import { RouterLink } from '@angular/router';
       text-decoration: none;
       font-size: 14px;
     }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        padding: 20px 12px;
+      }
+      .dashboard-header h1 {
+        font-size: 1.4em;
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .dashboard-card {
+        padding: 16px;
+      }
+      .stat-value {
+        font-size: 1.3em;
+      }
+      .stat-row {
+        gap: 12px;
+      }
+      .chart-placeholder {
+        height: 100px;
+        gap: 8px;
+      }
+      .activity-list li {
+        font-size: 13px;
+      }
+    }
   `
 })
 export class DashboardComponent {}

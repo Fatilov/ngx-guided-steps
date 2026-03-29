@@ -209,9 +209,13 @@ import { RouterLink } from '@angular/router';
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
       color: #1a1a2e;
       line-height: 1.6;
+      overflow-x: hidden;
+      max-width: 100%;
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -224,6 +228,8 @@ import { RouterLink } from '@angular/router';
       color: #0e9a6e;
       padding: 0.1em 0.35em;
       border-radius: 4px;
+      overflow-wrap: break-word;
+      word-break: break-all;
     }
 
     /* ------------------------------------------------------------------ */
@@ -254,6 +260,7 @@ import { RouterLink } from '@angular/router';
     .hero-content {
       flex: 1;
       max-width: 600px;
+      min-width: 0;
       z-index: 1;
     }
 
@@ -304,8 +311,11 @@ import { RouterLink } from '@angular/router';
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       padding: 14px 28px;
+      min-height: 44px;
+      min-width: 44px;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: 600;
@@ -485,6 +495,7 @@ import { RouterLink } from '@angular/router';
       border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      max-width: 100%;
     }
 
     .code-block-header {
@@ -525,6 +536,9 @@ import { RouterLink } from '@angular/router';
       color: #cbd5e0;
       line-height: 1.65;
       overflow-x: auto;
+      overflow-wrap: break-word;
+      word-break: break-all;
+      max-width: 100%;
       margin: 0;
     }
 
@@ -534,6 +548,9 @@ import { RouterLink } from '@angular/router';
       font-size: inherit;
       padding: 0;
       font-family: inherit;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
 
     /* ------------------------------------------------------------------ */
@@ -769,6 +786,10 @@ import { RouterLink } from '@angular/router';
         min-height: auto;
       }
 
+      .hero-content {
+        max-width: 100%;
+      }
+
       .hero-description {
         max-width: 100%;
       }
@@ -783,15 +804,18 @@ import { RouterLink } from '@angular/router';
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .feature-grid {
         grid-template-columns: 1fr;
       }
 
       .features,
-      .quickstart,
+      .quickstart {
+        padding: 72px 16px;
+      }
+
       .stats {
-        padding: 64px 16px;
+        padding: 48px 16px;
       }
 
       .hero {
@@ -800,6 +824,10 @@ import { RouterLink } from '@angular/router';
 
       .hero-visual {
         display: none;
+      }
+
+      .section-subtitle {
+        margin-bottom: 36px;
       }
 
       .code-block-body {
@@ -818,7 +846,121 @@ import { RouterLink } from '@angular/router';
       }
 
       .stat-item {
-        padding: 20px 24px;
+        padding: 16px 24px;
+      }
+
+      .btn {
+        padding: 12px 22px;
+        font-size: 0.95rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+      }
+
+      .step-label {
+        font-size: 1.05rem;
+      }
+
+      .feature-card {
+        padding: 22px 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 36px 12px 48px;
+      }
+
+      .features,
+      .quickstart {
+        padding: 48px 12px;
+      }
+
+      .stats {
+        padding: 36px 12px;
+      }
+
+      .hero-badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        margin-bottom: 16px;
+      }
+
+      .hero-description {
+        margin-bottom: 28px;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .section-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 28px;
+      }
+
+      .code-block-body {
+        font-size: 0.7rem;
+        padding: 12px 10px;
+      }
+
+      .code-block-body code {
+        font-size: 0.7rem;
+      }
+
+      .code-block-header {
+        padding: 8px 10px;
+      }
+
+      .code-block-lang {
+        font-size: 0.68rem;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+      }
+
+      .stat-value {
+        font-size: 1.1rem;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+      }
+
+      .stat-item {
+        padding: 12px 16px;
+      }
+
+      .feature-card {
+        padding: 18px 14px;
+      }
+
+      .feature-title {
+        font-size: 0.95rem;
+      }
+
+      .feature-desc {
+        font-size: 0.85rem;
+      }
+
+      .steps-grid {
+        gap: 28px;
+      }
+
+      .btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
       }
     }
   `],
