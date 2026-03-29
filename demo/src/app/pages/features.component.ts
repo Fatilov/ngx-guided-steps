@@ -38,6 +38,11 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <input type="text" id="demo-input" class="demo-input" placeholder="Champ texte (rect + margin)">
           </div>
         </div>
+        <div class="code-block"><pre><code><span class="comment">// Circle shape</span>
+{{'{'}} selector: '#avatar', shape: 'circle', description: '...' {{'}'}}
+<span class="comment">// Rectangle with margin</span>
+{{'{'}} selector: '#input', shape: 'rect', margin: 20, description: '...' {{'}'}}
+</code></pre></div>
       </div>
     </section>
 
@@ -51,6 +56,9 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
           <input type="text" id="demo-key-input" class="demo-input" placeholder="Appuyez Entree">
           <div class="demo-zone" id="demo-custom-zone">Zone custom (avance auto 3s)</div>
         </div>
+        <div class="code-block"><pre><code>{{'{'}} selector: '#btn', eventType: 'click', showNext: false {{'}'}}
+{{'{'}} selector: '#input', eventType: 'key', key: 'Enter', showNext: false {{'}'}}
+{{'{'}} selector: '#zone', eventType: 'custom', showNext: false {{'}'}}</code></pre></div>
       </div>
     </section>
 
@@ -73,6 +81,11 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <p>showSkip: false</p>
           </div>
         </div>
+        <div class="code-block"><pre><code>{{'{'}}
+  nextButton: {{'{'}} text: 'Continuer >>' {{'}'}},
+  showSkip: false,
+  arrowColor: '#ff6b6b',
+{{'}'}}</code></pre></div>
       </div>
     </section>
 
@@ -112,6 +125,8 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <p>Manuel</p>
           </div>
         </div>
+        <div class="code-block"><pre><code>{{'{'}} selector: '#el', autoAdvance: 5000 {{'}'}} <span class="comment">// countdown 5s</span>
+{{'{'}} selector: '#el', autoAdvance: 3000 {{'}'}} <span class="comment">// countdown 3s</span></code></pre></div>
       </div>
     </section>
 
@@ -130,6 +145,8 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <p>Boutons sombres sur overlay clair</p>
           </div>
         </div>
+        <div class="code-block"><pre><code><span class="comment">// onBeforeStart to switch theme mid-tour</span>
+hint.setConfig({{'{'}} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)' {{'}'}});</code></pre></div>
       </div>
     </section>
 
@@ -148,6 +165,7 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <p>Next, Previous, Skip</p>
           </div>
         </div>
+        <div class="code-block"><pre><code [innerHTML]="codeI18n"></code></pre></div>
       </div>
     </section>
 
@@ -174,6 +192,11 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             </div>
           </div>
         }
+        <div class="code-block"><pre><code>{{'{'}}
+  selector: '#modal-header',
+  waitForSelector: 3000,
+  onBeforeStart: () => {{'{'}} this.modalOpen = true; this.cdr.detectChanges(); {{'}'}},
+{{'}'}}</code></pre></div>
       </div>
     </section>
 
@@ -188,6 +211,7 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             <p>Le tour va naviguer vers le Dashboard, cibler un element, puis revenir ici.</p>
           </div>
         </div>
+        <div class="code-block"><pre><code>{{'{'}} selector: '#dashboard-stats', route: '/dashboard', waitForSelector: 5000 {{'}'}}</code></pre></div>
       </div>
     </section>
 
@@ -211,6 +235,8 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             </div>
           </div>
         </div>
+        <div class="code-block"><pre><code>hint.next(); hint.prev(); hint.stop();
+hint.isRunning; hint.getCurrentStep();</code></pre></div>
       </div>
     </section>
 
@@ -359,6 +385,27 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
     .log-warn { color: #fab387; }
     .log-placeholder { color: #585b70; font-style: italic; }
 
+    .code-block {
+      margin-top: 12px;
+      background: #0d1117;
+      border-radius: 8px;
+      padding: 14px 18px;
+      overflow-x: auto;
+    }
+    .code-block pre {
+      margin: 0;
+      font-family: 'Fira Code', 'Consolas', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #e6edf3;
+    }
+    .code-block code {
+      color: #e6edf3;
+    }
+    .code-block .comment {
+      color: #8b949e;
+    }
+
     @media (max-width: 640px) {
       .hero-bar { padding: 24px 0; }
       .hero-bar h1 { font-size: 1.3em; }
@@ -376,6 +423,7 @@ export class FeaturesComponent implements OnDestroy {
   private router = inject(Router);
   logs: { time: string; message: string; type: 'info' | 'success' | 'warn' }[] = [];
   modalOpen = false;
+  codeI18n = `hint.setConfig({\n  labels: { next: 'Next', prev: 'Previous', skip: 'Skip',\n            progress: '{{current}} of {{total}}' },\n});`;
 
   private subs: Subscription[] = [];
   private customTimeout: ReturnType<typeof setTimeout> | null = null;

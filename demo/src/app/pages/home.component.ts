@@ -7,27 +7,23 @@ import { RouterLink } from '@angular/router';
   imports: [RouterLink],
   template: `
     <!-- Hero Section -->
-    <section id="hero" class="hero">
+    <section class="hero">
       <div class="hero-content">
         <div class="hero-badge">Angular 18+</div>
-        <h1 class="hero-title">Tutoriels interactifs<br><span class="hero-title-accent">pour Angular</span></h1>
-        <p class="hero-subtitle">
-          Guidez vos utilisateurs pas a pas avec des overlays SVG, des fleches animees
-          et une accessibilite complete.
+        <h1 class="hero-title">Wanejoyhint</h1>
+        <p class="hero-accent-subtitle">Tutoriels interactifs pour Angular 18+</p>
+        <p class="hero-description">
+          Overlays SVG, fleches animees, themes, i18n, navigation cross-routes.
+          Zero dependance jQuery.
         </p>
         <div class="hero-actions">
-          <a id="hero-cta" class="btn btn-primary" routerLink="/features">
+          <a class="btn btn-primary" routerLink="/features">
             <span class="btn-icon">&#9654;</span>
             Lancer le parcours complet
           </a>
-          <a
-            class="btn btn-secondary"
-            href="https://github.com/fatilov/wanejoyhint"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a class="btn btn-secondary" routerLink="/advanced">
             <span class="btn-icon">&#9671;</span>
-            Voir sur GitHub
+            Documentation
           </a>
         </div>
       </div>
@@ -43,148 +39,163 @@ import { RouterLink } from '@angular/router';
       </div>
     </section>
 
+    <!-- Quick Start Section -->
+    <section class="quickstart">
+      <div class="section-container">
+        <h2 class="section-title">Demarrage rapide</h2>
+        <p class="section-subtitle">Operationnel en 3 etapes.</p>
+
+        <div class="steps-grid">
+          <!-- Step 1 -->
+          <div class="step-block">
+            <div class="step-header">
+              <div class="step-number">1</div>
+              <h3 class="step-label">Installer</h3>
+            </div>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">Terminal</span>
+                <div class="code-block-dots">
+                  <span class="dot dot--red"></span>
+                  <span class="dot dot--yellow"></span>
+                  <span class="dot dot--green"></span>
+                </div>
+              </div>
+              <pre class="code-block-body"><code>npm install wanejoyhint</code></pre>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="step-block">
+            <div class="step-header">
+              <div class="step-number">2</div>
+              <h3 class="step-label">Configurer</h3>
+            </div>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">app.config.ts</span>
+                <div class="code-block-dots">
+                  <span class="dot dot--red"></span>
+                  <span class="dot dot--yellow"></span>
+                  <span class="dot dot--green"></span>
+                </div>
+              </div>
+              <pre class="code-block-body"><code [innerHTML]="step2Code"></code></pre>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="step-block">
+            <div class="step-header">
+              <div class="step-number">3</div>
+              <h3 class="step-label">Utiliser</h3>
+            </div>
+            <div class="code-block">
+              <div class="code-block-header">
+                <span class="code-block-lang">app.component.ts</span>
+                <div class="code-block-dots">
+                  <span class="dot dot--red"></span>
+                  <span class="dot dot--yellow"></span>
+                  <span class="dot dot--green"></span>
+                </div>
+              </div>
+              <pre class="code-block-body"><code [innerHTML]="step3Code"></code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Feature Grid -->
-    <section id="feature-grid" class="features">
+    <section class="features">
       <div class="section-container">
         <h2 class="section-title">Tout ce dont vous avez besoin</h2>
-        <p class="section-subtitle">Une bibliotheque pensee pour les developpeurs Angular modernes.</p>
+        <p class="section-subtitle">Une bibliotheque complete pour les developpeurs Angular modernes.</p>
         <div class="feature-grid">
-          <!-- SVG Overlay -->
-          <div id="feat-svg" class="feature-card">
+          <a class="feature-card" routerLink="/features">
             <div class="feature-icon feature-icon--svg">
               <div class="icon-shape icon-shape--svg"></div>
             </div>
-            <h3 class="feature-title">Overlay SVG</h3>
+            <h3 class="feature-title">Overlays SVG</h3>
             <p class="feature-desc">
-              Decoupe masque SVG avec formes <code>rect</code> et <code>circle</code> autour des elements cibles.
+              Decoupe masque SVG avec formes <code>circle</code> et <code>rect</code> autour des elements cibles.
             </p>
-          </div>
+          </a>
 
-          <!-- Mobile First -->
-          <div id="feat-responsive" class="feature-card">
-            <div class="feature-icon feature-icon--responsive">
-              <div class="icon-shape icon-shape--responsive"></div>
-            </div>
-            <h3 class="feature-title">Mobile First</h3>
-            <p class="feature-desc">
-              Design responsive avec breakpoints a 640px et 960px. Touch-friendly.
-            </p>
-          </div>
-
-          <!-- Accessibility -->
-          <div id="feat-a11y" class="feature-card">
-            <div class="feature-icon feature-icon--a11y">
-              <div class="icon-shape icon-shape--a11y"></div>
-            </div>
-            <h3 class="feature-title">Accessibilite WCAG</h3>
-            <p class="feature-desc">
-              <code>role=dialog</code>, <code>aria-live</code>, focus trap, navigation clavier, ESC pour fermer.
-            </p>
-          </div>
-
-          <!-- i18n -->
-          <div id="feat-i18n" class="feature-card">
-            <div class="feature-icon feature-icon--i18n">
-              <div class="icon-shape icon-shape--i18n"></div>
-            </div>
-            <h3 class="feature-title">i18n complet</h3>
-            <p class="feature-desc">
-              Tous les textes configurables via <code>WanejoyhintLabels</code> avec templates.
-            </p>
-          </div>
-
-          <!-- Events -->
-          <div id="feat-events" class="feature-card">
+          <a class="feature-card" routerLink="/features">
             <div class="feature-icon feature-icon--events">
               <div class="icon-shape icon-shape--events"></div>
             </div>
-            <h3 class="feature-title">5 types d'evenements</h3>
+            <h3 class="feature-title">Evenements</h3>
             <p class="feature-desc">
-              <code>next</code>, <code>click</code>, <code>key</code>, <code>custom</code>, <code>auto</code>. Callbacks par etape.
+              <code>click</code>, <code>key</code>, <code>custom</code>, <code>next</code> -- controle total du flux utilisateur.
             </p>
-          </div>
+          </a>
 
-          <!-- API -->
-          <div id="feat-api" class="feature-card">
+          <a class="feature-card" routerLink="/features">
+            <div class="feature-icon feature-icon--themes">
+              <div class="icon-shape icon-shape--themes"></div>
+            </div>
+            <h3 class="feature-title">Themes</h3>
+            <p class="feature-desc">
+              Basculez entre dark et light ou creez vos propres themes personnalises.
+            </p>
+          </a>
+
+          <a class="feature-card" routerLink="/features">
+            <div class="feature-icon feature-icon--i18n">
+              <div class="icon-shape icon-shape--i18n"></div>
+            </div>
+            <h3 class="feature-title">i18n</h3>
+            <p class="feature-desc">
+              Labels entierement personnalisables via <code>WanejoyhintLabels</code> et templates.
+            </p>
+          </a>
+
+          <a class="feature-card" routerLink="/features">
+            <div class="feature-icon feature-icon--routes">
+              <div class="icon-shape icon-shape--routes"></div>
+            </div>
+            <h3 class="feature-title">Cross-routes</h3>
+            <p class="feature-desc">
+              Navigation entre pages avec continuite du parcours grace au Router Angular.
+            </p>
+          </a>
+
+          <a class="feature-card" routerLink="/features">
             <div class="feature-icon feature-icon--api">
               <div class="icon-shape icon-shape--api"></div>
             </div>
             <h3 class="feature-title">API programmatique</h3>
             <p class="feature-desc">
-              <code>next()</code>, <code>prev()</code>, <code>trigger()</code>, <code>reRun()</code>, observables RxJS.
+              <code>next()</code>, <code>prev()</code>, <code>stop()</code>, observables RxJS complets.
             </p>
-          </div>
+          </a>
         </div>
       </div>
     </section>
 
-    <!-- Quick Install Section -->
-    <section id="install-section" class="install">
-      <div class="section-container">
-        <h2 class="section-title">Installation rapide</h2>
-        <p class="section-subtitle">Operationnel en moins de 5 minutes.</p>
-
-        <div class="install-code-block">
-          <div class="install-code-header">
-            <span class="install-code-label">Terminal</span>
-            <div class="install-code-dots">
-              <span class="dot dot--red"></span>
-              <span class="dot dot--yellow"></span>
-              <span class="dot dot--green"></span>
-            </div>
-          </div>
-          <pre class="install-code"><code>npm install wanejoyhint</code></pre>
-        </div>
-
-        <div class="install-steps">
-          <div class="install-step">
-            <div class="step-number">1</div>
-            <div class="step-content">
-              <h4 class="step-title">Installez</h4>
-              <p class="step-desc">Ajoutez le package via npm ou yarn.</p>
-            </div>
-          </div>
-          <div class="install-step-arrow" aria-hidden="true">&#8594;</div>
-          <div class="install-step">
-            <div class="step-number">2</div>
-            <div class="step-content">
-              <h4 class="step-title">Configurez</h4>
-              <p class="step-desc">Ajoutez <code>provideWanejoyhint()</code> dans vos providers.</p>
-            </div>
-          </div>
-          <div class="install-step-arrow" aria-hidden="true">&#8594;</div>
-          <div class="install-step">
-            <div class="step-number">3</div>
-            <div class="step-content">
-              <h4 class="step-title">Lancez</h4>
-              <p class="step-desc">Injectez <code>WanejoyhintService</code> et appelez <code>start(steps)</code>.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Stats Bar -->
-    <section id="stats-bar" class="stats">
+    <!-- Footer Stats Bar -->
+    <section class="stats">
       <div class="stats-container">
         <div class="stat-item">
-          <span class="stat-value">0</span>
-          <span class="stat-label">dependance jQuery</span>
-        </div>
-        <div class="stat-divider" aria-hidden="true"></div>
-        <div class="stat-item">
           <span class="stat-value">Angular 18+</span>
-          <span class="stat-label">compatibilite garantie</span>
+          <span class="stat-label">compatible</span>
         </div>
         <div class="stat-divider" aria-hidden="true"></div>
         <div class="stat-item">
-          <span class="stat-value">WCAG AA</span>
-          <span class="stat-label">accessibilite certifiee</span>
+          <span class="stat-value">TypeScript pur</span>
+          <span class="stat-label">type-safe</span>
         </div>
         <div class="stat-divider" aria-hidden="true"></div>
         <div class="stat-item">
-          <span class="stat-value">56</span>
-          <span class="stat-label">tests automatises</span>
+          <span class="stat-value">0 dependances</span>
+          <span class="stat-label">autonome</span>
+        </div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat-item">
+          <span class="stat-value">WCAG accessible</span>
+          <span class="stat-label">inclusif</span>
         </div>
       </div>
     </section>
@@ -220,11 +231,11 @@ import { RouterLink } from '@angular/router';
     /* ------------------------------------------------------------------ */
     .hero {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-      min-height: 90vh;
+      min-height: 92vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 80px 24px 80px;
+      padding: 80px 24px;
       gap: 64px;
       position: relative;
       overflow: hidden;
@@ -242,7 +253,7 @@ import { RouterLink } from '@angular/router';
 
     .hero-content {
       flex: 1;
-      max-width: 580px;
+      max-width: 600px;
       z-index: 1;
     }
 
@@ -257,27 +268,31 @@ import { RouterLink } from '@angular/router';
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .hero-title {
-      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-size: clamp(2.6rem, 6vw, 4rem);
       font-weight: 800;
-      line-height: 1.15;
+      line-height: 1.1;
       color: #ffffff;
-      margin-bottom: 20px;
-      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+      letter-spacing: -0.03em;
     }
 
-    .hero-title-accent {
+    .hero-accent-subtitle {
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
       color: #1ecd97;
+      font-weight: 600;
+      margin-bottom: 20px;
     }
 
-    .hero-subtitle {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      color: rgba(255, 255, 255, 0.68);
+    .hero-description {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: rgba(255, 255, 255, 0.65);
       margin-bottom: 40px;
-      max-width: 480px;
+      max-width: 500px;
+      line-height: 1.7;
     }
 
     .hero-actions {
@@ -398,10 +413,10 @@ import { RouterLink } from '@angular/router';
     }
 
     /* ------------------------------------------------------------------ */
-    /* Features                                                            */
+    /* Quick Start                                                         */
     /* ------------------------------------------------------------------ */
-    .features {
-      background: #ffffff;
+    .quickstart {
+      background: #f5f7fa;
       padding: 96px 24px;
     }
 
@@ -426,6 +441,109 @@ import { RouterLink } from '@angular/router';
       margin-bottom: 56px;
     }
 
+    .steps-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 40px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    .step-block {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1ecd97, #0e9a6e);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-label {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    .code-block {
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .code-block-header {
+      background: #2d3748;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .code-block-lang {
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 0.75rem;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      letter-spacing: 0.05em;
+    }
+
+    .code-block-dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot--red    { background: #ff5f57; }
+    .dot--yellow { background: #febc2e; }
+    .dot--green  { background: #28c840; }
+
+    .code-block-body {
+      background: #1a202c;
+      padding: 20px 24px;
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.85rem;
+      color: #cbd5e0;
+      line-height: 1.65;
+      overflow-x: auto;
+      margin: 0;
+    }
+
+    .code-block-body code {
+      background: transparent;
+      color: inherit;
+      font-size: inherit;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* Features                                                            */
+    /* ------------------------------------------------------------------ */
+    .features {
+      background: #ffffff;
+      padding: 96px 24px;
+    }
+
     .feature-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -433,10 +551,13 @@ import { RouterLink } from '@angular/router';
     }
 
     .feature-card {
+      display: block;
       background: #ffffff;
       border: 1px solid #e8ecf0;
       border-radius: 16px;
       padding: 28px 24px;
+      text-decoration: none;
+      color: inherit;
       transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }
 
@@ -457,10 +578,10 @@ import { RouterLink } from '@angular/router';
     }
 
     .feature-icon--svg    { background: rgba(30, 205, 151, 0.12); }
-    .feature-icon--responsive { background: rgba(99, 102, 241, 0.12); }
-    .feature-icon--a11y   { background: rgba(249, 115, 22, 0.12); }
-    .feature-icon--i18n   { background: rgba(14, 165, 233, 0.12); }
     .feature-icon--events { background: rgba(168, 85, 247, 0.12); }
+    .feature-icon--themes { background: rgba(249, 115, 22, 0.12); }
+    .feature-icon--i18n   { background: rgba(14, 165, 233, 0.12); }
+    .feature-icon--routes { background: rgba(99, 102, 241, 0.12); }
     .feature-icon--api    { background: rgba(234, 179, 8, 0.12); }
 
     .icon-shape {
@@ -486,42 +607,20 @@ import { RouterLink } from '@angular/router';
       border-radius: 2px;
     }
 
-    .icon-shape--responsive {
-      width: 18px;
-      height: 22px;
-      border: 2.5px solid #6366f1;
-      border-radius: 3px;
-      position: relative;
+    .icon-shape--events {
+      width: 8px;
+      height: 8px;
+      background: #a855f7;
+      border-radius: 50%;
+      box-shadow: 10px -4px 0 #a855f7, 10px 8px 0 #a855f7;
     }
 
-    .icon-shape--responsive::after {
-      content: '';
-      position: absolute;
-      bottom: -5px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 6px;
-      height: 2px;
-      background: #6366f1;
-      border-radius: 1px;
-    }
-
-    .icon-shape--a11y {
+    .icon-shape--themes {
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      border: 2.5px solid #f97316;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .icon-shape--a11y::after {
-      content: '';
-      width: 6px;
-      height: 6px;
-      background: #f97316;
-      border-radius: 50%;
+      background: linear-gradient(135deg, #1a1a2e 50%, #f97316 50%);
+      border: 2px solid #f97316;
     }
 
     .icon-shape--i18n {
@@ -543,12 +642,32 @@ import { RouterLink } from '@angular/router';
       border-radius: 1px;
     }
 
-    .icon-shape--events {
-      width: 8px;
-      height: 8px;
-      background: #a855f7;
-      border-radius: 50%;
-      box-shadow: 10px -4px 0 #a855f7, 10px 8px 0 #a855f7;
+    .icon-shape--routes {
+      width: 22px;
+      height: 14px;
+      position: relative;
+    }
+
+    .icon-shape--routes::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      border: 2.5px solid #6366f1;
+      border-radius: 3px;
+    }
+
+    .icon-shape--routes::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 10px;
+      height: 10px;
+      border: 2.5px solid #6366f1;
+      border-radius: 3px;
     }
 
     .icon-shape--api {
@@ -585,124 +704,6 @@ import { RouterLink } from '@angular/router';
     }
 
     /* ------------------------------------------------------------------ */
-    /* Install Section                                                     */
-    /* ------------------------------------------------------------------ */
-    .install {
-      background: #f5f7fa;
-      padding: 96px 24px;
-    }
-
-    .install-code-block {
-      max-width: 560px;
-      margin: 0 auto 48px;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-
-    .install-code-header {
-      background: #2d3748;
-      padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .install-code-label {
-      color: rgba(255, 255, 255, 0.45);
-      font-size: 0.75rem;
-      font-family: 'SFMono-Regular', Consolas, monospace;
-      letter-spacing: 0.05em;
-    }
-
-    .install-code-dots {
-      display: flex;
-      gap: 6px;
-    }
-
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-    }
-
-    .dot--red    { background: #ff5f57; }
-    .dot--yellow { background: #febc2e; }
-    .dot--green  { background: #28c840; }
-
-    .install-code {
-      background: #1a202c;
-      padding: 24px 28px;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 1.1rem;
-      color: #1ecd97;
-      line-height: 1.5;
-      overflow-x: auto;
-    }
-
-    .install-code code {
-      background: transparent;
-      color: inherit;
-      font-size: inherit;
-      padding: 0;
-    }
-
-    .install-steps {
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .install-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      background: #ffffff;
-      border: 1px solid #e8ecf0;
-      border-radius: 14px;
-      padding: 20px 22px;
-      max-width: 220px;
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .step-number {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1ecd97, #0e9a6e);
-      color: #ffffff;
-      font-weight: 800;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
-    .step-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 4px;
-    }
-
-    .step-desc {
-      font-size: 0.82rem;
-      color: #5a6472;
-      line-height: 1.5;
-    }
-
-    .install-step-arrow {
-      color: #c4cdd6;
-      font-size: 1.4rem;
-      padding-top: 24px;
-      flex-shrink: 0;
-    }
-
-    /* ------------------------------------------------------------------ */
     /* Stats Bar                                                           */
     /* ------------------------------------------------------------------ */
     .stats {
@@ -711,7 +712,7 @@ import { RouterLink } from '@angular/router';
     }
 
     .stats-container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: 0 auto;
       display: flex;
       align-items: center;
@@ -724,20 +725,21 @@ import { RouterLink } from '@angular/router';
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 16px 40px;
+      padding: 16px 36px;
       gap: 4px;
     }
 
     .stat-value {
-      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-size: clamp(1.3rem, 2.5vw, 1.7rem);
       font-weight: 800;
       color: #1ecd97;
       letter-spacing: -0.02em;
       line-height: 1.1;
+      white-space: nowrap;
     }
 
     .stat-label {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: rgba(255, 255, 255, 0.5);
       text-align: center;
       letter-spacing: 0.04em;
@@ -767,7 +769,7 @@ import { RouterLink } from '@angular/router';
         min-height: auto;
       }
 
-      .hero-subtitle {
+      .hero-description {
         max-width: 100%;
       }
 
@@ -787,7 +789,7 @@ import { RouterLink } from '@angular/router';
       }
 
       .features,
-      .install,
+      .quickstart,
       .stats {
         padding: 64px 16px;
       }
@@ -800,20 +802,9 @@ import { RouterLink } from '@angular/router';
         display: none;
       }
 
-      .install-steps {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      .install-step-arrow {
-        transform: rotate(90deg);
-        padding: 0;
-        line-height: 1;
-      }
-
-      .install-step {
-        max-width: 100%;
-        width: 100%;
+      .code-block-body {
+        font-size: 0.78rem;
+        padding: 16px 18px;
       }
 
       .stats-container {
@@ -832,4 +823,32 @@ import { RouterLink } from '@angular/router';
     }
   `],
 })
-export class HomeComponent {}
+export class HomeComponent {
+  step2Code = `import { provideWanejoyhint, WANEJOYHINT_ROUTER } from 'wanejoyhint';
+import { provideRouter, Router } from '@angular/router';
+
+export const appConfig = {
+  providers: [
+    provideRouter(routes),
+    provideWanejoyhint({
+      showProgress: true,
+      labels: { next: 'Suivant', prev: 'Precedent', skip: 'Passer' },
+    }),
+    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+  ],
+};`;
+
+  step3Code = `import { WanejoyhintService, WanejoyhintStep } from 'wanejoyhint';
+
+export class AppComponent {
+  private hint = inject(WanejoyhintService);
+
+  startTour() {
+    this.hint.setSteps([
+      { selector: '#header', description: 'Bienvenue !', eventType: 'next' },
+      { selector: '#nav', description: 'La navigation.', eventType: 'next' },
+    ]);
+    this.hint.run();
+  }
+}`;
+}
