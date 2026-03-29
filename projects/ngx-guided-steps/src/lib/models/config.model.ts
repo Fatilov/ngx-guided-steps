@@ -3,7 +3,7 @@ import { InjectionToken } from '@angular/core';
 /**
  * Labels for all UI text in the overlay. Allows full i18n support.
  */
-export interface WanejoyhintLabels {
+export interface GuidedStepsLabels {
   /** Text for the Next button (default: 'Next') */
   next?: string;
   /** Text for the Previous button (default: 'Previous') */
@@ -20,7 +20,7 @@ export interface WanejoyhintLabels {
   stepAnnouncement?: string;
 }
 
-export const DEFAULT_LABELS: Required<WanejoyhintLabels> = {
+export const DEFAULT_LABELS: Required<GuidedStepsLabels> = {
   next: 'Next',
   prev: 'Previous',
   skip: 'Skip',
@@ -35,12 +35,12 @@ export const DEFAULT_LABELS: Required<WanejoyhintLabels> = {
  * - 'light': light-colored buttons and text (default, for dark overlays)
  * - 'dark': dark-colored buttons and text (for light overlays)
  */
-export type WanejoyhintTheme = 'light' | 'dark';
+export type GuidedStepsTheme = 'light' | 'dark';
 
 /**
- * Global configuration for the Wanejoyhint library.
+ * Global configuration for the ngx-guided-steps library.
  */
-export interface WanejoyhintConfig {
+export interface GuidedStepsConfig {
   /** Background color of the overlay (default: 'rgba(0,0,0,0.6)') */
   backgroundColor?: string;
 
@@ -63,10 +63,10 @@ export interface WanejoyhintConfig {
   showProgress?: boolean;
 
   /** Customizable UI labels for i18n support */
-  labels?: WanejoyhintLabels;
+  labels?: GuidedStepsLabels;
 
   /** Visual theme: 'light' (default) or 'dark' */
-  theme?: WanejoyhintTheme;
+  theme?: GuidedStepsTheme;
 
   /** Enable arrow key navigation between steps (default: true) */
   keyboardNav?: boolean;
@@ -75,7 +75,7 @@ export interface WanejoyhintConfig {
   backdropDismiss?: boolean;
 }
 
-export const DEFAULT_CONFIG: WanejoyhintConfig = {
+export const DEFAULT_CONFIG: GuidedStepsConfig = {
   backgroundColor: 'rgba(0,0,0,0.6)',
   nextButtonText: 'Next',
   skipButtonText: 'Skip',
@@ -88,8 +88,8 @@ export const DEFAULT_CONFIG: WanejoyhintConfig = {
   backdropDismiss: false,
 };
 
-export const WANEJOYHINT_CONFIG = new InjectionToken<WanejoyhintConfig>(
-  'WANEJOYHINT_CONFIG'
+export const GUIDED_STEPS_CONFIG = new InjectionToken<GuidedStepsConfig>(
+  'GUIDED_STEPS_CONFIG'
 );
 
 /**
@@ -99,20 +99,20 @@ export const WANEJOYHINT_CONFIG = new InjectionToken<WanejoyhintConfig>(
  * @example
  * ```typescript
  * import { Router } from '@angular/router';
- * import { WANEJOYHINT_ROUTER } from 'wanejoyhint';
+ * import { GUIDED_STEPS_ROUTER } from 'ngx-guided-steps';
  *
  * providers: [
- *   { provide: WANEJOYHINT_ROUTER, useExisting: Router }
+ *   { provide: GUIDED_STEPS_ROUTER, useExisting: Router }
  * ]
  * ```
  */
-export const WANEJOYHINT_ROUTER = new InjectionToken<WanejoyhintRouter>(
-  'WANEJOYHINT_ROUTER'
+export const GUIDED_STEPS_ROUTER = new InjectionToken<GuidedStepsRouter>(
+  'GUIDED_STEPS_ROUTER'
 );
 
 /**
  * Minimal router interface - compatible with Angular Router without requiring @angular/router as a dependency.
  */
-export interface WanejoyhintRouter {
+export interface GuidedStepsRouter {
   navigate(commands: any[], extras?: any): Promise<boolean>;
 }

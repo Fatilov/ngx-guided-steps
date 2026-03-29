@@ -1,7 +1,7 @@
-# Wanejoyhint
+# ngx-guided-steps
 
-[![npm version](https://img.shields.io/npm/v/wanejoyhint.svg)](https://www.npmjs.com/package/wanejoyhint)
-[![license](https://img.shields.io/npm/l/wanejoyhint.svg)](https://github.com/fatilov/wanejoyhint/blob/master/LICENSE.md)
+[![npm version](https://img.shields.io/npm/v/ngx-guided-steps.svg)](https://www.npmjs.com/package/ngx-guided-steps)
+[![license](https://img.shields.io/npm/l/ngx-guided-steps.svg)](https://github.com/fatilov/ngx-guided-steps/blob/master/LICENSE.md)
 [![Angular](https://img.shields.io/badge/Angular-18%2B-dd0031.svg)](https://angular.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-pure-3178c6.svg)](https://www.typescriptlang.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
@@ -11,7 +11,7 @@
 
 Inspiree de [EnjoyHint](https://github.com/xbsoftware/enjoyhint), reconstruite from scratch avec des composants standalone Angular.
 
-**[Demo en ligne](https://wanejoyhint.vercel.app/)** | **[Changelog](https://github.com/fatilov/wanejoyhint/releases)**
+**[Demo en ligne](https://ngx-guided-steps.vercel.app/)** | **[Changelog](https://github.com/fatilov/ngx-guided-steps/releases)**
 
 ---
 
@@ -59,14 +59,14 @@ Inspiree de [EnjoyHint](https://github.com/xbsoftware/enjoyhint), reconstruite f
 ### Depuis npm
 
 ```bash
-npm install wanejoyhint
+npm install ngx-guided-steps
 ```
 
 ### Depuis GitHub (developpement)
 
 ```bash
-git clone https://github.com/fatilov/wanejoyhint.git
-cd wanejoyhint
+git clone https://github.com/fatilov/ngx-guided-steps.git
+cd ngx-guided-steps
 npm install --legacy-peer-deps
 npm run build:lib    # Build de la bibliotheque
 npm run build        # Build de l'app demo
@@ -80,7 +80,7 @@ npm test             # Tests unitaires (Jest)
 ### Etape 1 : Installer le package
 
 ```bash
-npm install wanejoyhint
+npm install ngx-guided-steps
 ```
 
 ### Etape 2 : Configurer le provider (optionnel)
@@ -90,12 +90,12 @@ Creez ou modifiez votre fichier `app.config.ts` :
 ```typescript
 // src/app/app.config.ts
 import { ApplicationConfig } from '@angular/core';
-import { provideWanejoyhint } from 'wanejoyhint';
+import { provideGuidedSteps } from 'ngx-guided-steps';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     // Configuration optionnelle - les valeurs par defaut fonctionnent deja
-    provideWanejoyhint({
+    provideGuidedSteps({
       showProgress: true,       // Affiche "1 / 5" sur chaque etape
       keyboardNav: true,        // Navigation avec fleches (defaut: true)
     }),
@@ -103,14 +103,14 @@ export const appConfig: ApplicationConfig = {
 };
 ```
 
-> **Note :** Sans `provideWanejoyhint()`, la bibliotheque utilise les valeurs par defaut. Le service est `providedIn: 'root'`, donc aucun provider supplementaire n'est requis pour le cas simple.
+> **Note :** Sans `provideGuidedSteps()`, la bibliotheque utilise les valeurs par defaut. Le service est `providedIn: 'root'`, donc aucun provider supplementaire n'est requis pour le cas simple.
 
 ### Etape 3 : Injecter le service et lancer un tour
 
 ```typescript
 // src/app/app.component.ts
 import { Component, inject } from '@angular/core';
-import { WanejoyhintService, WanejoyhintStep } from 'wanejoyhint';
+import { GuidedStepsService, GuidedStep } from 'ngx-guided-steps';
 
 @Component({
   selector: 'app-root',
@@ -123,10 +123,10 @@ import { WanejoyhintService, WanejoyhintStep } from 'wanejoyhint';
   `,
 })
 export class AppComponent {
-  private hint = inject(WanejoyhintService);
+  private hint = inject(GuidedStepsService);
 
   startTour(): void {
-    const steps: WanejoyhintStep[] = [
+    const steps: GuidedStep[] = [
       {
         selector: '#header',
         description: '<b>Bienvenue !</b><br>Voici le header de l\'application.',
@@ -160,11 +160,11 @@ export class AppComponent {
 
 ## Configuration globale
 
-La configuration globale se fait via `provideWanejoyhint()` ou le token `WANEJOYHINT_CONFIG` :
+La configuration globale se fait via `provideGuidedSteps()` ou le token `GUIDED_STEPS_CONFIG` :
 
 ```typescript
-// Methode 1 : provideWanejoyhint (recommande)
-provideWanejoyhint({
+// Methode 1 : provideGuidedSteps (recommande)
+provideGuidedSteps({
   backgroundColor: 'rgba(0, 0, 0, 0.7)',
   zIndex: 2000,
   animationTime: 600,
@@ -181,11 +181,11 @@ provideWanejoyhint({
 })
 
 // Methode 2 : Injection token directe
-import { WANEJOYHINT_CONFIG } from 'wanejoyhint';
+import { GUIDED_STEPS_CONFIG } from 'ngx-guided-steps';
 
 providers: [
   {
-    provide: WANEJOYHINT_CONFIG,
+    provide: GUIDED_STEPS_CONFIG,
     useValue: { showProgress: true, theme: 'dark' }
   }
 ]
@@ -202,7 +202,7 @@ providers: [
 | `theme` | `'light' \| 'dark'` | `'light'` | Theme visuel (light pour overlay sombre, dark pour overlay clair) |
 | `keyboardNav` | `boolean` | `true` | Active la navigation par fleches gauche/droite |
 | `backdropDismiss` | `boolean` | `false` | Permet de fermer le tour en cliquant sur l'overlay |
-| `labels` | `WanejoyhintLabels` | voir [i18n](#internationalisation-i18n) | Textes personnalisables |
+| `labels` | `GuidedStepsLabels` | voir [i18n](#internationalisation-i18n) | Textes personnalisables |
 
 ---
 
@@ -257,16 +257,16 @@ this.hint.setConfig({
 }
 ```
 
-> **Note :** `setConfig()` fusionne les overrides avec la config globale fournie via `provideWanejoyhint()`. Chaque appel repart de la config de base.
+> **Note :** `setConfig()` fusionne les overrides avec la config globale fournie via `provideGuidedSteps()`. Chaque appel repart de la config de base.
 
 ---
 
 ## Definir les etapes
 
-Chaque etape est un objet `WanejoyhintStep`. Seuls `selector` et `description` sont requis :
+Chaque etape est un objet `GuidedStep`. Seuls `selector` et `description` sont requis :
 
 ```typescript
-const steps: WanejoyhintStep[] = [
+const steps: GuidedStep[] = [
   {
     selector: '#mon-element',           // Selecteur CSS de l'element a mettre en valeur
     description: 'Texte <b>HTML</b>',   // Description affichee (supporte le HTML)
@@ -408,7 +408,7 @@ Par defaut, la navigation clavier est activee (`keyboardNav: true`) :
 Pour desactiver les fleches :
 
 ```typescript
-provideWanejoyhint({ keyboardNav: false })
+provideGuidedSteps({ keyboardNav: false })
 ```
 
 ---
@@ -533,10 +533,10 @@ this.hint.run({
 ### Observables RxJS
 
 ```typescript
-import { WanejoyhintService } from 'wanejoyhint';
+import { GuidedStepsService } from 'ngx-guided-steps';
 
 export class AppComponent implements OnDestroy {
-  private hint = inject(WanejoyhintService);
+  private hint = inject(GuidedStepsService);
   private subs: Subscription[] = [];
 
   constructor() {
@@ -566,7 +566,7 @@ export class AppComponent implements OnDestroy {
 ### Methodes du service
 
 ```typescript
-const hint = inject(WanejoyhintService);
+const hint = inject(GuidedStepsService);
 
 // Configurer les etapes
 hint.setSteps(steps);
@@ -603,7 +603,7 @@ hint.resume();                  // Reprend le tour depuis l'etape courante
 Tous les textes de l'interface sont configurables via `labels` :
 
 ```typescript
-provideWanejoyhint({
+provideGuidedSteps({
   labels: {
     next: 'Suivant',
     prev: 'Precedent',
@@ -645,7 +645,7 @@ provideWanejoyhint({
 Pour les overlays sombres. Boutons et textes clairs :
 
 ```typescript
-provideWanejoyhint({
+provideGuidedSteps({
   backgroundColor: 'rgba(0, 0, 0, 0.6)',
   theme: 'light',
 })
@@ -656,35 +656,35 @@ provideWanejoyhint({
 Pour les overlays clairs. Boutons et textes sombres :
 
 ```typescript
-provideWanejoyhint({
+provideGuidedSteps({
   backgroundColor: 'rgba(255, 255, 255, 0.85)',
   theme: 'dark',
 })
 ```
 
 Le theme dark inverse automatiquement :
-- Couleur des boutons (`--wjh-btn-color: #333`)
-- Couleur du texte (`--wjh-label-color: #222`)
-- Couleur du bouton fermer (`--wjh-close-btn-color: #555`)
-- Fond des labels oversized (`--wjh-oversized-bg: #e8e8e8`)
+- Couleur des boutons (`--ngs-btn-color: #333`)
+- Couleur du texte (`--ngs-label-color: #222`)
+- Couleur du bouton fermer (`--ngs-close-btn-color: #555`)
+- Fond des labels oversized (`--ngs-oversized-bg: #e8e8e8`)
 - Couleur du focus outline (`#333` au lieu de `white`)
 
 ---
 
 ## CSS Custom Properties
 
-Personnalisez l'apparence via des variables CSS sur le composant `wanejoyhint-overlay` :
+Personnalisez l'apparence via des variables CSS sur le composant `ngs-overlay` :
 
 ```css
 /* Dans votre styles.css ou styles.scss global */
-wanejoyhint-overlay {
-  --wjh-btn-color: #6c63ff;
-  --wjh-btn-hover-color: white;
-  --wjh-label-color: #f0f0f0;
-  --wjh-label-font-size: 18px;
-  --wjh-label-font-family: 'Inter', sans-serif;
-  --wjh-close-btn-color: #6c63ff;
-  --wjh-oversized-bg: #1a1a2e;
+ngs-overlay {
+  --ngs-btn-color: #6c63ff;
+  --ngs-btn-hover-color: white;
+  --ngs-label-color: #f0f0f0;
+  --ngs-label-font-size: 18px;
+  --ngs-label-font-family: 'Inter', sans-serif;
+  --ngs-close-btn-color: #6c63ff;
+  --ngs-oversized-bg: #1a1a2e;
 }
 ```
 
@@ -692,13 +692,13 @@ wanejoyhint-overlay {
 
 | Variable | Defaut (light) | Defaut (dark) | Description |
 |----------|---------------|---------------|-------------|
-| `--wjh-btn-color` | `rgb(30, 205, 151)` | `#333` | Bordure et texte des boutons |
-| `--wjh-btn-hover-color` | `white` | `white` | Texte des boutons au hover |
-| `--wjh-label-color` | `white` | `#222` | Couleur du texte du label |
-| `--wjh-label-font-size` | `22px` | `22px` | Taille de police du label |
-| `--wjh-label-font-family` | `'Segoe UI', Arial, sans-serif` | idem | Police du label |
-| `--wjh-close-btn-color` | `rgba(33, 224, 163, 1)` | `#555` | Bordure du bouton fermer |
-| `--wjh-oversized-bg` | `#272A26` | `#e8e8e8` | Fond du label quand l'element est tres grand |
+| `--ngs-btn-color` | `rgb(30, 205, 151)` | `#333` | Bordure et texte des boutons |
+| `--ngs-btn-hover-color` | `white` | `white` | Texte des boutons au hover |
+| `--ngs-label-color` | `white` | `#222` | Couleur du texte du label |
+| `--ngs-label-font-size` | `22px` | `22px` | Taille de police du label |
+| `--ngs-label-font-family` | `'Segoe UI', Arial, sans-serif` | idem | Police du label |
+| `--ngs-close-btn-color` | `rgba(33, 224, 163, 1)` | `#555` | Bordure du bouton fermer |
+| `--ngs-oversized-bg` | `#272A26` | `#e8e8e8` | Fond du label quand l'element est tres grand |
 
 ---
 
@@ -713,7 +713,7 @@ La bibliotheque inclut nativement :
 - **`Escape`** pour fermer le tour
 - **`:focus-visible`** avec outline visible sur tous les boutons
 - **`<button type="button">`** semantiques (pas de `<div>`)
-- **`.wjh-sr-only`** pour le contenu reserve aux lecteurs d'ecran
+- **`.ngs-sr-only`** pour le contenu reserve aux lecteurs d'ecran
 
 ---
 
@@ -737,7 +737,7 @@ startTour(): void {
 ### Tour interactif avec click et key
 
 ```typescript
-const steps: WanejoyhintStep[] = [
+const steps: GuidedStep[] = [
   {
     selector: '#search-input',
     description: 'Tapez votre recherche ici.',
@@ -762,7 +762,7 @@ const steps: WanejoyhintStep[] = [
 ### Tour avec auto-avance et couleurs
 
 ```typescript
-const steps: WanejoyhintStep[] = [
+const steps: GuidedStep[] = [
   {
     selector: '#step1',
     description: 'Avance auto dans 3s.',
@@ -790,11 +790,11 @@ const steps: WanejoyhintStep[] = [
 ```typescript
 // app.config.ts
 import { ApplicationConfig } from '@angular/core';
-import { provideWanejoyhint } from 'wanejoyhint';
+import { provideGuidedSteps } from 'ngx-guided-steps';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideWanejoyhint({
+    provideGuidedSteps({
       backgroundColor: 'rgba(0, 0, 0, 0.7)',
       showProgress: true,
       keyboardNav: true,
@@ -817,19 +817,19 @@ export const appConfig: ApplicationConfig = {
 
 ## Navigation cross-routes
 
-Wanejoyhint peut naviguer entre les routes Angular pendant un tour. Chaque étape peut spécifier une route cible :
+ngx-guided-steps peut naviguer entre les routes Angular pendant un tour. Chaque étape peut spécifier une route cible :
 
 ### Etape 1 : Fournir le Router
 
 ```typescript
 // app.config.ts
 import { Router } from '@angular/router';
-import { provideWanejoyhint, WANEJOYHINT_ROUTER } from 'wanejoyhint';
+import { provideGuidedSteps, GUIDED_STEPS_ROUTER } from 'ngx-guided-steps';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideWanejoyhint({ showProgress: true }),
-    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+    provideGuidedSteps({ showProgress: true }),
+    { provide: GUIDED_STEPS_ROUTER, useExisting: Router },
   ],
 };
 ```
@@ -837,7 +837,7 @@ export const appConfig: ApplicationConfig = {
 ### Etape 2 : Utiliser `route` dans les étapes
 
 ```typescript
-const steps: WanejoyhintStep[] = [
+const steps: GuidedStep[] = [
   {
     selector: '#dashboard-header',
     description: 'Bienvenue sur le tableau de bord.',
@@ -866,7 +866,7 @@ const steps: WanejoyhintStep[] = [
 Pour cibler des éléments dans des modals (Material Dialog, CDK Overlay, etc.), utilisez `waitForSelector` combiné avec `onBeforeStart` :
 
 ```typescript
-const steps: WanejoyhintStep[] = [
+const steps: GuidedStep[] = [
   {
     selector: '#open-dialog-btn',
     description: 'Cliquez pour ouvrir le formulaire.',
@@ -940,7 +940,7 @@ La bibliotheque est publiee automatiquement sur npm via GitHub Actions lors de l
 
 ### Publier une nouvelle version
 
-1. Mettez a jour la version dans `projects/wanejoyhint/package.json`
+1. Mettez a jour la version dans `projects/ngx-guided-steps/package.json`
 2. Commitez et poussez sur `master`
 3. Creez une release GitHub :
    ```bash
@@ -956,7 +956,7 @@ La bibliotheque est publiee automatiquement sur npm via GitHub Actions lors de l
 
 ```bash
 npm run build:lib
-cd dist/wanejoyhint
+cd dist/ngx-guided-steps
 npm publish --access public
 ```
 
@@ -964,7 +964,7 @@ npm publish --access public
 
 ## Reference API
 
-### WanejoyhintService
+### GuidedStepsService
 
 | Methode | Description |
 |---------|-------------|
@@ -986,7 +986,7 @@ npm publish --access public
 
 | Observable | Type emis | Description |
 |------------|-----------|-------------|
-| `onStepChange` | `{ index: number, step: WanejoyhintStep }` | A chaque changement d'etape |
+| `onStepChange` | `{ index: number, step: GuidedStep }` | A chaque changement d'etape |
 | `onEnd` | `void` | Quand le tour se termine normalement |
 | `onSkip` | `void` | Quand l'utilisateur passe le tour |
 
@@ -995,31 +995,31 @@ npm publish --access public
 ```typescript
 import {
   // Service principal
-  WanejoyhintService,
-  WanejoyhintEvents,
+  GuidedStepsService,
+  GuidedStepsEvents,
 
   // Modeles
-  WanejoyhintStep,
+  GuidedStep,
   StepButtonConfig,
-  WanejoyhintConfig,
-  WanejoyhintLabels,
-  WanejoyhintTheme,
+  GuidedStepsConfig,
+  GuidedStepsLabels,
+  GuidedStepsTheme,
 
   // Configuration
-  WANEJOYHINT_CONFIG,
-  WANEJOYHINT_ROUTER,
-  provideWanejoyhint,
+  GUIDED_STEPS_CONFIG,
+  GUIDED_STEPS_ROUTER,
+  provideGuidedSteps,
 
   // Composant (usage avance)
-  WanejoyhintOverlayComponent,
+  GuidedStepsOverlayComponent,
 
   // Service de positionnement (usage avance)
   PositionService,
-} from 'wanejoyhint';
+} from 'ngx-guided-steps';
 ```
 
 ---
 
 ## License
 
-MIT - [Voir LICENSE](https://github.com/fatilov/wanejoyhint/blob/master/LICENSE)
+MIT - [Voir LICENSE](https://github.com/fatilov/ngx-guided-steps/blob/master/LICENSE)

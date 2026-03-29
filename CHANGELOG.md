@@ -3,7 +3,7 @@
 ## [1.1.0] - 2026-03-28
 
 ### Added
-- **i18n support**: New `WanejoyhintLabels` interface for full UI text customization
+- **i18n support**: New `GuidedStepsLabels` interface for full UI text customization
   - Configurable labels: `next`, `prev`, `skip`, `close`, `progress`, `stepLabel`, `stepAnnouncement`
   - Template interpolation with `{{current}}`, `{{total}}`, `{{description}}` placeholders
 - **Theme support**: `theme` config option (`'light'` or `'dark'`) for visual theme switching
@@ -41,7 +41,7 @@
 - Step-level callbacks: `onBeforeStart`
 - Custom button text and CSS classes per step
 - Custom arrow colors per step
-- Global configuration via `WANEJOYHINT_CONFIG` injection token
+- Global configuration via `GUIDED_STEPS_CONFIG` injection token
 - `key` property on step model (modern replacement for deprecated `keyCode`)
 - Angular 18 modern patterns: `inject()`, `@if`/`@for` control flow
 - Unit tests with Jest (39 tests)

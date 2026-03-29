@@ -44,14 +44,14 @@ import { RouterLink } from '@angular/router';
           <div class="card-number">1</div>
           <h2>Installation</h2>
           <p>Installez la librairie via npm :</p>
-          <pre class="code-block"><code>npm install wanejoyhint</code></pre>
+          <pre class="code-block"><code>npm install ngx-guided-steps</code></pre>
         </section>
 
         <!-- 2. Configuration globale -->
         <section class="card" id="config">
           <div class="card-number">2</div>
           <h2>Configuration globale</h2>
-          <p>Configurez Wanejoyhint au niveau de l'application dans votre fichier <code>app.config.ts</code>. Fournissez le router pour activer la navigation cross-routes.</p>
+          <p>Configurez ngx-guided-steps au niveau de l'application dans votre fichier <code>app.config.ts</code>. Fournissez le router pour activer la navigation cross-routes.</p>
           <pre class="code-block"><code [innerHTML]="codeConfig"></code></pre>
         </section>
 
@@ -119,7 +119,7 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="crossroute">
           <div class="card-number">8</div>
           <h2>Navigation cross-routes</h2>
-          <p>Le tour peut naviguer entre les pages de votre application. Utilisez la propriete <code>route</code> et <code>waitForSelector</code> pour cibler des elements sur d'autres pages. Le token <code>WANEJOYHINT_ROUTER</code> doit etre fourni dans la configuration.</p>
+          <p>Le tour peut naviguer entre les pages de votre application. Utilisez la propriete <code>route</code> et <code>waitForSelector</code> pour cibler des elements sur d'autres pages. Le token <code>GUIDED_STEPS_ROUTER</code> doit etre fourni dans la configuration.</p>
           <pre class="code-block"><code>// Etape sur une autre page
 {{ '{' }}
   selector: '#dashboard-stats',
@@ -148,7 +148,7 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="scroll">
           <div class="card-number">10</div>
           <h2>Scroll automatique</h2>
-          <p>Si l'element cible est hors du viewport, Wanejoyhint scrolle automatiquement vers lui. Configurez la vitesse de l'animation de scroll.</p>
+          <p>Si l'element cible est hors du viewport, ngx-guided-steps scrolle automatiquement vers lui. Configurez la vitesse de l'animation de scroll.</p>
           <pre class="code-block"><code>{{ '{' }} selector: '#hidden-el', scrollAnimationSpeed: 300, description: '...' {{ '}' }}</code></pre>
         </section>
 
@@ -156,8 +156,8 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="api">
           <div class="card-number">11</div>
           <h2>API programmatique</h2>
-          <p>Controlez entierement le tour par code via le service <code>WanejoyhintService</code>. Injectez-le et utilisez les methodes suivantes :</p>
-          <pre class="code-block"><code>const hint = inject(WanejoyhintService);
+          <p>Controlez entierement le tour par code via le service <code>GuidedStepsService</code>. Injectez-le et utilisez les methodes suivantes :</p>
+          <pre class="code-block"><code>const hint = inject(GuidedStepsService);
 
 hint.setSteps(steps);
 hint.run({{ '{' }} onEnd: () =&gt; console.log('Done') {{ '}' }});
@@ -183,7 +183,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         <section class="card" id="a11y">
           <div class="card-number">13</div>
           <h2>Accessibilite (WCAG)</h2>
-          <p>Wanejoyhint est conforme aux bonnes pratiques d'accessibilite web :</p>
+          <p>ngx-guided-steps est conforme aux bonnes pratiques d'accessibilite web :</p>
           <dl class="a11y-list">
             <dt>role="dialog" + aria-modal="true"</dt>
             <dd>L'overlay est annonce comme un dialogue modal aux technologies d'assistance.</dd>
@@ -203,12 +203,12 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
           <div class="card-number">14</div>
           <h2>CSS Custom Properties</h2>
           <p>Personnalisez l'apparence de l'overlay avec les proprietes CSS custom suivantes :</p>
-          <pre class="code-block"><code>wanejoyhint-overlay {{ '{' }}
-  --wjh-btn-color: #6c63ff;
-  --wjh-btn-hover-color: white;
-  --wjh-label-color: #f0f0f0;
-  --wjh-label-font-size: 18px;
-  --wjh-close-btn-color: #6c63ff;
+          <pre class="code-block"><code>ngs-overlay {{ '{' }}
+  --ngs-btn-color: #6c63ff;
+  --ngs-btn-hover-color: white;
+  --ngs-label-color: #f0f0f0;
+  --ngs-label-font-size: 18px;
+  --ngs-close-btn-color: #6c63ff;
 {{ '}' }}</code></pre>
         </section>
 
@@ -245,7 +245,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
               </tbody>
             </table>
           </div>
-          <pre class="code-block"><code>provideWanejoyhint({{ '{' }} keyboardNav: true {{ '}' }}) // defaut</code></pre>
+          <pre class="code-block"><code>provideGuidedSteps({{ '{' }} keyboardNav: true {{ '}' }}) // defaut</code></pre>
         </section>
 
       </main>
@@ -531,9 +531,9 @@ export class AdvancedComponent {
 
   codeConfig =
 `<span style="color:#8b949e">// app.config.ts</span>
-<span style="color:#ff7b72">import</span> { provideWanejoyhint, WANEJOYHINT_ROUTER } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'wanejoyhint'</span>;
+<span style="color:#ff7b72">import</span> { provideGuidedSteps, GUIDED_STEPS_ROUTER } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'ngx-guided-steps'</span>;
 
-provideWanejoyhint({
+provideGuidedSteps({
   backgroundColor: <span style="color:#a5d6ff">'rgba(0,0,0,0.7)'</span>,
   showProgress: <span style="color:#79c0ff">true</span>,
   theme: <span style="color:#a5d6ff">'light'</span>,
@@ -547,7 +547,7 @@ provideWanejoyhint({
     progress: <span style="color:#a5d6ff">'{{current}} sur {{total}}'</span>,
   },
 }),
-{ provide: WANEJOYHINT_ROUTER, useExisting: Router },`;
+{ provide: GUIDED_STEPS_ROUTER, useExisting: Router },`;
 
   codeI18n =
 `hint.setConfig({

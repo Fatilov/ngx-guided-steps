@@ -1,5 +1,5 @@
 import { PositionService, ArrowData } from './position.service';
-import { ResolvedStepData } from '../models/wanejoyhint-step.model';
+import { ResolvedStepData } from '../models/step.model';
 
 describe('PositionService', () => {
   let service: PositionService;

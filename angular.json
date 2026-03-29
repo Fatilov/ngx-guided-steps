@@ -3,19 +3,19 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "wanejoyhint": {
+    "ngx-guided-steps": {
       "projectType": "library",
-      "root": "projects/wanejoyhint",
-      "sourceRoot": "projects/wanejoyhint/src",
+      "root": "projects/ngx-guided-steps",
+      "sourceRoot": "projects/ngx-guided-steps/src",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
-            "project": "projects/wanejoyhint/ng-package.json"
+            "project": "projects/ngx-guided-steps/ng-package.json"
           },
           "configurations": {
             "production": {
-              "tsConfig": "projects/wanejoyhint/tsconfig.lib.json"
+              "tsConfig": "projects/ngx-guided-steps/tsconfig.lib.json"
             }
           }
         }

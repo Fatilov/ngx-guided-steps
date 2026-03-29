@@ -14,16 +14,16 @@ import { debounceTime, takeUntil } from 'rxjs/operators';
 
 let nextInstanceId = 0;
 import {
-  WanejoyhintConfig,
+  GuidedStepsConfig,
   DEFAULT_CONFIG,
   DEFAULT_LABELS,
-  WANEJOYHINT_CONFIG,
-  WanejoyhintLabels,
-} from '../models/wanejoyhint-config.model';
+  GUIDED_STEPS_CONFIG,
+  GuidedStepsLabels,
+} from '../models/config.model';
 import {
-  WanejoyhintStep,
+  GuidedStep,
   ResolvedStepData,
-} from '../models/wanejoyhint-step.model';
+} from '../models/step.model';
 import {
   PositionService,
   ArrowData,
@@ -37,21 +37,21 @@ export interface OverlayState {
   visible: boolean;
   stepIndex: number;
   totalSteps: number;
-  step: WanejoyhintStep | null;
+  step: GuidedStep | null;
   resolved: ResolvedStepData | null;
 }
 
 @Component({
-  selector: 'wanejoyhint-overlay',
+  selector: 'ngs-overlay',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
-      class="wjh-overlay"
-      [class.wjh-hidden]="!state.visible"
-      [class.wjh-transparent]="animating"
-      [class.wjh-theme-dark]="config.theme === 'dark'"
-      [class.wjh-transitioning]="transitioning"
+      class="ngs-overlay"
+      [class.ngs-hidden]="!state.visible"
+      [class.ngs-transparent]="animating"
+      [class.ngs-theme-dark]="config.theme === 'dark'"
+      [class.ngs-transitioning]="transitioning"
       [style.z-index]="config.zIndex"
       [style.height]="vpHeight"
       [style.width]="vpWidth"
@@ -61,13 +61,13 @@ export interface OverlayState {
       [attr.aria-label]="dialogLabel"
     >
       <!-- Live region for screen readers -->
-      <div class="wjh-sr-only" aria-live="polite" aria-atomic="true">
+      <div class="ngs-sr-only" aria-live="polite" aria-atomic="true">
         {{ liveAnnouncement }}
       </div>
 
       <!-- SVG overlay with cutout -->
       <svg
-        class="wjh-svg"
+        class="ngs-svg"
         [style.height]="vpHeight"
         [style.width]="vpWidth"
         aria-hidden="true"
@@ -84,7 +84,7 @@ export interface OverlayState {
               [attr.rx]="cutout.r"
               [attr.ry]="cutout.r"
               fill="black"
-              class="wjh-cutout"
+              class="ngs-cutout"
             />
             }
             @if (cutout && state.resolved?.shape === 'circle') {
@@ -93,7 +93,7 @@ export interface OverlayState {
               [attr.cy]="cutout.cy"
               [attr.r]="cutout.cr"
               fill="black"
-              class="wjh-cutout"
+              class="ngs-cutout"
             />
             }
           </mask>
@@ -133,7 +133,7 @@ export interface OverlayState {
           [attr.stroke]="arrowColor"
           style="fill:none; stroke-width:3"
           [attr.marker-end]="'url(#' + markerId + ')'"
-          class="wjh-arrow"
+          class="ngs-arrow"
         />
         }
       </svg>
@@ -142,18 +142,18 @@ export interface OverlayState {
       @if (labelPos && state.step) {
       <div
         #labelEl
-        class="wjh-label"
-        [class.wjh-label-oversized]="isOversized"
+        class="ngs-label"
+        [class.ngs-label-oversized]="isOversized"
         [style.left.px]="labelPos.x"
         [style.top.px]="labelPos.y"
         [style.z-index]="(config.zIndex || 1010) + 7"
       >
         <span [innerHTML]="state.step.description"></span>
         @if (config.showProgress) {
-        <div class="wjh-progress">{{ progressText }}</div>
+        <div class="ngs-progress">{{ progressText }}</div>
         }
         @if (countdownSeconds > 0) {
-        <div class="wjh-countdown">{{ countdownSeconds }}s</div>
+        <div class="ngs-countdown">{{ countdownSeconds }}s</div>
         }
       </div>
       }
@@ -161,25 +161,25 @@ export interface OverlayState {
       <!-- Event blocker regions (4 zones around the cutout) -->
       @if (cutout) {
       <div
-        class="wjh-event-blocker wjh-blocker-top"
+        class="ngs-event-blocker ngs-blocker-top"
         [style.height.px]="blockerTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        class="wjh-event-blocker wjh-blocker-bottom"
+        class="ngs-event-blocker ngs-blocker-bottom"
         [style.top.px]="blockerBottomTop"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        class="wjh-event-blocker wjh-blocker-left"
+        class="ngs-event-blocker ngs-blocker-left"
         [style.width.px]="blockerLeftWidth"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
       ></div>
       <div
-        class="wjh-event-blocker wjh-blocker-right"
+        class="ngs-event-blocker ngs-blocker-right"
         [style.left.px]="blockerRightLeft"
         [style.z-index]="(config.zIndex || 1010) + 1"
         aria-hidden="true"
@@ -190,7 +190,7 @@ export interface OverlayState {
       @if (showPrev && buttonPos) {
       <button
         type="button"
-        class="wjh-btn wjh-prev-btn"
+        class="ngs-btn ngs-prev-btn"
         [class]="prevBtnClass"
         [style.left.px]="buttonPos.prev.x"
         [style.top.px]="buttonPos.prev.y"
@@ -203,7 +203,7 @@ export interface OverlayState {
       <button
         #firstFocusable
         type="button"
-        class="wjh-btn wjh-next-btn"
+        class="ngs-btn ngs-next-btn"
         [class]="nextBtnClass"
         [style.left.px]="buttonPos.next.x"
         [style.top.px]="buttonPos.next.y"
@@ -215,7 +215,7 @@ export interface OverlayState {
       @if (showSkip && buttonPos) {
       <button
         type="button"
-        class="wjh-btn wjh-skip-btn"
+        class="ngs-btn ngs-skip-btn"
         [class]="skipBtnClass"
         [style.left.px]="buttonPos.skip.x"
         [style.top.px]="buttonPos.skip.y"
@@ -227,7 +227,7 @@ export interface OverlayState {
       <!-- Close button -->
       <button
         type="button"
-        class="wjh-close-btn"
+        class="ngs-close-btn"
         [style.z-index]="(config.zIndex || 1010) + 2"
         (click)="onSkipClick()"
         [attr.aria-label]="labels.close"
@@ -236,13 +236,13 @@ export interface OverlayState {
   `,
   styles: [`
     :host {
-      --wjh-btn-color: rgb(30, 205, 151);
-      --wjh-btn-hover-color: white;
-      --wjh-label-color: white;
-      --wjh-label-font-size: 22px;
-      --wjh-label-font-family: 'Segoe UI', Arial, sans-serif;
-      --wjh-close-btn-color: rgba(33, 224, 163, 1);
-      --wjh-oversized-bg: #272A26;
+      --ngs-btn-color: rgb(30, 205, 151);
+      --ngs-btn-hover-color: white;
+      --ngs-label-color: white;
+      --ngs-label-font-size: 22px;
+      --ngs-label-font-family: 'Segoe UI', Arial, sans-serif;
+      --ngs-close-btn-color: rgba(33, 224, 163, 1);
+      --ngs-oversized-bg: #272A26;
 
       position: fixed;
       top: 0;
@@ -252,7 +252,7 @@ export interface OverlayState {
       z-index: 9999;
     }
 
-    .wjh-overlay {
+    .ngs-overlay {
       position: fixed;
       width: 100vw;
       height: 100vh;
@@ -264,14 +264,14 @@ export interface OverlayState {
       overflow: visible;
     }
 
-    .wjh-hidden { display: none; }
+    .ngs-hidden { display: none; }
 
-    .wjh-transparent .wjh-svg,
-    .wjh-transparent .wjh-label {
+    .ngs-transparent .ngs-svg,
+    .ngs-transparent .ngs-label {
       opacity: 0;
     }
 
-    .wjh-svg {
+    .ngs-svg {
       position: absolute;
       width: 100vw;
       height: 100vh;
@@ -283,15 +283,15 @@ export interface OverlayState {
       transition: opacity 400ms ease-in-out;
     }
 
-    .wjh-cutout {
+    .ngs-cutout {
       transition: all 200ms ease-in-out;
     }
 
-    .wjh-arrow {
+    .ngs-arrow {
       transition: opacity 400ms ease-in-out;
     }
 
-    .wjh-label {
+    .ngs-label {
       display: inline-block;
       max-width: 80%;
       position: absolute;
@@ -299,22 +299,22 @@ export interface OverlayState {
       overflow-wrap: break-word;
       word-wrap: break-word;
       text-align: center;
-      color: var(--wjh-label-color, white);
-      font-size: var(--wjh-label-font-size, 22px);
-      font-family: var(--wjh-label-font-family, 'Segoe UI', Arial, sans-serif);
+      color: var(--ngs-label-color, white);
+      font-size: var(--ngs-label-font-size, 22px);
+      font-family: var(--ngs-label-font-family, 'Segoe UI', Arial, sans-serif);
       transition: opacity 400ms ease-in-out;
       pointer-events: none;
       padding: 8px 12px;
     }
 
-    .wjh-label-oversized {
+    .ngs-label-oversized {
       border-radius: 20px;
-      background-color: var(--wjh-oversized-bg, #272A26);
+      background-color: var(--ngs-oversized-bg, #272A26);
       transition: background-color ease-out 0.5s, opacity 400ms ease-in-out;
     }
 
     @media (max-width: 640px) {
-      .wjh-label {
+      .ngs-label {
         font-size: 14px;
         max-width: 90%;
         padding: 6px 10px;
@@ -322,19 +322,19 @@ export interface OverlayState {
     }
 
     /* Event blockers */
-    .wjh-event-blocker {
+    .ngs-event-blocker {
       position: absolute;
       pointer-events: all;
       touch-action: none;
       -webkit-touch-callout: none;
     }
-    .wjh-blocker-top { top: 0; left: 0; width: 100%; }
-    .wjh-blocker-bottom { left: 0; width: 100%; height: 2000px; }
-    .wjh-blocker-left { top: 0; left: 0; height: 100%; }
-    .wjh-blocker-right { top: 0; height: 100%; width: 2000px; }
+    .ngs-blocker-top { top: 0; left: 0; width: 100%; }
+    .ngs-blocker-bottom { left: 0; width: 100%; height: 2000px; }
+    .ngs-blocker-left { top: 0; left: 0; height: 100%; }
+    .ngs-blocker-right { top: 0; height: 100%; width: 2000px; }
 
     /* Buttons */
-    .wjh-btn {
+    .ngs-btn {
       position: absolute;
       pointer-events: all;
       touch-action: manipulation;
@@ -342,10 +342,10 @@ export interface OverlayState {
       min-width: 100px;
       height: 40px;
       cursor: pointer;
-      border: 2px solid var(--wjh-btn-color, rgb(30, 205, 151));
+      border: 2px solid var(--ngs-btn-color, rgb(30, 205, 151));
       border-radius: 40px;
       font: normal 17px/40px 'Segoe UI', Helvetica, sans-serif;
-      color: var(--wjh-btn-color, rgb(30, 205, 151));
+      color: var(--ngs-btn-color, rgb(30, 205, 151));
       text-align: center;
       letter-spacing: 1px;
       background: transparent;
@@ -354,19 +354,19 @@ export interface OverlayState {
       white-space: nowrap;
     }
 
-    .wjh-btn:hover {
-      color: var(--wjh-btn-hover-color, white);
-      background: var(--wjh-btn-color, rgb(30, 205, 151));
+    .ngs-btn:hover {
+      color: var(--ngs-btn-hover-color, white);
+      background: var(--ngs-btn-color, rgb(30, 205, 151));
     }
 
-    .wjh-btn:active {
+    .ngs-btn:active {
       border-color: rgba(33, 224, 163, 1);
       background: rgba(33, 224, 163, 1);
       transition: none;
     }
 
     @media (max-width: 640px) {
-      .wjh-btn {
+      .ngs-btn {
         font: normal 13px/32px 'Segoe UI', Helvetica, sans-serif;
         min-width: 0;
         height: 32px;
@@ -374,11 +374,11 @@ export interface OverlayState {
         letter-spacing: 0;
       }
 
-      .wjh-skip-btn { display: none; }
+      .ngs-skip-btn { display: none; }
     }
 
     /* Close button */
-    .wjh-close-btn {
+    .ngs-close-btn {
       display: inline-block;
       position: absolute;
       right: 10px;
@@ -390,15 +390,15 @@ export interface OverlayState {
       box-sizing: content-box;
       width: 24px;
       height: 24px;
-      border: 2px solid var(--wjh-close-btn-color, rgba(33, 224, 163, 1));
+      border: 2px solid var(--ngs-close-btn-color, rgba(33, 224, 163, 1));
       border-radius: 50%;
       background: transparent;
       cursor: pointer;
       z-index: 1012;
     }
 
-    .wjh-close-btn::before,
-    .wjh-close-btn::after {
+    .ngs-close-btn::before,
+    .ngs-close-btn::after {
       content: '';
       position: absolute;
       width: 60%;
@@ -408,20 +408,20 @@ export interface OverlayState {
       background: white;
     }
 
-    .wjh-close-btn::before { transform: rotate(45deg); }
-    .wjh-close-btn::after { transform: rotate(-45deg); }
+    .ngs-close-btn::before { transform: rotate(45deg); }
+    .ngs-close-btn::after { transform: rotate(-45deg); }
 
-    .wjh-close-btn:hover {
+    .ngs-close-btn:hover {
       background: rgb(30, 205, 151);
     }
 
-    .wjh-close-btn:active {
+    .ngs-close-btn:active {
       border-color: rgba(33, 224, 163, 1);
       background: rgba(33, 224, 163, 1);
     }
 
     @media (max-width: 640px) {
-      .wjh-close-btn {
+      .ngs-close-btn {
         width: 32px;
         height: 32px;
         min-width: 44px;
@@ -434,7 +434,7 @@ export interface OverlayState {
     }
 
     /* Progress indicator */
-    .wjh-progress {
+    .ngs-progress {
       margin-top: 6px;
       font-size: 12px;
       opacity: 0.7;
@@ -442,7 +442,7 @@ export interface OverlayState {
     }
 
     /* Auto-advance countdown */
-    .wjh-countdown {
+    .ngs-countdown {
       margin-top: 4px;
       font-size: 11px;
       opacity: 0.6;
@@ -450,42 +450,42 @@ export interface OverlayState {
     }
 
     /* Step transition */
-    .wjh-transitioning .wjh-label,
-    .wjh-transitioning .wjh-arrow,
-    .wjh-transitioning .wjh-btn,
-    .wjh-transitioning .wjh-close-btn {
+    .ngs-transitioning .ngs-label,
+    .ngs-transitioning .ngs-arrow,
+    .ngs-transitioning .ngs-btn,
+    .ngs-transitioning .ngs-close-btn {
       opacity: 0;
       transition: opacity 150ms ease-out;
     }
 
     /* Dark theme overrides */
-    .wjh-theme-dark {
-      --wjh-btn-color: #333;
-      --wjh-btn-hover-color: white;
-      --wjh-label-color: #222;
-      --wjh-close-btn-color: #555;
-      --wjh-oversized-bg: #e8e8e8;
+    .ngs-theme-dark {
+      --ngs-btn-color: #333;
+      --ngs-btn-hover-color: white;
+      --ngs-label-color: #222;
+      --ngs-close-btn-color: #555;
+      --ngs-oversized-bg: #e8e8e8;
     }
 
-    .wjh-theme-dark .wjh-close-btn::before,
-    .wjh-theme-dark .wjh-close-btn::after {
+    .ngs-theme-dark .ngs-close-btn::before,
+    .ngs-theme-dark .ngs-close-btn::after {
       background: #333;
     }
 
     /* Focus indicators */
-    .wjh-btn:focus-visible,
-    .wjh-close-btn:focus-visible {
+    .ngs-btn:focus-visible,
+    .ngs-close-btn:focus-visible {
       outline: 2px solid white;
       outline-offset: 2px;
     }
 
-    .wjh-theme-dark .wjh-btn:focus-visible,
-    .wjh-theme-dark .wjh-close-btn:focus-visible {
+    .ngs-theme-dark .ngs-btn:focus-visible,
+    .ngs-theme-dark .ngs-close-btn:focus-visible {
       outline-color: #333;
     }
 
     /* Screen reader only */
-    .wjh-sr-only {
+    .ngs-sr-only {
       position: absolute;
       width: 1px;
       height: 1px;
@@ -498,16 +498,16 @@ export interface OverlayState {
     }
   `],
 })
-export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDestroy {
+export class GuidedStepsOverlayComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('labelEl') labelEl?: ElementRef<HTMLElement>;
 
   // Unique SVG IDs per instance to avoid collisions
   private instanceId = nextInstanceId++;
-  maskId = `wjh-mask-${this.instanceId}`;
-  markerId = `wjh-arrow-marker-${this.instanceId}`;
+  maskId = `ngs-mask-${this.instanceId}`;
+  markerId = `ngs-arrow-marker-${this.instanceId}`;
 
-  config: Required<WanejoyhintConfig>;
-  labels: Required<WanejoyhintLabels>;
+  config: Required<GuidedStepsConfig>;
+  labels: Required<GuidedStepsLabels>;
   state: OverlayState = {
     visible: false,
     stepIndex: 0,
@@ -547,9 +547,9 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   nextBtnText = 'Next';
   prevBtnText = 'Previous';
   skipBtnText = 'Skip';
-  nextBtnClass = 'wjh-btn wjh-next-btn';
-  prevBtnClass = 'wjh-btn wjh-prev-btn';
-  skipBtnClass = 'wjh-btn wjh-skip-btn';
+  nextBtnClass = 'ngs-btn ngs-next-btn';
+  prevBtnClass = 'ngs-btn ngs-prev-btn';
+  skipBtnClass = 'ngs-btn ngs-skip-btn';
 
   buttonPos: {
     prev: { x: number; y: number };
@@ -582,8 +582,8 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {
-    const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
-    this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
+    const userConfig = inject(GUIDED_STEPS_CONFIG, { optional: true });
+    this.config = { ...DEFAULT_CONFIG, ...userConfig } as Required<GuidedStepsConfig>;
     this.labels = { ...DEFAULT_LABELS, ...userConfig?.labels };
     // Backwards compat: if old *ButtonText was set but labels.* wasn't, use old value
     if (userConfig?.nextButtonText && !userConfig?.labels?.next) this.labels.next = userConfig.nextButtonText;
@@ -592,7 +592,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   }
 
   /** Update config at runtime (called by service before each tour) */
-  updateConfig(cfg: Required<WanejoyhintConfig>): void {
+  updateConfig(cfg: Required<GuidedStepsConfig>): void {
     this.config = cfg;
     this.labels = { ...DEFAULT_LABELS, ...cfg.labels };
     if (cfg.nextButtonText && !cfg.labels?.next) this.labels.next = cfg.nextButtonText;
@@ -691,14 +691,14 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
    * Called by the service to render a step.
    */
   renderStep(
-    step: WanejoyhintStep,
+    step: GuidedStep,
     stepIndex: number,
     totalSteps: number
   ): void {
     const margin = step.margin !== undefined ? step.margin : 10;
     const pos = this.positionService.resolveElementPosition(step.selector, margin);
     if (!pos) {
-      console.error(`Wanejoyhint: Element not found for selector "${step.selector}"`);
+      console.error(`GuidedSteps: Element not found for selector "${step.selector}"`);
       return;
     }
 
@@ -781,9 +781,9 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     this.skipBtnText = step.skipButton?.text || this.labels.skip;
 
     // Button classes
-    this.nextBtnClass = 'wjh-btn wjh-next-btn ' + (step.nextButton?.className || '');
-    this.prevBtnClass = 'wjh-btn wjh-prev-btn ' + (step.prevButton?.className || '');
-    this.skipBtnClass = 'wjh-btn wjh-skip-btn ' + (step.skipButton?.className || '');
+    this.nextBtnClass = 'ngs-btn ngs-next-btn ' + (step.nextButton?.className || '');
+    this.prevBtnClass = 'ngs-btn ngs-prev-btn ' + (step.prevButton?.className || '');
+    this.skipBtnClass = 'ngs-btn ngs-skip-btn ' + (step.skipButton?.className || '');
 
     // Compute label strings from templates
     const templateVars = { current: stepIndex + 1, total: totalSteps };
@@ -851,7 +851,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     // Create a temporary off-screen element to measure label
     const isMobile = window.innerWidth < 640;
     const tempLabel = document.createElement('div');
-    tempLabel.className = 'wjh-label';
+    tempLabel.className = 'ngs-label';
     tempLabel.style.position = 'absolute';
     tempLabel.style.visibility = 'hidden';
     tempLabel.style.maxWidth = isMobile ? '90%' : '80%';
@@ -1030,7 +1030,7 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
   }
 
   private trapFocus(e: KeyboardEvent): void {
-    const host = document.getElementById('wanejoyhint-host');
+    const host = document.getElementById('ngs-host');
     if (!host) return;
     const focusable = Array.from(host.querySelectorAll('button')) as HTMLElement[];
     if (focusable.length === 0) return;

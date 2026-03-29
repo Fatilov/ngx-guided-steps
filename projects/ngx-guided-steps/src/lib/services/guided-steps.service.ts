@@ -8,16 +8,16 @@ import {
 } from '@angular/core';
 import { Subject, Observable, Subscription } from 'rxjs';
 import {
-  WanejoyhintConfig,
+  GuidedStepsConfig,
   DEFAULT_CONFIG,
-  WANEJOYHINT_CONFIG,
-  WANEJOYHINT_ROUTER,
-  WanejoyhintRouter,
-} from '../models/wanejoyhint-config.model';
-import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
-import { WanejoyhintOverlayComponent } from '../components/wanejoyhint-overlay.component';
+  GUIDED_STEPS_CONFIG,
+  GUIDED_STEPS_ROUTER,
+  GuidedStepsRouter,
+} from '../models/config.model';
+import { GuidedStep } from '../models/step.model';
+import { GuidedStepsOverlayComponent } from '../components/overlay.component';
 
-export interface WanejoyhintEvents {
+export interface GuidedStepsEvents {
   onStart?: () => void;
   onEnd?: () => void;
   onSkip?: () => void;
@@ -25,13 +25,13 @@ export interface WanejoyhintEvents {
 }
 
 @Injectable({ providedIn: 'root' })
-export class WanejoyhintService {
-  private steps: WanejoyhintStep[] = [];
+export class GuidedStepsService {
+  private steps: GuidedStep[] = [];
   private currentStep = 0;
-  private overlayRef: ComponentRef<WanejoyhintOverlayComponent> | null = null;
-  private events: WanejoyhintEvents = {};
-  private config: Required<WanejoyhintConfig>;
-  private baseConfig: Required<WanejoyhintConfig>;
+  private overlayRef: ComponentRef<GuidedStepsOverlayComponent> | null = null;
+  private events: GuidedStepsEvents = {};
+  private config: Required<GuidedStepsConfig>;
+  private baseConfig: Required<GuidedStepsConfig>;
   private eventListenerCleanup: (() => void) | null = null;
   private customEventSub: Subscription | null = null;
   private running = false;
@@ -39,12 +39,12 @@ export class WanejoyhintService {
 
 
   // Observables for external consumers
-  private stepChange$ = new Subject<{ index: number; step: WanejoyhintStep }>();
+  private stepChange$ = new Subject<{ index: number; step: GuidedStep }>();
   private end$ = new Subject<void>();
   private skip$ = new Subject<void>();
 
   /** Emits on each step change */
-  get onStepChange(): Observable<{ index: number; step: WanejoyhintStep }> {
+  get onStepChange(): Observable<{ index: number; step: GuidedStep }> {
     return this.stepChange$.asObservable();
   }
 
@@ -68,20 +68,20 @@ export class WanejoyhintService {
 
   private appRef = inject(ApplicationRef);
   private injector = inject(EnvironmentInjector);
-  private router = inject(WANEJOYHINT_ROUTER, { optional: true });
+  private router = inject(GUIDED_STEPS_ROUTER, { optional: true });
 
   constructor() {
-    const userConfig = inject(WANEJOYHINT_CONFIG, { optional: true });
-    this.baseConfig = { ...DEFAULT_CONFIG, ...userConfig } as Required<WanejoyhintConfig>;
+    const userConfig = inject(GUIDED_STEPS_CONFIG, { optional: true });
+    this.baseConfig = { ...DEFAULT_CONFIG, ...userConfig } as Required<GuidedStepsConfig>;
     this.config = { ...this.baseConfig };
   }
 
   /**
    * Override global config for the next tour run.
-   * Merged on top of the global config provided via `provideWanejoyhint()`.
+   * Merged on top of the global config provided via `provideGuidedSteps()`.
    */
-  setConfig(overrides: Partial<WanejoyhintConfig>): void {
-    this.config = { ...this.baseConfig, ...overrides } as Required<WanejoyhintConfig>;
+  setConfig(overrides: Partial<GuidedStepsConfig>): void {
+    this.config = { ...this.baseConfig, ...overrides } as Required<GuidedStepsConfig>;
     // Propagate to overlay if it exists
     if (this.overlayRef) {
       this.overlayRef.instance.updateConfig(this.config);
@@ -91,9 +91,9 @@ export class WanejoyhintService {
   /**
    * Set the steps for the tutorial.
    */
-  setSteps(steps: WanejoyhintStep[]): void {
+  setSteps(steps: GuidedStep[]): void {
     if (!Array.isArray(steps) || steps.length === 0) {
-      throw new Error('Wanejoyhint: Steps array must not be empty.');
+      throw new Error('GuidedSteps: Steps array must not be empty.');
     }
     this.steps = steps;
   }
@@ -111,9 +111,9 @@ export class WanejoyhintService {
   /**
    * Start the tutorial from the beginning.
    */
-  run(events?: WanejoyhintEvents): void {
+  run(events?: GuidedStepsEvents): void {
     if (this.steps.length === 0) {
-      throw new Error('Wanejoyhint: No steps configured. Call setSteps() first.');
+      throw new Error('GuidedSteps: No steps configured. Call setSteps() first.');
     }
     this.events = events || {};
     this.currentStep = 0;
@@ -136,7 +136,7 @@ export class WanejoyhintService {
    */
   reRun(stepIndex: number): void {
     if (this.steps.length === 0) {
-      throw new Error('Wanejoyhint: No steps configured. Call setSteps() first.');
+      throw new Error('GuidedSteps: No steps configured. Call setSteps() first.');
     }
     this.currentStep = Math.max(0, Math.min(stepIndex, this.steps.length - 1));
     this.running = true;
@@ -215,14 +215,14 @@ export class WanejoyhintService {
     }
 
     // Remove any existing overlay
-    const existing = document.getElementById('wanejoyhint-host');
+    const existing = document.getElementById('ngs-host');
     if (existing) existing.remove();
 
     const hostEl = document.createElement('div');
-    hostEl.id = 'wanejoyhint-host';
+    hostEl.id = 'ngs-host';
     document.body.appendChild(hostEl);
 
-    this.overlayRef = createComponent(WanejoyhintOverlayComponent, {
+    this.overlayRef = createComponent(GuidedStepsOverlayComponent, {
       hostElement: hostEl,
       environmentInjector: this.injector,
     });
@@ -244,7 +244,7 @@ export class WanejoyhintService {
       this.overlayRef.destroy();
       this.overlayRef = null;
     }
-    const host = document.getElementById('wanejoyhint-host');
+    const host = document.getElementById('ngs-host');
     if (host) host.remove();
   }
 
@@ -282,7 +282,7 @@ export class WanejoyhintService {
     this._scheduleStep(step);
   }
 
-  private _scheduleStep(step: WanejoyhintStep): void {
+  private _scheduleStep(step: GuidedStep): void {
     const timeout = step.timeout || 0;
 
     const outerTimeout = setTimeout(async () => {
@@ -300,7 +300,7 @@ export class WanejoyhintService {
       // Wait for the element (with optional polling)
       const el = await this.waitForElement(step.selector, step.waitForSelector);
       if (!el) {
-        console.error(`Wanejoyhint: Element "${step.selector}" not found after waiting.`);
+        console.error(`GuidedSteps: Element "${step.selector}" not found after waiting.`);
         this.stop();
         return;
       }
@@ -364,7 +364,7 @@ export class WanejoyhintService {
     });
   }
 
-  private setupEventListeners(step: WanejoyhintStep, el: Element): void {
+  private setupEventListeners(step: GuidedStep, el: Element): void {
     const eventType = step.eventType || 'next';
 
     switch (eventType) {

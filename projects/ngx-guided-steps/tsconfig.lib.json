@@ -8,7 +8,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "inlineSources": true,
-    "outDir": "../../dist/wanejoyhint",
+    "outDir": "../../dist/ngx-guided-steps",
     "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,

@@ -1,13 +1,13 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideRouter, Router } from '@angular/router';
 import { AppComponent } from './app/app.component';
-import { provideWanejoyhint, WANEJOYHINT_ROUTER } from '../../projects/wanejoyhint/src/public-api';
+import { provideGuidedSteps, GUIDED_STEPS_ROUTER } from '../../projects/ngx-guided-steps/src/public-api';
 import { routes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideRouter(routes),
-    provideWanejoyhint({
+    provideGuidedSteps({
       backgroundColor: 'rgba(0,0,0,0.65)',
       showProgress: true,
       keyboardNav: true,
@@ -21,6 +21,6 @@ bootstrapApplication(AppComponent, {
         stepAnnouncement: 'Etape {{current}} sur {{total}} : {{description}}',
       },
     }),
-    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+    { provide: GUIDED_STEPS_ROUTER, useExisting: Router },
   ],
 }).catch((err) => console.error(err));

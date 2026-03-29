@@ -1,26 +1,29 @@
 {
-  "name": "wanejoyhint",
+  "name": "ngx-guided-steps",
   "version": "1.0.0",
-  "description": "Angular interactive tutorial and hint library, inspired by EnjoyHint.",
+  "description": "Angular library for interactive guided tours, onboarding walkthroughs, and step-by-step tutorials with SVG overlays and WCAG accessibility.",
   "scripts": {
     "build": "ng build demo --configuration=production",
     "build:dev": "ng build demo --configuration=development",
     "serve": "ng serve demo",
-    "build:lib": "ng build wanejoyhint --configuration=production",
+    "build:lib": "ng build ngx-guided-steps --configuration=production",
     "lint": "tsc --noEmit --project demo/tsconfig.app.json",
     "test": "jest --config jest.config.ts"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/fatilov/wanejoyhint"
+    "url": "https://github.com/fatilov/ngx-guided-steps"
   },
   "keywords": [
     "angular",
-    "tutorial",
-    "hint",
+    "guided-tour",
     "onboarding",
-    "enjoyhint",
-    "wanejoyhint"
+    "walkthrough",
+    "tutorial",
+    "step-by-step",
+    "ngx-guided-steps",
+    "interactive-guide",
+    "overlay"
   ],
   "engines": {
     "node": ">=20"

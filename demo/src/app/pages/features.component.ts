@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-api';
+import { GuidedStepsService } from '../../../../projects/ngx-guided-steps/src/public-api';
 
 @Component({
   selector: 'app-features',
@@ -12,7 +12,7 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
       <div class="container hero-bar-inner">
         <div>
           <h1>Parcours complet</h1>
-          <p>Un seul tour, <b>toutes</b> les fonctionnalites de Wanejoyhint.</p>
+          <p>Un seul tour, <b>toutes</b> les fonctionnalites de ngx-guided-steps.</p>
         </div>
         <button class="btn btn-start" id="btn-start-tour" (click)="startTour()">
           &#9654; Lancer le tour
@@ -460,7 +460,7 @@ hint.isRunning; hint.getCurrentStep();</code></pre></div>
   `],
 })
 export class FeaturesComponent implements OnDestroy {
-  hint = inject(WanejoyhintService);
+  hint = inject(GuidedStepsService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
   logs: { time: string; message: string; type: 'info' | 'success' | 'warn' }[] = [];
@@ -528,7 +528,7 @@ export class FeaturesComponent implements OnDestroy {
       // Step 1: Welcome
       {
         selector: '#section-shapes',
-        description: 'Bienvenue ! Ce tour couvre <b>toutes</b> les fonctionnalites de Wanejoyhint.',
+        description: 'Bienvenue ! Ce tour couvre <b>toutes</b> les fonctionnalites de ngx-guided-steps.',
         eventType: 'next',
       },
       // Step 2: Circle shape

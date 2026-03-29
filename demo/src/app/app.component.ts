@@ -9,7 +9,7 @@ import { ThemeToggleComponent } from './components/theme-toggle.component';
   template: `
     <nav class="navbar" id="navbar">
       <a class="navbar-brand" routerLink="/">
-        <span class="brand-icon">&#9670;</span> Wanejoyhint
+        <span class="brand-icon">&#9670;</span> ngx-guided-steps
       </a>
       <div class="navbar-links">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" id="nav-home">Accueil</a>
@@ -23,11 +23,11 @@ import { ThemeToggleComponent } from './components/theme-toggle.component';
       <router-outlet />
     </main>
     <footer class="footer" id="footer">
-      <p>Wanejoyhint v1.1.0 &mdash; Bibliotheque Angular de tutoriels interactifs</p>
+      <p>ngx-guided-steps v1.0.0 &mdash; Bibliotheque Angular de tutoriels interactifs</p>
       <p class="footer-links">
-        <a href="https://github.com/fatilov/wanejoyhint" target="_blank">GitHub</a>
+        <a href="https://github.com/fatilov/ngx-guided-steps" target="_blank">GitHub</a>
         <span>&bull;</span>
-        <a href="https://www.npmjs.com/package/wanejoyhint" target="_blank">npm</a>
+        <a href="https://www.npmjs.com/package/ngx-guided-steps" target="_blank">npm</a>
       </p>
     </footer>
   `,

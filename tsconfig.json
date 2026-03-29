@@ -15,7 +15,7 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "wanejoyhint": ["projects/wanejoyhint/src/public-api"]
+      "ngx-guided-steps": ["projects/ngx-guided-steps/src/public-api"]
     }
   }
 }

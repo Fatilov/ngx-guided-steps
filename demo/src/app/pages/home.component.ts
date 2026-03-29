@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
     <section class="hero">
       <div class="hero-content">
         <div class="hero-badge">Angular 18+</div>
-        <h1 class="hero-title">Wanejoyhint</h1>
+        <h1 class="hero-title">ngx-guided-steps</h1>
         <p class="hero-accent-subtitle">Tutoriels interactifs pour Angular 18+</p>
         <p class="hero-description">
           Overlays SVG, fleches animees, themes, i18n, navigation cross-routes.
@@ -61,7 +61,7 @@ import { RouterLink } from '@angular/router';
                   <span class="dot dot--green"></span>
                 </div>
               </div>
-              <pre class="code-block-body"><code>npm install wanejoyhint</code></pre>
+              <pre class="code-block-body"><code>npm install ngx-guided-steps</code></pre>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ import { RouterLink } from '@angular/router';
             </div>
             <h3 class="feature-title">i18n</h3>
             <p class="feature-desc">
-              Labels entierement personnalisables via <code>WanejoyhintLabels</code> et templates.
+              Labels entierement personnalisables via <code>GuidedStepsLabels</code> et templates.
             </p>
           </a>
 
@@ -966,24 +966,24 @@ import { RouterLink } from '@angular/router';
   `],
 })
 export class HomeComponent {
-  step2Code = `import { provideWanejoyhint, WANEJOYHINT_ROUTER } from 'wanejoyhint';
+  step2Code = `import { provideGuidedSteps, GUIDED_STEPS_ROUTER } from 'ngx-guided-steps';
 import { provideRouter, Router } from '@angular/router';
 
 export const appConfig = {
   providers: [
     provideRouter(routes),
-    provideWanejoyhint({
+    provideGuidedSteps({
       showProgress: true,
       labels: { next: 'Suivant', prev: 'Precedent', skip: 'Passer' },
     }),
-    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+    { provide: GUIDED_STEPS_ROUTER, useExisting: Router },
   ],
 };`;
 
-  step3Code = `import { WanejoyhintService, WanejoyhintStep } from 'wanejoyhint';
+  step3Code = `import { GuidedStepsService, GuidedStep } from 'ngx-guided-steps';
 
 export class AppComponent {
-  private hint = inject(WanejoyhintService);
+  private hint = inject(GuidedStepsService);
 
   startTour() {
     this.hint.setSteps([
