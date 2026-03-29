@@ -98,6 +98,58 @@ function isInViewport(box, device) {
 }
 
 // ============================
+// HELPERS
+// ============================
+
+/**
+ * Advance tour from step 1 to targetStep, handling all special steps.
+ * Assumes the tour is already started and on step 1.
+ */
+async function advanceToStep(page, targetStep) {
+  for (let current = 1; current < targetStep; current++) {
+    if (current === 4) {
+      // Step 4: click event — dispatch click on #demo-click-btn
+      await page.evaluate(() => {
+        const btn = document.querySelector('#demo-click-btn');
+        if (btn) btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      });
+      await page.waitForTimeout(500);
+    } else if (current === 5) {
+      // Step 5: key event — dispatch keydown Enter on #demo-key-input
+      await page.evaluate(() => {
+        const input = document.querySelector('#demo-key-input');
+        if (input) input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      });
+      await page.waitForTimeout(500);
+    } else if (current === 10 || current === 11) {
+      // Steps 10-11: auto-advance — poll for progress text change
+      const prefix = String(current);
+      for (let i = 0; i < 16; i++) {
+        await page.waitForTimeout(500);
+        const p = await getProgressText(page);
+        if (p && !p.startsWith(prefix)) break;
+      }
+    } else if (current === 13) {
+      // Step 13: custom event — poll for progress text change (3s auto next)
+      for (let i = 0; i < 12; i++) {
+        await page.waitForTimeout(500);
+        const p = await getProgressText(page);
+        if (p && !p.startsWith('13')) break;
+      }
+    } else if (current === 14) {
+      // Step 14: timeout step — wait 1000ms then click next
+      await page.waitForTimeout(1000);
+      await clickButton(page, '.wjh-next-btn');
+      await page.waitForTimeout(500);
+    } else {
+      // Normal step: click next
+      await clickButton(page, '.wjh-next-btn');
+      await page.waitForTimeout(500);
+    }
+  }
+}
+
+// ============================
 // TEST SUITES
 // ============================
 
@@ -374,9 +426,51 @@ async function testCompleteTourWalkthrough(page, device) {
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(500);
 
-  // === STEP 15: onBeforeStart + waitForSelector (modal opens) ===
-  // onBeforeStart opens modal, waitForSelector polls for 3s max
-  // Poll for modal to appear
+  // === STEP 15: Dark theme (#demo-theme-dark) ===
+  await waitForOverlay(page);
+  const darkThemeClass = await page.$('.wjh-overlay.wjh-theme-dark');
+  darkThemeClass
+    ? logOk(`[${device.label}] Step 15: .wjh-theme-dark class present on overlay`)
+    : logFail(`[${device.label}] Step 15: .wjh-theme-dark class missing on overlay`);
+  await screenshot(page, `${device.name}_16_step15-dark-theme`);
+
+  // === STEP 16: Light theme (#demo-theme-light) ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+  const darkThemeGone = !(await page.$('.wjh-overlay.wjh-theme-dark'));
+  darkThemeGone
+    ? logOk(`[${device.label}] Step 16: .wjh-theme-dark class NOT present (light theme)`)
+    : logFail(`[${device.label}] Step 16: .wjh-theme-dark class still present`);
+  await screenshot(page, `${device.name}_17_step16-light-theme`);
+
+  // === STEP 17: i18n French (#demo-i18n-fr) ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+  const nextBtn17 = await page.$('.wjh-next-btn');
+  if (nextBtn17) {
+    const text17 = (await nextBtn17.textContent()).trim();
+    text17 === 'Suivant'
+      ? logOk(`[${device.label}] Step 17: Next button text is "Suivant" (French)`)
+      : logFail(`[${device.label}] Step 17: Expected "Suivant", got "${text17}"`);
+  }
+  await screenshot(page, `${device.name}_18_step17-i18n-fr`);
+
+  // === STEP 18: i18n English (#demo-i18n-en) ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+  const nextBtn18 = await page.$('.wjh-next-btn');
+  if (nextBtn18) {
+    const text18 = (await nextBtn18.textContent()).trim();
+    text18 === 'Next'
+      ? logOk(`[${device.label}] Step 18: Next button text is "Next" (English)`)
+      : logFail(`[${device.label}] Step 18: Expected "Next", got "${text18}"`);
+  }
+  await screenshot(page, `${device.name}_19_step18-i18n-en`);
+
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+
+  // === STEP 19: onBeforeStart + waitForSelector (modal opens) ===
   log(`  Waiting for modal to open via onBeforeStart...`);
   let modalHeader = null;
   for (let i = 0; i < 12; i++) {
@@ -385,60 +479,118 @@ async function testCompleteTourWalkthrough(page, device) {
     if (modalHeader) break;
   }
   modalHeader
-    ? logOk(`[${device.label}] Step 15: Modal opened via onBeforeStart`)
-    : logFail(`[${device.label}] Step 15: Modal not opened`);
+    ? logOk(`[${device.label}] Step 19: Modal opened via onBeforeStart`)
+    : logFail(`[${device.label}] Step 19: Modal not opened`);
 
-  await screenshot(page, `${device.name}_16_step15-modal`);
+  await screenshot(page, `${device.name}_20_step19-modal`);
 
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(400);
 
-  // === STEP 16: Inside modal ===
-  await screenshot(page, `${device.name}_17_step16-modal-body`);
-  logOk(`[${device.label}] Step 16: Targeting element inside modal`);
+  // === STEP 20: Inside modal ===
+  await screenshot(page, `${device.name}_21_step20-modal-body`);
+  logOk(`[${device.label}] Step 20: Targeting element inside modal`);
 
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(500);
 
-  // === STEP 17: API state (modal closed via onBeforeStart) ===
-  await screenshot(page, `${device.name}_18_step17-api`);
+  // === STEP 21: API state (modal closed via onBeforeStart) ===
+  await screenshot(page, `${device.name}_22_step21-api`);
 
   const modalGone = !(await page.$('#demo-modal-header'));
   modalGone
-    ? logOk(`[${device.label}] Step 17: Modal closed via onBeforeStart`)
-    : log(`[${device.label}] Step 17: Modal may still be visible`);
+    ? logOk(`[${device.label}] Step 21: Modal closed via onBeforeStart`)
+    : log(`[${device.label}] Step 21: Modal may still be visible`);
 
   await clickButton(page, '.wjh-next-btn');
   await page.waitForTimeout(400);
 
-  // === STEP 18: Event log ===
-  await screenshot(page, `${device.name}_19_step18-log`);
+  // === STEP 22: Event log ===
+  await screenshot(page, `${device.name}_23_step22-log`);
 
   const logEntries = await page.$$('.log-entry');
   logEntries.length > 0
-    ? logOk(`[${device.label}] Step 18: Event log has ${logEntries.length} entries`)
-    : logFail(`[${device.label}] Step 18: Event log empty`);
+    ? logOk(`[${device.label}] Step 22: Event log has ${logEntries.length} entries`)
+    : logFail(`[${device.label}] Step 22: Event log empty`);
 
   await clickButton(page, '.wjh-next-btn');
-  await page.waitForTimeout(400);
+  await page.waitForTimeout(500);
 
-  // === STEP 19: Final step — finish tour ===
-  await screenshot(page, `${device.name}_20_step19-final`);
-
-  // Click next until tour finishes (handles any step offset from timing)
-  for (let i = 0; i < 5; i++) {
-    const hasNext = await page.$('.wjh-next-btn');
-    if (!hasNext) break;
-    await clickButton(page, '.wjh-next-btn');
+  // === STEP 23: Cross-route to /dashboard (#dashboard-stats) ===
+  // Wait for URL to contain '/dashboard' (poll up to 8s)
+  log(`  Waiting for cross-route navigation to /dashboard...`);
+  for (let i = 0; i < 16; i++) {
+    const pathname = await page.evaluate(() => window.location.pathname);
+    if (pathname.includes('/dashboard')) break;
     await page.waitForTimeout(500);
   }
+  const pathname23 = await page.evaluate(() => window.location.pathname);
+  pathname23.includes('/dashboard')
+    ? logOk(`[${device.label}] Step 23: URL changed to ${pathname23}`)
+    : logFail(`[${device.label}] Step 23: URL did not change to /dashboard (got ${pathname23})`);
+
+  // Wait for #dashboard-stats element (poll up to 5s)
+  for (let i = 0; i < 10; i++) {
+    const el = await page.$('#dashboard-stats');
+    if (el) break;
+    await page.waitForTimeout(500);
+  }
+  const dashStats = await page.$('#dashboard-stats');
+  dashStats
+    ? logOk(`[${device.label}] Step 23: #dashboard-stats element present`)
+    : logFail(`[${device.label}] Step 23: #dashboard-stats element missing`);
+
+  const overlay23 = await waitForOverlay(page);
+  overlay23
+    ? logOk(`[${device.label}] Step 23: Overlay visible after cross-route`)
+    : logFail(`[${device.label}] Step 23: Overlay not visible after cross-route`);
+  await screenshot(page, `${device.name}_24_step23-dashboard`);
+
+  // === STEP 24: Dashboard chart (#dashboard-chart) ===
+  await clickButton(page, '.wjh-next-btn');
+  await waitForOverlay(page);
+  await page.waitForTimeout(400);
+  await screenshot(page, `${device.name}_25_step24-dashboard-chart`);
+
+  // === STEP 25: Final — back to /features (#section-shapes) ===
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+
+  // Wait for URL to contain '/features' (poll up to 8s)
+  log(`  Waiting for cross-route navigation back to /features...`);
+  for (let i = 0; i < 16; i++) {
+    const pathname = await page.evaluate(() => window.location.pathname);
+    if (pathname.includes('/features')) break;
+    await page.waitForTimeout(500);
+  }
+  const pathname25 = await page.evaluate(() => window.location.pathname);
+  pathname25.includes('/features')
+    ? logOk(`[${device.label}] Step 25: URL changed back to ${pathname25}`)
+    : logFail(`[${device.label}] Step 25: URL did not change to /features (got ${pathname25})`);
+
+  // Wait for #section-shapes element
+  for (let i = 0; i < 10; i++) {
+    const el = await page.$('#section-shapes');
+    if (el) break;
+    await page.waitForTimeout(500);
+  }
+
+  const overlay25 = await waitForOverlay(page);
+  overlay25
+    ? logOk(`[${device.label}] Step 25: Overlay visible after route back`)
+    : logFail(`[${device.label}] Step 25: Overlay not visible after route back`);
+  await screenshot(page, `${device.name}_26_step25-back-features`);
+
+  // Finish the tour
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
 
   const overlayGone = await waitForOverlayGone(page);
   overlayGone
     ? logOk(`[${device.label}] Tour completed, overlay removed`)
     : logFail(`[${device.label}] Overlay still present after tour completion`);
 
-  await screenshot(page, `${device.name}_21_tour-finished`);
+  await screenshot(page, `${device.name}_27_tour-finished`);
 }
 
 async function testCloseButton(page, device) {
@@ -819,6 +971,160 @@ async function testSVGMask(page, device) {
   await page.waitForTimeout(300);
 }
 
+async function testDarkTheme(page, device) {
+  log(`\n--- Dark Theme [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] DarkTheme: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Advance to step 15 (dark theme)
+  await advanceToStep(page, 15);
+  await waitForOverlay(page);
+  await page.waitForTimeout(400);
+
+  // Verify .wjh-theme-dark class on .wjh-overlay
+  const darkOverlay = await page.$('.wjh-overlay.wjh-theme-dark');
+  darkOverlay
+    ? logOk(`[${device.label}] DarkTheme: .wjh-theme-dark class present on overlay`)
+    : logFail(`[${device.label}] DarkTheme: .wjh-theme-dark class missing on overlay`);
+
+  // Verify backgroundColor changed (overlay rect fill should be light)
+  const rectFill = await page.evaluate(() => {
+    const rect = document.querySelector('.wjh-overlay svg rect[fill="white"]');
+    return rect ? rect.getAttribute('fill') : null;
+  });
+  rectFill
+    ? logOk(`[${device.label}] DarkTheme: Overlay rect fill is light ("${rectFill}")`)
+    : log(`[${device.label}] DarkTheme: Overlay rect fill not white (may use different selector)`);
+
+  // Advance to step 16 (light theme), verify .wjh-theme-dark is gone
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+
+  const darkGone = !(await page.$('.wjh-overlay.wjh-theme-dark'));
+  darkGone
+    ? logOk(`[${device.label}] DarkTheme: .wjh-theme-dark removed after switching to light`)
+    : logFail(`[${device.label}] DarkTheme: .wjh-theme-dark still present after switching to light`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testI18nSwitch(page, device) {
+  log(`\n--- i18n Switch [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] i18nSwitch: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Advance to step 18 (i18n English)
+  await advanceToStep(page, 18);
+  await page.waitForTimeout(400);
+
+  // Verify next button text is "Next" (English)
+  const nextBtn = await page.$('.wjh-next-btn');
+  if (nextBtn) {
+    const text = (await nextBtn.textContent()).trim();
+    text === 'Next'
+      ? logOk(`[${device.label}] i18nSwitch: Next button text is "Next" (English)`)
+      : logFail(`[${device.label}] i18nSwitch: Expected "Next", got "${text}"`);
+  } else {
+    logFail(`[${device.label}] i18nSwitch: Next button not found`);
+  }
+
+  // Verify skip button text is "Skip" (English)
+  const skipBtn = await page.$('.wjh-skip-btn');
+  if (skipBtn) {
+    const skipVisible = await skipBtn.isVisible();
+    if (skipVisible) {
+      const text = (await skipBtn.textContent()).trim();
+      text === 'Skip'
+        ? logOk(`[${device.label}] i18nSwitch: Skip button text is "Skip" (English)`)
+        : logFail(`[${device.label}] i18nSwitch: Expected "Skip", got "${text}"`);
+    } else {
+      log(`[${device.label}] i18nSwitch: Skip button not visible on this step`);
+    }
+  }
+
+  // Verify progress text contains "of" instead of "sur"
+  const progress = await getProgressText(page);
+  if (progress) {
+    progress.includes('of')
+      ? logOk(`[${device.label}] i18nSwitch: Progress text contains "of" (English): "${progress}"`)
+      : logFail(`[${device.label}] i18nSwitch: Progress text does not contain "of": "${progress}"`);
+  } else {
+    logFail(`[${device.label}] i18nSwitch: No progress text found`);
+  }
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
+async function testCrossRouteNavigation(page, device) {
+  log(`\n--- Cross-Route Navigation [${device.label}] ---`);
+
+  const started = await startTour(page);
+  if (!started) { logFail(`[${device.label}] CrossRoute: Tour failed to start`); return; }
+  await page.waitForTimeout(400);
+
+  // Advance to step 23 (cross-route to /dashboard)
+  await advanceToStep(page, 23);
+  await page.waitForTimeout(500);
+
+  // Wait for URL to change to /dashboard (poll up to 8s)
+  for (let i = 0; i < 16; i++) {
+    const pathname = await page.evaluate(() => window.location.pathname);
+    if (pathname.includes('/dashboard')) break;
+    await page.waitForTimeout(500);
+  }
+
+  const pathname23 = await page.evaluate(() => window.location.pathname);
+  pathname23.includes('/dashboard')
+    ? logOk(`[${device.label}] CrossRoute: URL changed to /dashboard`)
+    : logFail(`[${device.label}] CrossRoute: URL did not change to /dashboard (got ${pathname23})`);
+
+  // Verify #dashboard-stats is visible
+  for (let i = 0; i < 10; i++) {
+    const el = await page.$('#dashboard-stats');
+    if (el) break;
+    await page.waitForTimeout(500);
+  }
+  const dashStats = await page.$('#dashboard-stats');
+  dashStats
+    ? logOk(`[${device.label}] CrossRoute: #dashboard-stats is visible`)
+    : logFail(`[${device.label}] CrossRoute: #dashboard-stats not found`);
+
+  // Advance to step 24, verify #dashboard-chart targeted
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+  const dashChart = await page.$('#dashboard-chart');
+  dashChart
+    ? logOk(`[${device.label}] CrossRoute: #dashboard-chart is present on step 24`)
+    : logFail(`[${device.label}] CrossRoute: #dashboard-chart not found on step 24`);
+
+  // Advance to step 25, verify URL changed back to /features
+  await clickButton(page, '.wjh-next-btn');
+  await page.waitForTimeout(500);
+
+  for (let i = 0; i < 16; i++) {
+    const pathname = await page.evaluate(() => window.location.pathname);
+    if (pathname.includes('/features')) break;
+    await page.waitForTimeout(500);
+  }
+
+  const pathname25 = await page.evaluate(() => window.location.pathname);
+  pathname25.includes('/features')
+    ? logOk(`[${device.label}] CrossRoute: URL changed back to /features`)
+    : logFail(`[${device.label}] CrossRoute: URL did not change back to /features (got ${pathname25})`);
+
+  // Cleanup
+  await page.keyboard.press('Escape');
+  await page.waitForTimeout(300);
+}
+
 // ============================
 // MAIN RUNNER
 // ============================
@@ -865,6 +1171,9 @@ async function runAllTests() {
         await testI18nLabels(page, device);
         await testThemeDefault(page, device);
         await testEventLog(page, device);
+        await testDarkTheme(page, device);
+        await testI18nSwitch(page, device);
+        await testCrossRouteNavigation(page, device);
       }
 
       // Desktop-only tests (keyboard, accessibility, backdrop)

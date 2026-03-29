@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, inject, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-api';
 
@@ -132,6 +133,24 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
       </div>
     </section>
 
+    <!-- 6b. i18n -->
+    <section class="section section-white" id="section-i18n">
+      <div class="container">
+        <h2>6b. Internationalisation (i18n)</h2>
+        <p class="section-desc">Changement dynamique des labels via <code>setConfig()</code>.</p>
+        <div class="demo-row">
+          <div class="demo-card" id="demo-i18n-fr">
+            <h4>Francais</h4>
+            <p>Suivant, Precedent, Passer</p>
+          </div>
+          <div class="demo-card" id="demo-i18n-en">
+            <h4>English</h4>
+            <p>Next, Previous, Skip</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 7. Modal -->
     <section class="section section-white" id="section-modal">
       <div class="container">
@@ -155,6 +174,20 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
             </div>
           </div>
         }
+      </div>
+    </section>
+
+    <!-- 7b. Cross-route -->
+    <section class="section section-gray" id="section-crossroute">
+      <div class="container">
+        <h2>7b. Navigation cross-routes</h2>
+        <p class="section-desc">Le tour navigue vers <code>/dashboard</code> puis revient.</p>
+        <div class="demo-row">
+          <div class="demo-card" id="demo-crossroute-info">
+            <h4>Cross-route</h4>
+            <p>Le tour va naviguer vers le Dashboard, cibler un element, puis revenir ici.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -340,6 +373,7 @@ import { WanejoyhintService } from '../../../../projects/wanejoyhint/src/public-
 export class FeaturesComponent implements OnDestroy {
   hint = inject(WanejoyhintService);
   private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
   logs: { time: string; message: string; type: 'info' | 'success' | 'warn' }[] = [];
   modalOpen = false;
 
@@ -508,7 +542,72 @@ export class FeaturesComponent implements OnDestroy {
         timeout: 500,
         showPrev: true,
       },
-      // Step 15: onBeforeStart opens modal
+      // Step 15: Switch to dark theme
+      {
+        selector: '#demo-theme-dark',
+        description: 'Theme <b>dark</b> active via <code>setConfig()</code>.',
+        eventType: 'next',
+        showPrev: true,
+        onBeforeStart: () => {
+          this.hint.setConfig({
+            theme: 'dark',
+            backgroundColor: 'rgba(255,255,255,0.85)',
+            showProgress: true,
+            labels: {
+              next: 'Suivant',
+              prev: 'Precedent',
+              skip: 'Passer',
+              progress: '{{current}} sur {{total}}',
+            },
+          });
+        },
+      },
+      // Step 16: Switch back to light theme
+      {
+        selector: '#demo-theme-light',
+        description: 'Retour au theme <b>light</b> (defaut).',
+        eventType: 'next',
+        showPrev: true,
+        onBeforeStart: () => {
+          this.hint.setConfig({
+            theme: 'light',
+            backgroundColor: 'rgba(0,0,0,0.65)',
+            showProgress: true,
+            labels: {
+              next: 'Suivant',
+              prev: 'Precedent',
+              skip: 'Passer',
+              progress: '{{current}} sur {{total}}',
+            },
+          });
+        },
+      },
+      // Step 17: i18n French labels (already active)
+      {
+        selector: '#demo-i18n-fr',
+        description: 'Labels en <b>francais</b> : Suivant, Precedent, Passer.',
+        eventType: 'next',
+        showPrev: true,
+      },
+      // Step 18: Switch to English labels
+      {
+        selector: '#demo-i18n-en',
+        description: 'Labels switched to <b>English</b>: Next, Previous, Skip.',
+        eventType: 'next',
+        showPrev: true,
+        onBeforeStart: () => {
+          this.hint.setConfig({
+            showProgress: true,
+            labels: {
+              next: 'Next',
+              prev: 'Previous',
+              skip: 'Skip',
+              progress: '{{current}} of {{total}}',
+            },
+          });
+        },
+      },
+      // Step 19: onBeforeStart opens modal
       {
         selector: '#demo-modal-header',
         description: 'Le modal a ete ouvert via <b>onBeforeStart</b>.',
@@ -516,14 +615,14 @@ export class FeaturesComponent implements OnDestroy {
         waitForSelector: 3000,
         onBeforeStart: () => { this.modalOpen = true; this.cdr.detectChanges(); },
       },
-      // Step 16: Inside modal
+      // Step 20: Inside modal
       {
         selector: '#demo-modal-body',
         description: 'Navigation a l\'interieur du modal.',
         eventType: 'next',
         showPrev: true,
       },
-      // Step 17: API state (close modal first)
+      // Step 21: API state (close modal first)
       {
         selector: '#demo-api-state',
         description: '<b>isRunning</b>: true, <b>currentStep</b>: visible en temps reel.',
@@ -531,19 +630,48 @@ export class FeaturesComponent implements OnDestroy {
         showPrev: true,
         onBeforeStart: () => { this.modalOpen = false; this.cdr.detectChanges(); },
       },
-      // Step 18: Event log
+      // Step 22: Event log
       {
         selector: '#log-output',
         description: 'Journal des evenements en temps reel.',
         eventType: 'next',
         showPrev: true,
       },
-      // Step 19: Final
+      // Step 23: Navigate to dashboard
+      {
+        selector: '#dashboard-stats',
+        route: '/dashboard',
+        description: 'Navigation vers <b>/dashboard</b> ! Cet element est sur une autre page.',
+        eventType: 'next',
+        showPrev: true,
+        waitForSelector: 5000,
+        onBeforeStart: () => {
+          this.hint.setConfig({
+            showProgress: true,
+            labels: {
+              next: 'Suivant',
+              prev: 'Precedent',
+              skip: 'Passer',
+              progress: '{{current}} sur {{total}}',
+            },
+          });
+        },
+      },
+      // Step 24: Dashboard chart then navigate back
+      {
+        selector: '#dashboard-chart',
+        description: 'Un autre element du <b>Dashboard</b>. On revient aux fonctionnalites.',
+        eventType: 'next',
+        showPrev: true,
+      },
+      // Step 25: Final - back to features
       {
         selector: '#section-shapes',
+        route: '/features',
         description: 'Tour <b>complet</b> ! Toutes les fonctionnalites ont ete couvertes.',
         eventType: 'next',
         showPrev: true,
+        waitForSelector: 5000,
       },
     ]);
 

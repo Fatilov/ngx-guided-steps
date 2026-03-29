@@ -82,6 +82,10 @@ export class WanejoyhintService {
    */
   setConfig(overrides: Partial<WanejoyhintConfig>): void {
     this.config = { ...this.baseConfig, ...overrides } as Required<WanejoyhintConfig>;
+    // Propagate to overlay if it exists
+    if (this.overlayRef) {
+      this.overlayRef.instance.updateConfig(this.config);
+    }
   }
 
   /**
