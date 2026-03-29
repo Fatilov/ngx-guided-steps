@@ -10,7 +10,7 @@ import { RouterLink } from '@angular/router';
     <section class="hero">
       <div class="hero-content">
         <div class="hero-badge">Angular 18+</div>
-        <h1 class="hero-title">Wanejoyhint</h1>
+        <h1 class="hero-title">ngx-guided-steps</h1>
         <p class="hero-accent-subtitle">Tutoriels interactifs pour Angular 18+</p>
         <p class="hero-description">
           Overlays SVG, fleches animees, themes, i18n, navigation cross-routes.
@@ -61,7 +61,7 @@ import { RouterLink } from '@angular/router';
                   <span class="dot dot--green"></span>
                 </div>
               </div>
-              <pre class="code-block-body"><code>npm install wanejoyhint</code></pre>
+              <pre class="code-block-body"><code>npm install ngx-guided-steps</code></pre>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ import { RouterLink } from '@angular/router';
             </div>
             <h3 class="feature-title">i18n</h3>
             <p class="feature-desc">
-              Labels entierement personnalisables via <code>WanejoyhintLabels</code> et templates.
+              Labels entierement personnalisables via <code>GuidedStepsLabels</code> et templates.
             </p>
           </a>
 
@@ -207,11 +207,15 @@ import { RouterLink } from '@angular/router';
     :host {
       display: block;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
-      color: #1a1a2e;
+      color: var(--site-text);
       line-height: 1.6;
+      overflow-x: hidden;
+      max-width: 100%;
     }
 
-    * {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -220,17 +224,19 @@ import { RouterLink } from '@angular/router';
     code {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 0.85em;
-      background: rgba(30, 205, 151, 0.12);
-      color: #0e9a6e;
+      background: var(--site-code-inline-bg);
+      color: var(--site-accent);
       padding: 0.1em 0.35em;
       border-radius: 4px;
+      overflow-wrap: break-word;
+      word-break: break-all;
     }
 
     /* ------------------------------------------------------------------ */
     /* Hero                                                                */
     /* ------------------------------------------------------------------ */
     .hero {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       min-height: 92vh;
       display: flex;
       align-items: center;
@@ -254,13 +260,14 @@ import { RouterLink } from '@angular/router';
     .hero-content {
       flex: 1;
       max-width: 600px;
+      min-width: 0;
       z-index: 1;
     }
 
     .hero-badge {
       display: inline-block;
       background: rgba(30, 205, 151, 0.15);
-      color: #1ecd97;
+      color: var(--site-accent);
       border: 1px solid rgba(30, 205, 151, 0.3);
       border-radius: 20px;
       padding: 4px 14px;
@@ -275,14 +282,14 @@ import { RouterLink } from '@angular/router';
       font-size: clamp(2.6rem, 6vw, 4rem);
       font-weight: 800;
       line-height: 1.1;
-      color: #ffffff;
+      color: var(--site-chrome-text);
       margin-bottom: 12px;
       letter-spacing: -0.03em;
     }
 
     .hero-accent-subtitle {
       font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: #1ecd97;
+      color: var(--site-accent);
       font-weight: 600;
       margin-bottom: 20px;
     }
@@ -304,8 +311,11 @@ import { RouterLink } from '@angular/router';
     .btn {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       padding: 14px 28px;
+      min-height: 44px;
+      min-width: 44px;
       border-radius: 10px;
       font-size: 1rem;
       font-weight: 600;
@@ -317,17 +327,17 @@ import { RouterLink } from '@angular/router';
     }
 
     .btn:focus-visible {
-      outline: 3px solid #1ecd97;
+      outline: 3px solid var(--site-accent);
       outline-offset: 3px;
     }
 
     .btn-primary {
-      background: #1ecd97;
-      color: #0f1e17;
+      background: var(--site-accent);
+      color: var(--site-accent-text);
     }
 
     .btn-primary:hover {
-      background: #17b882;
+      background: var(--site-accent-hover);
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(30, 205, 151, 0.35);
     }
@@ -338,7 +348,7 @@ import { RouterLink } from '@angular/router';
 
     .btn-secondary {
       background: rgba(255, 255, 255, 0.08);
-      color: #ffffff;
+      color: var(--site-chrome-text);
       border: 1px solid rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(8px);
     }
@@ -389,7 +399,7 @@ import { RouterLink } from '@angular/router';
       position: absolute;
       bottom: -28px;
       right: 20px;
-      background: #1ecd97;
+      background: var(--site-accent);
       border-radius: 10px;
       padding: 10px 14px;
       display: flex;
@@ -416,7 +426,7 @@ import { RouterLink } from '@angular/router';
     /* Quick Start                                                         */
     /* ------------------------------------------------------------------ */
     .quickstart {
-      background: #f5f7fa;
+      background: var(--site-bg);
       padding: 96px 24px;
     }
 
@@ -429,14 +439,14 @@ import { RouterLink } from '@angular/router';
       font-size: clamp(1.75rem, 3vw, 2.4rem);
       font-weight: 800;
       text-align: center;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin-bottom: 12px;
       letter-spacing: -0.02em;
     }
 
     .section-subtitle {
       text-align: center;
-      color: #5a6472;
+      color: var(--site-text-secondary);
       font-size: 1.05rem;
       margin-bottom: 56px;
     }
@@ -465,8 +475,8 @@ import { RouterLink } from '@angular/router';
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1ecd97, #0e9a6e);
-      color: #ffffff;
+      background: linear-gradient(135deg, var(--site-accent), var(--site-accent-hover));
+      color: var(--site-chrome-text);
       font-weight: 800;
       font-size: 1rem;
       display: flex;
@@ -478,17 +488,18 @@ import { RouterLink } from '@angular/router';
     .step-label {
       font-size: 1.15rem;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--site-text);
     }
 
     .code-block {
       border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 8px 32px var(--site-shadow);
+      max-width: 100%;
     }
 
     .code-block-header {
-      background: #2d3748;
+      background: var(--site-code-bg);
       padding: 10px 16px;
       display: flex;
       align-items: center;
@@ -518,13 +529,16 @@ import { RouterLink } from '@angular/router';
     .dot--green  { background: #28c840; }
 
     .code-block-body {
-      background: #1a202c;
+      background: var(--site-code-bg);
       padding: 20px 24px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 0.85rem;
-      color: #cbd5e0;
+      color: var(--site-code-text);
       line-height: 1.65;
       overflow-x: auto;
+      overflow-wrap: break-word;
+      word-break: break-all;
+      max-width: 100%;
       margin: 0;
     }
 
@@ -534,13 +548,16 @@ import { RouterLink } from '@angular/router';
       font-size: inherit;
       padding: 0;
       font-family: inherit;
+      word-break: break-all;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
     }
 
     /* ------------------------------------------------------------------ */
     /* Features                                                            */
     /* ------------------------------------------------------------------ */
     .features {
-      background: #ffffff;
+      background: var(--site-surface);
       padding: 96px 24px;
     }
 
@@ -552,18 +569,18 @@ import { RouterLink } from '@angular/router';
 
     .feature-card {
       display: block;
-      background: #ffffff;
-      border: 1px solid #e8ecf0;
+      background: var(--site-surface);
+      border: 1px solid var(--site-surface-border);
       border-radius: 16px;
       padding: 28px 24px;
       text-decoration: none;
       color: inherit;
-      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.3s ease, color 0.3s ease;
     }
 
     .feature-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 16px 40px var(--site-shadow);
       border-color: rgba(30, 205, 151, 0.35);
     }
 
@@ -591,7 +608,7 @@ import { RouterLink } from '@angular/router';
     .icon-shape--svg {
       width: 22px;
       height: 22px;
-      border: 2.5px solid #1ecd97;
+      border: 2.5px solid var(--site-accent);
       border-radius: 4px;
       position: relative;
     }
@@ -619,7 +636,7 @@ import { RouterLink } from '@angular/router';
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #1a1a2e 50%, #f97316 50%);
+      background: linear-gradient(135deg, var(--site-hero-from) 50%, #f97316 50%);
       border: 2px solid #f97316;
     }
 
@@ -693,13 +710,13 @@ import { RouterLink } from '@angular/router';
     .feature-title {
       font-size: 1.05rem;
       font-weight: 700;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin-bottom: 8px;
     }
 
     .feature-desc {
       font-size: 0.9rem;
-      color: #5a6472;
+      color: var(--site-text-secondary);
       line-height: 1.65;
     }
 
@@ -707,7 +724,7 @@ import { RouterLink } from '@angular/router';
     /* Stats Bar                                                           */
     /* ------------------------------------------------------------------ */
     .stats {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       padding: 56px 24px;
     }
 
@@ -732,7 +749,7 @@ import { RouterLink } from '@angular/router';
     .stat-value {
       font-size: clamp(1.3rem, 2.5vw, 1.7rem);
       font-weight: 800;
-      color: #1ecd97;
+      color: var(--site-accent);
       letter-spacing: -0.02em;
       line-height: 1.1;
       white-space: nowrap;
@@ -769,6 +786,10 @@ import { RouterLink } from '@angular/router';
         min-height: auto;
       }
 
+      .hero-content {
+        max-width: 100%;
+      }
+
       .hero-description {
         max-width: 100%;
       }
@@ -783,15 +804,18 @@ import { RouterLink } from '@angular/router';
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 768px) {
       .feature-grid {
         grid-template-columns: 1fr;
       }
 
       .features,
-      .quickstart,
+      .quickstart {
+        padding: 72px 16px;
+      }
+
       .stats {
-        padding: 64px 16px;
+        padding: 48px 16px;
       }
 
       .hero {
@@ -800,6 +824,10 @@ import { RouterLink } from '@angular/router';
 
       .hero-visual {
         display: none;
+      }
+
+      .section-subtitle {
+        margin-bottom: 36px;
       }
 
       .code-block-body {
@@ -818,30 +846,144 @@ import { RouterLink } from '@angular/router';
       }
 
       .stat-item {
-        padding: 20px 24px;
+        padding: 16px 24px;
+      }
+
+      .btn {
+        padding: 12px 22px;
+        font-size: 0.95rem;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      }
+
+      .hero-actions .btn {
+        width: 100%;
+        max-width: 320px;
+        justify-content: center;
+      }
+
+      .step-label {
+        font-size: 1.05rem;
+      }
+
+      .feature-card {
+        padding: 22px 18px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .hero {
+        padding: 36px 12px 48px;
+      }
+
+      .features,
+      .quickstart {
+        padding: 48px 12px;
+      }
+
+      .stats {
+        padding: 36px 12px;
+      }
+
+      .hero-badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+        margin-bottom: 16px;
+      }
+
+      .hero-description {
+        margin-bottom: 28px;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .section-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 28px;
+      }
+
+      .code-block-body {
+        font-size: 0.7rem;
+        padding: 12px 10px;
+      }
+
+      .code-block-body code {
+        font-size: 0.7rem;
+      }
+
+      .code-block-header {
+        padding: 8px 10px;
+      }
+
+      .code-block-lang {
+        font-size: 0.68rem;
+      }
+
+      .dot {
+        width: 9px;
+        height: 9px;
+      }
+
+      .stat-value {
+        font-size: 1.1rem;
+      }
+
+      .stat-label {
+        font-size: 0.7rem;
+      }
+
+      .stat-item {
+        padding: 12px 16px;
+      }
+
+      .feature-card {
+        padding: 18px 14px;
+      }
+
+      .feature-title {
+        font-size: 0.95rem;
+      }
+
+      .feature-desc {
+        font-size: 0.85rem;
+      }
+
+      .steps-grid {
+        gap: 28px;
+      }
+
+      .btn {
+        padding: 12px 18px;
+        font-size: 0.9rem;
       }
     }
   `],
 })
 export class HomeComponent {
-  step2Code = `import { provideWanejoyhint, WANEJOYHINT_ROUTER } from 'wanejoyhint';
+  step2Code = `import { provideGuidedSteps, GUIDED_STEPS_ROUTER } from 'ngx-guided-steps';
 import { provideRouter, Router } from '@angular/router';
 
 export const appConfig = {
   providers: [
     provideRouter(routes),
-    provideWanejoyhint({
+    provideGuidedSteps({
       showProgress: true,
       labels: { next: 'Suivant', prev: 'Precedent', skip: 'Passer' },
     }),
-    { provide: WANEJOYHINT_ROUTER, useExisting: Router },
+    { provide: GUIDED_STEPS_ROUTER, useExisting: Router },
   ],
 };`;
 
-  step3Code = `import { WanejoyhintService, WanejoyhintStep } from 'wanejoyhint';
+  step3Code = `import { GuidedStepsService, GuidedStep } from 'ngx-guided-steps';
 
 export class AppComponent {
-  private hint = inject(WanejoyhintService);
+  private hint = inject(GuidedStepsService);
 
   startTour() {
     this.hint.setSteps([

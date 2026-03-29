@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ResolvedStepData } from '../models/wanejoyhint-step.model';
+import { ResolvedStepData } from '../models/step.model';
 
 export interface LabelPosition {
   x: number;

@@ -4,6 +4,6 @@
     "outDir": "./dist",
     "rootDir": ".."
   },
-  "include": ["src/**/*.ts", "../projects/wanejoyhint/src/**/*.ts"],
+  "include": ["src/**/*.ts", "../projects/ngx-guided-steps/src/**/*.ts"],
   "exclude": ["src/**/*.spec.ts"]
 }

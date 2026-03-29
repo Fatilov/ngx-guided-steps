@@ -44,14 +44,14 @@ import { RouterLink } from '@angular/router';
           <div class="card-number">1</div>
           <h2>Installation</h2>
           <p>Installez la librairie via npm :</p>
-          <pre class="code-block"><code>npm install wanejoyhint</code></pre>
+          <pre class="code-block"><code>npm install ngx-guided-steps</code></pre>
         </section>
 
         <!-- 2. Configuration globale -->
         <section class="card" id="config">
           <div class="card-number">2</div>
           <h2>Configuration globale</h2>
-          <p>Configurez Wanejoyhint au niveau de l'application dans votre fichier <code>app.config.ts</code>. Fournissez le router pour activer la navigation cross-routes.</p>
+          <p>Configurez ngx-guided-steps au niveau de l'application dans votre fichier <code>app.config.ts</code>. Fournissez le router pour activer la navigation cross-routes.</p>
           <pre class="code-block"><code [innerHTML]="codeConfig"></code></pre>
         </section>
 
@@ -119,7 +119,7 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="crossroute">
           <div class="card-number">8</div>
           <h2>Navigation cross-routes</h2>
-          <p>Le tour peut naviguer entre les pages de votre application. Utilisez la propriete <code>route</code> et <code>waitForSelector</code> pour cibler des elements sur d'autres pages. Le token <code>WANEJOYHINT_ROUTER</code> doit etre fourni dans la configuration.</p>
+          <p>Le tour peut naviguer entre les pages de votre application. Utilisez la propriete <code>route</code> et <code>waitForSelector</code> pour cibler des elements sur d'autres pages. Le token <code>GUIDED_STEPS_ROUTER</code> doit etre fourni dans la configuration.</p>
           <pre class="code-block"><code>// Etape sur une autre page
 {{ '{' }}
   selector: '#dashboard-stats',
@@ -148,7 +148,7 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="scroll">
           <div class="card-number">10</div>
           <h2>Scroll automatique</h2>
-          <p>Si l'element cible est hors du viewport, Wanejoyhint scrolle automatiquement vers lui. Configurez la vitesse de l'animation de scroll.</p>
+          <p>Si l'element cible est hors du viewport, ngx-guided-steps scrolle automatiquement vers lui. Configurez la vitesse de l'animation de scroll.</p>
           <pre class="code-block"><code>{{ '{' }} selector: '#hidden-el', scrollAnimationSpeed: 300, description: '...' {{ '}' }}</code></pre>
         </section>
 
@@ -156,8 +156,8 @@ hint.setConfig({{ '{' }} theme: 'dark', backgroundColor: 'rgba(255,255,255,0.85)
         <section class="card" id="api">
           <div class="card-number">11</div>
           <h2>API programmatique</h2>
-          <p>Controlez entierement le tour par code via le service <code>WanejoyhintService</code>. Injectez-le et utilisez les methodes suivantes :</p>
-          <pre class="code-block"><code>const hint = inject(WanejoyhintService);
+          <p>Controlez entierement le tour par code via le service <code>GuidedStepsService</code>. Injectez-le et utilisez les methodes suivantes :</p>
+          <pre class="code-block"><code>const hint = inject(GuidedStepsService);
 
 hint.setSteps(steps);
 hint.run({{ '{' }} onEnd: () =&gt; console.log('Done') {{ '}' }});
@@ -183,7 +183,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         <section class="card" id="a11y">
           <div class="card-number">13</div>
           <h2>Accessibilite (WCAG)</h2>
-          <p>Wanejoyhint est conforme aux bonnes pratiques d'accessibilite web :</p>
+          <p>ngx-guided-steps est conforme aux bonnes pratiques d'accessibilite web :</p>
           <dl class="a11y-list">
             <dt>role="dialog" + aria-modal="true"</dt>
             <dd>L'overlay est annonce comme un dialogue modal aux technologies d'assistance.</dd>
@@ -203,12 +203,12 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
           <div class="card-number">14</div>
           <h2>CSS Custom Properties</h2>
           <p>Personnalisez l'apparence de l'overlay avec les proprietes CSS custom suivantes :</p>
-          <pre class="code-block"><code>wanejoyhint-overlay {{ '{' }}
-  --wjh-btn-color: #6c63ff;
-  --wjh-btn-hover-color: white;
-  --wjh-label-color: #f0f0f0;
-  --wjh-label-font-size: 18px;
-  --wjh-close-btn-color: #6c63ff;
+          <pre class="code-block"><code>ngs-overlay {{ '{' }}
+  --ngs-btn-color: #6c63ff;
+  --ngs-btn-hover-color: white;
+  --ngs-label-color: #f0f0f0;
+  --ngs-label-font-size: 18px;
+  --ngs-close-btn-color: #6c63ff;
 {{ '}' }}</code></pre>
         </section>
 
@@ -217,49 +217,52 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
           <div class="card-number">15</div>
           <h2>Navigation clavier</h2>
           <p>Activez la navigation clavier pour permettre aux utilisateurs de controler le tour sans la souris.</p>
-          <table class="key-table">
-            <thead>
-              <tr>
-                <th>Touche</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><kbd>Arrow Right</kbd></td>
-                <td>Etape suivante</td>
-              </tr>
-              <tr>
-                <td><kbd>Arrow Left</kbd></td>
-                <td>Etape precedente</td>
-              </tr>
-              <tr>
-                <td><kbd>Escape</kbd></td>
-                <td>Fermer le tour</td>
-              </tr>
-              <tr>
-                <td><kbd>Tab</kbd></td>
-                <td>Focus trap (navigation entre boutons)</td>
-              </tr>
-            </tbody>
-          </table>
-          <pre class="code-block"><code>provideWanejoyhint({{ '{' }} keyboardNav: true {{ '}' }}) // defaut</code></pre>
+          <div class="table-scroll">
+            <table class="key-table">
+              <thead>
+                <tr>
+                  <th>Touche</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><kbd>Arrow Right</kbd></td>
+                  <td>Etape suivante</td>
+                </tr>
+                <tr>
+                  <td><kbd>Arrow Left</kbd></td>
+                  <td>Etape precedente</td>
+                </tr>
+                <tr>
+                  <td><kbd>Escape</kbd></td>
+                  <td>Fermer le tour</td>
+                </tr>
+                <tr>
+                  <td><kbd>Tab</kbd></td>
+                  <td>Focus trap (navigation entre boutons)</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre class="code-block"><code>provideGuidedSteps({{ '{' }} keyboardNav: true {{ '}' }}) // defaut</code></pre>
         </section>
 
       </main>
     </div>
   `,
   styles: [`
-    :host { display: block; }
+    :host { display: block; overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: border-box; }
 
     /* Hero header */
     .hero-bar {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      background: linear-gradient(135deg, var(--site-hero-from) 0%, var(--site-hero-to) 100%);
       padding: 48px 0 40px;
     }
     .hero-bar h1 {
       font-size: 2em;
-      color: white;
+      color: var(--site-surface);
       margin: 0 0 8px;
       font-weight: 800;
     }
@@ -304,15 +307,15 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       display: block;
       padding: 8px 14px;
       font-size: 13px;
-      color: #555;
+      color: var(--site-text-secondary);
       text-decoration: none;
       border-radius: 6px;
       transition: all 0.15s;
       line-height: 1.4;
     }
     .nav-link:hover {
-      background: #f0f2f5;
-      color: #1a1a2e;
+      background: var(--site-code-inline-bg);
+      color: var(--site-text);
     }
 
     /* Main content */
@@ -324,20 +327,21 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Cards */
     .card {
-      background: white;
-      border: 1px solid #e8ecf0;
+      background: var(--site-surface);
+      border: 1px solid var(--site-surface-border);
       border-radius: 14px;
       padding: 28px 32px;
       margin-bottom: 24px;
       position: relative;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 8px var(--site-shadow);
       scroll-margin-top: 20px;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
     .card:nth-child(even) {
-      border-left: 3px solid #1ecd97;
+      border-left: 3px solid var(--site-accent);
     }
     .card:nth-child(odd) {
-      border-left: 3px solid #6c63ff;
+      border-left: 3px solid var(--site-accent-secondary);
     }
 
     .card-number {
@@ -347,8 +351,8 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
       width: 28px;
       height: 28px;
       border-radius: 50%;
-      background: #1a1a2e;
-      color: white;
+      background: var(--site-text);
+      color: var(--site-surface);
       font-size: 13px;
       font-weight: 700;
       display: flex;
@@ -358,12 +362,12 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     .card h2 {
       font-size: 1.25em;
-      color: #1a1a2e;
+      color: var(--site-text);
       margin: 0 0 10px;
       font-weight: 700;
     }
     .card p {
-      color: #555;
+      color: var(--site-text-secondary);
       font-size: 14px;
       line-height: 1.7;
       margin: 0 0 16px;
@@ -371,7 +375,7 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Inline code */
     code {
-      background: #f0f2f5;
+      background: var(--site-code-inline-bg);
       padding: 2px 7px;
       border-radius: 4px;
       font-size: 13px;
@@ -380,13 +384,14 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
 
     /* Code blocks */
     .code-block {
-      background: #0d1117;
-      color: #c9d1d9;
+      background: var(--site-code-bg);
+      color: var(--site-code-text);
       padding: 18px 20px;
       border-radius: 10px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 13px;
       overflow-x: auto;
+      max-width: 100%;
       line-height: 1.65;
       margin: 0;
       white-space: pre;
@@ -407,11 +412,11 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     .a11y-list dt {
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
       font-size: 13px;
-      color: #1a1a2e;
+      color: var(--site-text);
       font-weight: 600;
       margin-top: 14px;
       padding: 4px 8px;
-      background: #f0f2f5;
+      background: var(--site-code-inline-bg);
       border-radius: 4px;
       display: inline-block;
     }
@@ -420,53 +425,62 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
     }
     .a11y-list dd {
       margin: 6px 0 0 0;
-      color: #666;
+      color: var(--site-text-secondary);
       font-size: 14px;
       line-height: 1.6;
+    }
+
+    /* Table scroll wrapper */
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
     }
 
     /* Keyboard table */
     .key-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
+      margin-bottom: 0;
       font-size: 14px;
     }
     .key-table th {
       text-align: left;
       padding: 10px 14px;
-      background: #f5f7fa;
-      color: #1a1a2e;
+      background: var(--site-bg);
+      color: var(--site-text);
       font-weight: 600;
       font-size: 13px;
-      border-bottom: 2px solid #e8ecf0;
+      border-bottom: 2px solid var(--site-surface-border);
     }
     .key-table td {
       padding: 10px 14px;
-      border-bottom: 1px solid #eee;
-      color: #555;
+      border-bottom: 1px solid var(--site-surface-border);
+      color: var(--site-text-secondary);
     }
     kbd {
-      background: #f0f2f5;
-      border: 1px solid #d0d4da;
+      background: var(--site-code-inline-bg);
+      border: 1px solid var(--site-surface-border);
       border-radius: 5px;
       padding: 3px 8px;
       font-size: 12px;
       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 1px 2px var(--site-shadow);
     }
 
-    /* Mobile */
+    /* Tablet */
     @media (max-width: 768px) {
       .hero-bar { padding: 32px 0 28px; }
       .hero-bar h1 { font-size: 1.5em; }
-      .layout { flex-direction: column; gap: 0; }
+      .container { padding: 0 16px; }
+      .layout { flex-direction: column; gap: 0; padding: 0 16px; }
       .sidebar {
         width: 100%;
         position: static;
         padding: 20px 0 0;
         max-height: none;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .sidebar-nav {
         flex-direction: row;
@@ -474,18 +488,40 @@ hint.setConfig({{ '{' }} ... {{ '}' }}); // runtime config override</code></pre>
         gap: 4px;
         padding-bottom: 12px;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
       }
       .nav-link {
         white-space: nowrap;
         padding: 6px 12px;
         font-size: 12px;
-        background: #f5f7fa;
+        background: var(--site-bg);
         border-radius: 20px;
       }
       .content { padding: 20px 0 60px; }
-      .card { padding: 22px 20px; }
+      .card { padding: 22px 20px; max-width: 100%; }
       .card h2 { font-size: 1.1em; }
       .code-block { font-size: 12px; padding: 14px 16px; }
+      .a11y-list dt { display: block; }
+    }
+
+    /* Small phones */
+    @media (max-width: 480px) {
+      .hero-bar { padding: 24px 0 20px; }
+      .hero-bar h1 { font-size: 1.25em; }
+      .hero-bar p { font-size: 14px; }
+      .container { padding: 0 12px; }
+      .layout { padding: 0 12px; }
+      .card { padding: 18px 14px; border-radius: 10px; }
+      .card h2 { font-size: 1em; }
+      .card p { font-size: 13px; }
+      .card-number { width: 24px; height: 24px; font-size: 11px; top: -10px; left: 14px; }
+      .code-block { font-size: 11px; padding: 12px 10px; border-radius: 8px; }
+      .nav-link { font-size: 11px; padding: 5px 10px; }
+      .key-table { font-size: 13px; }
+      .key-table th, .key-table td { padding: 8px 10px; }
+      kbd { font-size: 11px; padding: 2px 6px; }
+      .a11y-list dt { font-size: 12px; }
+      .a11y-list dd { font-size: 13px; }
     }
   `],
 })
@@ -495,9 +531,9 @@ export class AdvancedComponent {
 
   codeConfig =
 `<span style="color:#8b949e">// app.config.ts</span>
-<span style="color:#ff7b72">import</span> { provideWanejoyhint, WANEJOYHINT_ROUTER } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'wanejoyhint'</span>;
+<span style="color:#ff7b72">import</span> { provideGuidedSteps, GUIDED_STEPS_ROUTER } <span style="color:#ff7b72">from</span> <span style="color:#a5d6ff">'ngx-guided-steps'</span>;
 
-provideWanejoyhint({
+provideGuidedSteps({
   backgroundColor: <span style="color:#a5d6ff">'rgba(0,0,0,0.7)'</span>,
   showProgress: <span style="color:#79c0ff">true</span>,
   theme: <span style="color:#a5d6ff">'light'</span>,
@@ -511,7 +547,7 @@ provideWanejoyhint({
     progress: <span style="color:#a5d6ff">'{{current}} sur {{total}}'</span>,
   },
 }),
-{ provide: WANEJOYHINT_ROUTER, useExisting: Router },`;
+{ provide: GUIDED_STEPS_ROUTER, useExisting: Router },`;
 
   codeI18n =
 `hint.setConfig({

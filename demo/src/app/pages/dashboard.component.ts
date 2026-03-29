@@ -63,11 +63,11 @@ import { RouterLink } from '@angular/router';
 
     .dashboard-header h1 {
       font-size: 1.8em;
-      color: #1a1a2e;
+      color: var(--site-text);
     }
 
     .dashboard-header p {
-      color: #666;
+      color: var(--site-text-secondary);
     }
 
     .dashboard-grid {
@@ -77,16 +77,17 @@ import { RouterLink } from '@angular/router';
     }
 
     .dashboard-card {
-      background: white;
+      background: var(--site-surface);
       border-radius: 12px;
       padding: 20px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 12px var(--site-shadow);
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }
 
     .dashboard-card h3 {
       margin-bottom: 16px;
       font-size: 1em;
-      color: #333;
+      color: var(--site-text);
     }
 
     .stat-row {
@@ -103,12 +104,12 @@ import { RouterLink } from '@angular/router';
       display: block;
       font-size: 1.6em;
       font-weight: 700;
-      color: #1ecd97;
+      color: var(--site-accent);
     }
 
     .stat-label {
       font-size: 12px;
-      color: #999;
+      color: var(--site-text-tertiary);
     }
 
     .chart-placeholder {
@@ -121,7 +122,7 @@ import { RouterLink } from '@angular/router';
 
     .bar {
       flex: 1;
-      background: linear-gradient(to top, #1ecd97, #16a085);
+      background: linear-gradient(to top, var(--site-accent), var(--site-accent-hover));
       border-radius: 4px 4px 0 0;
       transition: height 0.3s;
     }
@@ -133,7 +134,7 @@ import { RouterLink } from '@angular/router';
 
     .activity-list li {
       padding: 8px 0;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--site-surface-border);
       font-size: 14px;
       display: flex;
       align-items: center;
@@ -148,11 +149,11 @@ import { RouterLink } from '@angular/router';
     }
 
     .dot.green {
-      background: #1ecd97;
+      background: var(--site-accent);
     }
 
     .dot.blue {
-      background: #6c63ff;
+      background: var(--site-accent-secondary);
     }
 
     .dot.orange {
@@ -165,9 +166,38 @@ import { RouterLink } from '@angular/router';
     }
 
     .back-link a {
-      color: #1ecd97;
+      color: var(--site-accent);
       text-decoration: none;
       font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        padding: 20px 12px;
+      }
+      .dashboard-header h1 {
+        font-size: 1.4em;
+      }
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+      .dashboard-card {
+        padding: 16px;
+      }
+      .stat-value {
+        font-size: 1.3em;
+      }
+      .stat-row {
+        gap: 12px;
+      }
+      .chart-placeholder {
+        height: 100px;
+        gap: 8px;
+      }
+      .activity-list li {
+        font-size: 13px;
+      }
     }
   `
 })

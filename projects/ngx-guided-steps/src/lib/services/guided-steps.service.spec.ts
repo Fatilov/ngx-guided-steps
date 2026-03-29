@@ -1,10 +1,10 @@
-import { WanejoyhintService } from './wanejoyhint.service';
-import { WanejoyhintStep } from '../models/wanejoyhint-step.model';
-import { DEFAULT_CONFIG, DEFAULT_LABELS, WANEJOYHINT_ROUTER } from '../models/wanejoyhint-config.model';
+import { GuidedStepsService } from './guided-steps.service';
+import { GuidedStep } from '../models/step.model';
+import { DEFAULT_CONFIG, DEFAULT_LABELS, GUIDED_STEPS_ROUTER } from '../models/config.model';
 import { Subject } from 'rxjs';
 
-function createServiceManually(): WanejoyhintService {
-  const svc = Object.create(WanejoyhintService.prototype);
+function createServiceManually(): GuidedStepsService {
+  const svc = Object.create(GuidedStepsService.prototype);
   svc['steps'] = [];
   svc['currentStep'] = 0;
   svc['overlayRef'] = null;
@@ -29,10 +29,10 @@ function createServiceManually(): WanejoyhintService {
   return svc;
 }
 
-describe('WanejoyhintService', () => {
-  let service: WanejoyhintService;
+describe('GuidedStepsService', () => {
+  let service: GuidedStepsService;
 
-  const makeStep = (overrides: Partial<WanejoyhintStep> = {}): WanejoyhintStep => ({
+  const makeStep = (overrides: Partial<GuidedStep> = {}): GuidedStep => ({
     selector: '.test-el',
     description: 'Test step',
     ...overrides,
@@ -57,7 +57,7 @@ describe('WanejoyhintService', () => {
       }
     } catch (_) { /* ignore */ }
     document.querySelectorAll('.test-el').forEach(el => el.remove());
-    document.querySelectorAll('#wanejoyhint-host').forEach(el => el.remove());
+    document.querySelectorAll('#ngs-host').forEach(el => el.remove());
   });
 
   describe('setSteps', () => {
@@ -348,11 +348,11 @@ describe('WanejoyhintService', () => {
     });
   });
 
-  describe('WanejoyhintRouter token', () => {
-    it('should define WANEJOYHINT_ROUTER as an InjectionToken', () => {
-      expect(WANEJOYHINT_ROUTER).toBeDefined();
-      expect(typeof WANEJOYHINT_ROUTER).toBe('object');
-      expect(WANEJOYHINT_ROUTER.toString()).toContain('InjectionToken');
+  describe('GuidedStepsRouter token', () => {
+    it('should define GUIDED_STEPS_ROUTER as an InjectionToken', () => {
+      expect(GUIDED_STEPS_ROUTER).toBeDefined();
+      expect(typeof GUIDED_STEPS_ROUTER).toBe('object');
+      expect(GUIDED_STEPS_ROUTER.toString()).toContain('InjectionToken');
     });
   });
 });

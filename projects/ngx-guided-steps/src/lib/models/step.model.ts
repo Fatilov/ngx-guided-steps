@@ -1,7 +1,7 @@
 /**
  * Configuration for a single tutorial step.
  */
-export interface WanejoyhintStep {
+export interface GuidedStep {
   /** CSS selector of the target element to highlight */
   selector: string;
 
@@ -82,7 +82,7 @@ export interface WanejoyhintStep {
 
   /**
    * Angular route to navigate to before executing this step.
-   * Requires a Router instance provided via `WANEJOYHINT_ROUTER` token or config.
+   * Requires a Router instance provided via `GUIDED_STEPS_ROUTER` token or config.
    * Example: '/dashboard', '/settings/profile'
    */
   route?: string;
@@ -109,7 +109,7 @@ export interface StepButtonConfig {
  * Internal resolved step data with computed positions.
  */
 export interface ResolvedStepData {
-  step: WanejoyhintStep;
+  step: GuidedStep;
   centerX: number;
   centerY: number;
   width: number;

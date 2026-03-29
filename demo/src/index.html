@@ -1,24 +1,64 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
-  <title>Wanejoyhint - Tutoriels interactifs pour Angular</title>
+  <title>ngx-guided-steps — Angular Guided Tour & Onboarding Library</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bibliotheque Angular de tutoriels interactifs avec overlays SVG, fleches animees et accessibilite WCAG.">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      color: #333;
-      background: #f5f7fa;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    code, pre, .mono { font-family: 'Fira Code', 'Courier New', monospace; }
-  </style>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="Angular library for interactive guided tours, onboarding walkthroughs, and step-by-step tutorials. SVG overlays, animated arrows, keyboard navigation, WCAG accessible. Zero dependencies.">
+  <meta name="keywords" content="angular guided tour, angular onboarding, angular walkthrough, angular tutorial, step by step, ngx-guided-steps, interactive guide, overlay, SVG, accessibility, WCAG">
+  <meta name="author" content="fatilov">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://ngx-guided-steps.vercel.app/">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="ngx-guided-steps — Angular Guided Tour Library">
+  <meta property="og:description" content="Create interactive guided tours for your Angular app. SVG overlays, animated arrows, keyboard navigation, i18n support, cross-route tours. Zero dependencies, WCAG accessible.">
+  <meta property="og:url" content="https://ngx-guided-steps.vercel.app/">
+  <meta property="og:site_name" content="ngx-guided-steps">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ngx-guided-steps — Angular Guided Tour Library">
+  <meta name="twitter:description" content="Interactive guided tours for Angular. SVG overlays, animated arrows, WCAG accessible, zero dependencies.">
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": "ngx-guided-steps",
+    "description": "Angular library for interactive guided tours, onboarding walkthroughs, and step-by-step tutorials with SVG overlays and WCAG accessibility.",
+    "codeRepository": "https://github.com/fatilov/ngx-guided-steps",
+    "programmingLanguage": ["TypeScript", "Angular"],
+    "runtimePlatform": "Angular 18+",
+    "license": "https://opensource.org/licenses/MIT",
+    "author": {
+      "@type": "Person",
+      "name": "fatilov",
+      "url": "https://github.com/fatilov"
+    },
+    "keywords": ["angular", "guided tour", "onboarding", "walkthrough", "tutorial", "overlay"]
+  }
+  </script>
+
+  <!-- Anti-FOUC theme script -->
+  <script>
+    (function() {
+      var t = localStorage.getItem('site-theme');
+      if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+      else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) document.documentElement.setAttribute('data-theme', 'dark');
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>
+  <noscript>
+    <p>ngx-guided-steps demo requires JavaScript to run. Please enable JavaScript in your browser.</p>
+  </noscript>
 </body>
 </html>
