@@ -1,13 +1,17 @@
 # Wanejoyhint
 
 [![npm version](https://img.shields.io/npm/v/wanejoyhint.svg)](https://www.npmjs.com/package/wanejoyhint)
-[![license](https://img.shields.io/npm/l/wanejoyhint.svg)](https://github.com/fatilov/wanejoyhint/blob/master/LICENSE)
+[![license](https://img.shields.io/npm/l/wanejoyhint.svg)](https://github.com/fatilov/wanejoyhint/blob/master/LICENSE.md)
+[![Angular](https://img.shields.io/badge/Angular-18%2B-dd0031.svg)](https://angular.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-pure-3178c6.svg)](https://www.typescriptlang.org/)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)]()
 
-Bibliotheque Angular 18+ de tutoriels interactifs. TypeScript pur, zero dependance jQuery.
+> Bibliotheque Angular 18+ de tutoriels interactifs. TypeScript pur, zero dependance jQuery.
+> Overlays SVG, fleches animees, support mobile complet, accessibilite WCAG.
 
-Inspiree de [EnjoyHint](https://github.com/xbsoftware/enjoyhint), reconstruite from scratch avec des composants standalone, des overlays SVG et un support mobile complet.
+Inspiree de [EnjoyHint](https://github.com/xbsoftware/enjoyhint), reconstruite from scratch avec des composants standalone Angular.
 
-**[Demo en ligne](https://wanejoyhint.vercel.app/)**
+**[Demo en ligne](https://wanejoyhint.vercel.app/)** | **[Changelog](https://github.com/fatilov/wanejoyhint/releases)**
 
 ---
 
@@ -17,22 +21,26 @@ Inspiree de [EnjoyHint](https://github.com/xbsoftware/enjoyhint), reconstruite f
 2. [Installation](#installation)
 3. [Demarrage rapide](#demarrage-rapide)
 4. [Configuration globale](#configuration-globale)
-5. [Definir les etapes](#definir-les-etapes)
-6. [Types d'evenements](#types-devenements)
-7. [Navigation clavier](#navigation-clavier)
-8. [Auto-avance (countdown)](#auto-avance-countdown)
-9. [Personnalisation des boutons](#personnalisation-des-boutons)
-10. [Formes de decoupe (rect / circle)](#formes-de-decoupe)
-11. [Callbacks et Observables](#callbacks-et-observables)
-12. [API programmatique](#api-programmatique)
-13. [Internationalisation (i18n)](#internationalisation-i18n)
-14. [Themes (light / dark)](#themes)
-15. [CSS Custom Properties](#css-custom-properties)
-16. [Accessibilite (WCAG)](#accessibilite-wcag)
-17. [Exemples complets](#exemples-complets)
-18. [Publication npm](#publication-npm)
-19. [Reference API](#reference-api)
-20. [License](#license)
+5. [Configuration dynamique (setConfig)](#configuration-dynamique-setconfig)
+6. [Definir les etapes](#definir-les-etapes)
+7. [Types d'evenements](#types-devenements)
+8. [Navigation clavier](#navigation-clavier)
+9. [Auto-avance (countdown)](#auto-avance-countdown)
+10. [Personnalisation des boutons](#personnalisation-des-boutons)
+11. [Formes de decoupe (rect / circle)](#formes-de-decoupe)
+12. [Navigation cross-routes](#navigation-cross-routes)
+13. [Support des modals](#support-des-modals)
+14. [Attente d'elements (waitForSelector)](#attente-delements-waitforselector)
+15. [Callbacks et Observables](#callbacks-et-observables)
+16. [API programmatique](#api-programmatique)
+17. [Internationalisation (i18n)](#internationalisation-i18n)
+18. [Themes (light / dark)](#themes)
+19. [CSS Custom Properties](#css-custom-properties)
+20. [Accessibilite (WCAG)](#accessibilite-wcag)
+21. [Exemples complets](#exemples-complets)
+22. [Publication npm](#publication-npm)
+23. [Reference API](#reference-api)
+24. [License](#license)
 
 ---
 
@@ -198,6 +206,61 @@ providers: [
 
 ---
 
+## Configuration dynamique (setConfig)
+
+`setConfig()` permet de modifier la configuration **en cours de tour** (theme, labels, progress...). Les changements sont appliques immediatement a l'overlay :
+
+```typescript
+// Changer le theme et les labels a mi-parcours
+this.hint.setConfig({
+  theme: 'dark',
+  backgroundColor: 'rgba(255,255,255,0.85)',
+  showProgress: true,
+  labels: {
+    next: 'Next',
+    prev: 'Previous',
+    skip: 'Skip',
+    progress: '{{current}} of {{total}}',
+  },
+});
+```
+
+### Cas d'usage typiques
+
+**Changer de langue dynamiquement :**
+
+```typescript
+{
+  selector: '#lang-switch',
+  description: 'Labels switched to <b>English</b>.',
+  onBeforeStart: () => {
+    this.hint.setConfig({
+      showProgress: true,
+      labels: { next: 'Next', prev: 'Previous', skip: 'Skip', progress: '{{current}} of {{total}}' },
+    });
+  },
+}
+```
+
+**Basculer le theme en cours de tour :**
+
+```typescript
+{
+  selector: '#dark-section',
+  description: 'Dark theme activé.',
+  onBeforeStart: () => {
+    this.hint.setConfig({
+      theme: 'dark',
+      backgroundColor: 'rgba(255,255,255,0.85)',
+    });
+  },
+}
+```
+
+> **Note :** `setConfig()` fusionne les overrides avec la config globale fournie via `provideWanejoyhint()`. Chaque appel repart de la config de base.
+
+---
+
 ## Definir les etapes
 
 Chaque etape est un objet `WanejoyhintStep`. Seuls `selector` et `description` sont requis :
@@ -234,8 +297,10 @@ const steps: WanejoyhintStep[] = [
 | `nextButton` | `StepButtonConfig` | - | Config du bouton Suivant |
 | `prevButton` | `StepButtonConfig` | - | Config du bouton Precedent |
 | `skipButton` | `StepButtonConfig` | - | Config du bouton Passer |
+| `route` | `string` | - | Route Angular vers laquelle naviguer avant cette etape |
+| `waitForSelector` | `boolean \| number` | - | Attend que l'element apparaisse (true = 10s, nombre = ms) |
 | `top/bottom/left/right` | `number` | `0` | Ajustements de la decoupe |
-| `onBeforeStart` | `() => void` | - | Callback avant le debut de l'etape |
+| `onBeforeStart` | `() => void \| Promise<void>` | - | Callback avant le debut de l'etape (supporte async) |
 | `onNext` | `() => void` | - | Callback quand Suivant est clique |
 | `onPrev` | `() => void` | - | Callback quand Precedent est clique |
 | `onSkip` | `() => void` | - | Callback quand Passer est clique |
@@ -903,6 +968,7 @@ npm publish --access public
 
 | Methode | Description |
 |---------|-------------|
+| `setConfig(overrides)` | Override la config pour le prochain tour ou en cours de tour |
 | `setSteps(steps)` | Definit les etapes du tour |
 | `validateSteps(): string[]` | Retourne les selecteurs absents du DOM |
 | `run(events?)` | Demarre le tour depuis le debut |
@@ -941,6 +1007,7 @@ import {
 
   // Configuration
   WANEJOYHINT_CONFIG,
+  WANEJOYHINT_ROUTER,
   provideWanejoyhint,
 
   // Composant (usage avance)
