@@ -53,6 +53,9 @@ export interface OverlayState {
       [class.wjh-theme-dark]="config.theme === 'dark'"
       [class.wjh-transitioning]="transitioning"
       [style.z-index]="config.zIndex"
+      [style.height]="vpHeight"
+      [style.width]="vpWidth"
+      [style.top.px]="vpTop"
       role="dialog"
       aria-modal="true"
       [attr.aria-label]="dialogLabel"
@@ -65,6 +68,8 @@ export interface OverlayState {
       <!-- SVG overlay with cutout -->
       <svg
         class="wjh-svg"
+        [style.height]="vpHeight"
+        [style.width]="vpWidth"
         aria-hidden="true"
       >
         <defs>
@@ -552,6 +557,11 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
     skip: { x: number; y: number };
   } | null = null;
 
+  // Visual viewport tracking (mobile keyboard)
+  vpHeight: string = '100dvh';
+  vpWidth: string = '100vw';
+  vpTop: number = 0;
+
   // Accessibility
   liveAnnouncement = '';
 
@@ -614,6 +624,27 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
           this.recalculate();
         }
       });
+
+    // Listen to visualViewport resize (fires when mobile keyboard opens/closes)
+    if (window.visualViewport) {
+      fromEvent(window.visualViewport, 'resize')
+        .pipe(debounceTime(100), takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.applyVisualViewport();
+          if (this.state.visible && this.state.step) {
+            this.recalculate();
+          }
+        });
+
+      fromEvent(window.visualViewport, 'scroll')
+        .pipe(debounceTime(50), takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.applyVisualViewport();
+          if (this.state.visible && this.state.step) {
+            this.recalculate();
+          }
+        });
+    }
 
     // Keyboard handling: ESC, arrow keys, Tab focus trap
     fromEvent<KeyboardEvent>(document, 'keydown')
@@ -979,6 +1010,23 @@ export class WanejoyhintOverlayComponent implements OnInit, AfterViewInit, OnDes
       this.countdownInterval = null;
     }
     this.countdownSeconds = 0;
+  }
+
+  private applyVisualViewport(): void {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    // Only apply if viewport is notably smaller than layout viewport (keyboard open)
+    const layoutH = window.innerHeight;
+    if (vv.height < layoutH - 50) {
+      this.vpHeight = `${vv.height}px`;
+      this.vpWidth = `${vv.width}px`;
+      this.vpTop = vv.offsetTop;
+    } else {
+      this.vpHeight = '100dvh';
+      this.vpWidth = '100vw';
+      this.vpTop = 0;
+    }
+    this.cdr.detectChanges();
   }
 
   private trapFocus(e: KeyboardEvent): void {
